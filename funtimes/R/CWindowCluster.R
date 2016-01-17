@@ -1,7 +1,7 @@
 CWindowCluster <- function(X, Alpha=NULL, Beta=NULL, Delta=NULL, Theta=0.8, p, w, s, Epsilon=1){
   T <- dim(X)[1]
   N <- dim(X)[2]
-  nWindows <- length(seq(from=1, to=T, by=s*p))
+  nWindows <- length(seq(from=p*w, to=T, by=s*p))
   Clusters <- array(NA, dim=c(w, N, nWindows))
   ClustersWithinWindow <- array(NA, dim=c(nWindows, N))
   #Separate data into windows

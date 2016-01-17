@@ -6,7 +6,7 @@ Non-parametric test for synchronism of parametric trends in multiple time series
 }
 
 \usage{
-sync.test(X, B=1000, Window=NULL, q=NULL, j=NULL, ar_order=NULL, BIC=TRUE, robust = TRUE)
+sync.test(X, B=1000, Window=NULL, q=NULL, j=NULL, ar_order=NULL, BIC=TRUE, robust=TRUE)
 }
 
 \arguments{
