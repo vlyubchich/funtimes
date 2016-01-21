@@ -11,6 +11,7 @@ i.tails(x, y, d=NULL)
 
 \arguments{
   \item{x,y}{vectors of the same length (preferably). Tail in \eqn{y} is compared against the tail in \eqn{x}. \eqn{x \ge d} is used to obtain interval width.}
+  
   \item{d}{a threshold defining the tail. The threshold is the same for both \eqn{x} and \eqn{y}. Default is \code{quantile(x, probs=0.99)}.}
 }
 
