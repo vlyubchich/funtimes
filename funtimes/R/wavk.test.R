@@ -1,4 +1,4 @@
-wavk.test <-
+wavk.test <- 
 function(x, factor.length=c("user.defined", "adaptive.selection"), 
 Window=round(0.1*length(x)), q=3/4, j=c(8:11), B=1000, 
 H0=c("no trend", "linear"), method=c("boot", "asympt"), 
