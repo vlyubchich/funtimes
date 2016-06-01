@@ -5,6 +5,7 @@ ar.order=NULL, BIC=TRUE, robust=TRUE, out=FALSE)
 {
     ### Perform various checks.
   
+  
     DNAME <- deparse(substitute(formula))
     DNAME <- substr(DNAME,1,1)
     x <- eval(parse(text = DNAME))
