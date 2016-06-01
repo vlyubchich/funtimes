@@ -4,6 +4,7 @@ Window=round(0.1*length(x)), q=3/4, j=c(8:11), B=1000,
 H0=c("no trend", "linear"), method=c("boot", "asympt"), 
 ar.order=NULL, BIC=TRUE, robust=TRUE, out=FALSE)
 {
+  
     ### Perform various checks.
     if (NCOL(x) > 1 | !is.numeric(x)) {
         stop("x is not a vector or univariate time series.")
