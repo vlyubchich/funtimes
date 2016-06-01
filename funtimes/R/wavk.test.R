@@ -4,7 +4,6 @@ Window=NULL, q=3/4, j=c(8:11), B=1000, method=c("boot", "asympt"),
 ar.order=NULL, BIC=TRUE, robust=TRUE, out=FALSE)
 {
     ### Perform various checks.
-    
     DNAME <- deparse(substitute(formula))
     DNAME <- substr(DNAME,1,1)
     x <- eval(parse(text = DNAME))
