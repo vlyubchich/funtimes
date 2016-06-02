@@ -1,65 +1,62 @@
-wavk.test.new.R <-
-function(formula, factor.length=c("user.defined", "adaptive.selection"), 
-Window=NULL, q=3/4, j=c(8:11), B=1000, method=c("boot", "asympt"), 
-ar.order=NULL, BIC=TRUE, robust=TRUE, out=FALSE)
-{
+wavk.test.new.R <- function(formula, factor.length=c("user.defined", "adaptive.selection"), 
+           Window=NULL, q=3/4, j=c(8:11), B=1000, method=c("boot", "asympt"), 
+           ar.order=NULL, BIC=TRUE, robust=TRUE, out=FALSE)
+  {
     ### Perform various checks.
-    DNAME <- deparse(substitute(formula))
-    DNAME <- substr(DNAME,1,1)
+    frml <- deparse(substitute(formula))
+    DNAME <- substr(frml,1,1)
     x <- eval(parse(text = DNAME))
-    
     if (is.null(Window)) {
       Window = round(0.1*length(x))
     }
-    
+    #browser()
     if (NCOL(x) > 1 | !is.numeric(x)) {
-        stop("x is not a vector or univariate time series.")
+      stop("x is not a vector or univariate time series.")
     }
-    
     n <- length(x)
     if (any(is.na(x))) {
-        stop("x contains missing values.")
+      stop("x contains missing values.")
     }
     if (any(ls() == "factor.length")) {
-        factor.length <- match.arg(factor.length)
+      factor.length <- match.arg(factor.length)
     } else {
-        factor.length <- "user.defined"
+      factor.length <- "user.defined"
     }
     if (NCOL(q) > 1 | !is.numeric(q) | NROW(q) > 1) {
-        stop("q is not a scalar.")
+      stop("q is not a scalar.")
     }
     if (q >= 1 | q <= 0) {
-        stop("q is out of range from 0 to 1.")
+      stop("q is out of range from 0 to 1.")
     }
     if (!is.vector(j) | !is.numeric(j)) {
-        stop("j is not a numeric vector.")
+      stop("j is not a numeric vector.")
     }
     if (factor.length == "user.defined") {
-        kn <- Window[1]
+      kn <- Window[1]
     } else {
-        kn <- length(x)*q^j
+      kn <- length(x)*q^j
     }
     kn <- unique(sort(floor(kn)))
     kn <- kn[kn > 2 & kn < n]
     if (length(kn) == 0) {
-        stop("set a proper window.")
+      stop("set a proper window.")
     }
     if (factor.length == "adaptive.selection" & length(kn) < 3) {
-        stop("number of possible windows is not enough for adaptive selection. Change parameters 'q' and/or 'j'.")
+      stop("number of possible windows is not enough for adaptive selection. Change parameters 'q' and/or 'j'.")
     }
     if (factor.length == "adaptive.selection") {
-        method <- "boot"
+      method <- "boot"
     }
     B <- round(B)
     if (B <= 0) {
-        stop("number of bootstrap samples B must be positive.")
+      stop("number of bootstrap samples B must be positive.")
     }
     method <- match.arg(method)
     if (!is.null(ar.order) & (NCOL(ar.order) > 1 | !is.numeric(ar.order) | NROW(ar.order) > 1)) {
-        stop("ar.order is not a scalar.")
+      stop("ar.order is not a scalar.")
     }
     if (!is.null(ar.order) && ar.order < 0) {
-          stop("ar.order must be non-negative.")
+      stop("ar.order must be non-negative.")
     }
     ### Function.
     #DNAME <- deparse(substitute(x))
@@ -67,21 +64,19 @@ ar.order=NULL, BIC=TRUE, robust=TRUE, out=FALSE)
     result <- matrix(NA, length(kn), 2)
     res <- matrix(NA, 1, 2)
     if (is.null(ar.order)) {
-        ar.order <- floor(10*log10(n))
+      ar.order <- floor(10*log10(n))
     }
-    
-        mod <- lm(formula)
-        linear <- mod$coefficients
-        TS <- mod$residuals
-        ALTERNATIVE <- "alternative form of trend"
-    
+    #browser()
+    mod <- lm(as.formula(frml))
+    linear <- mod$coefficients
+    TS <- mod$residuals
+    ALTERNATIVE <- "alternative form of trend"
     TS <- as.vector(TS)
-    
     if (ar.order > 0) {
-        if (BIC) {
-            bic <- rep(NA, ar.order)
-            if (robust){
-                for (i in 1:length(bic)) {
+      if (BIC) {
+        bic <- rep(NA, ar.order)
+        if (robust){
+          for (i in 1:length(bic)) {
             pheta_rob <- HVK(TS, ar.order=i)
             tmp <- filter(TS, pheta_rob, sides=1)
             et <- TS[(i+1):n] - tmp[i:(n-1)]
@@ -108,20 +103,17 @@ ar.order=NULL, BIC=TRUE, robust=TRUE, out=FALSE)
     } else { #ar.order==0, no filtering
       pheta <- numeric(0)
     }
-    
     if (length(pheta)>0) {
       tmp <- filter(x, pheta, sides=1)
       tmp2 <- filter(mod$fitted.values, pheta, sides=1)
       Z <- (x[(length(pheta)+1):n] - tmp[length(pheta):(n-1)]) - (mod$fitted.values[(length(pheta)+1):n] - tmp2[length(pheta):(n-1)])
       ESTIMATE <- list(linear, pheta)
       names(ESTIMATE) <- c("trend_coefficients", "AR_coefficients")
-      
     } else {
       Z <- TS
       ESTIMATE <- list(linear, pheta)
       names(ESTIMATE) <- c("trend_coefficients", "AR_coefficients")
     }
-    
     Z <- Z - mean(Z)
     sigma <- sqrt(sum(diff(Z)^2)/(2*(length(Z)-1)))
     if (method == "asympt") {

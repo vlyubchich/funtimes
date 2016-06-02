@@ -65,7 +65,7 @@ Wang, L., Akritas, M. G. and Van Keilegom, I. (2008) An ANOVA-type nonparametric
 Wang, L. and Van Keilegom, I. (2007) Nonparametric test for the form of parametric regression with time series errors. \emph{Statistica Sinica} 17, 369--386.
 }
 
-\author{Yulia R. Gel, Vyacheslav Lyubchich}
+\author{Yulia R. Gel, Vyacheslav Lyubchich, Ethan Schaeffer}
 
 \seealso{\code{\link{HVK}}, 
          \code{\link{WAVK}},
@@ -77,38 +77,45 @@ Wang, L. and Van Keilegom, I. (2007) Nonparametric test for the form of parametr
 # Fix seed for reproduceable simulations.
 set.seed(123)
 
-# Test for presence of a trend: ), with U~1; for linear trend, U~t; and for higher-order 
-# (e.g., quadratic) trend, with U~poly(t,2)
-# where t is a regular sequence on the interval (0,1].
-n <- 100
-t <- c(1:n)/n
-U <- 1+2 + arima.sim(n=n, list(order = c(2,0,0), ar = c(-0.7, -0.1)))
+#Simulate autoregressive time series of length n with smooth linear trend:
 
-# Test for quadratic trend with output of all results.
+n <- 100
+U <- 1+2*(1:n/n) + arima.sim(n=n, list(order = c(2,0,0), ar = c(-0.7, -0.1)))
+
+# Test for quadratic trend with m-out-of-n Windows selection and output of all results.
 \dontrun{
 wavk.test(U~poly(t,2), factor.length = "adaptive.selection", out=TRUE, B=1000)
 }
 # Sample output:
-##           	Trend test by Wang, Akritas and Van Keilegom
-
+##	Trend test by Wang, Akritas and Van Keilegom
+##
 ##data:  U
-##WAVK test statistic = -0.76134, adaptively selected window = 4, p-value = 0.532
+##WAVK test statistic = 0.54439, adaptively selected window = 4, p-value = 0.5
 ##alternative hypothesis: alternative form of trend
 ##sample estimates:
 ##$trend_coefficients
 ##(Intercept) poly(t, 2)1 poly(t, 2)2 
-##  3.0090287   0.5521614   1.0795380 
+##  2.0130509   5.8379526  -0.7139714 
 ##
 ##$AR_coefficients
-##     phi_1 
-##-0.6230489 
+##     phi_1      phi_2 
+##-0.6841828 -0.2432090 
 ##
 ##$all_considered_windows
 ## Window WAVK-statistic p-value
-##      4     -0.7613440   0.532
-##      5     -0.8945720   0.424
-##      7     -1.0321461   0.332
-##     10     -0.9431631   0.424
+##      4      0.5443881   0.500
+##      5      0.4987429   0.492
+##      7      0.5160588   0.410
+##     10      0.4505820   0.404
+
+# Test H0 of no trend (constant trend) using asymptotic distribution of statistic.
+wavk.test(U~1, method="asympt")
+##
+##	Trend test by Wang, Akritas and Van Keilegom
+##
+##data:  U
+##WAVK test statistic = 10.298, user-defined window = 10, p-value < 2.2e-16
+##alternative hypothesis: alternative form of trend
 }
 \keyword{ts}
 \keyword{htest}
