@@ -1,5 +1,11 @@
-sync.test <- function(X, B=1000, Window=NULL, 
+sync.test <- function(formula, B=1000, Window=NULL, 
                       q=NULL, j=NULL, ar_order=NULL, BIC=TRUE, robust = TRUE){
+  
+    frml <- deparse(substitute(formula))
+    frml <- strsplit(frml, "~")[[1]]
+    fh <- frml[1]
+    sh <- frml[2]
+    X <- eval(parse(text = fh))
     n <- nrow(X)
     K <- ncol(X)
     t <- c(1:n)/n
@@ -62,15 +68,15 @@ sync.test <- function(X, B=1000, Window=NULL,
     wavk_obs <- rep(NA, K)
     sigma <- rep(NA, K)
     OutputARorder <- matrix(NA, 1, K, dimnames=list("ar_order", dimnames(X)[[2]]))
-    OutputWindow <- matrix(NA, 1, K, dimnames=list("Window", dimnames(X)[[2]]))
-        
-    DNAME <- deparse(substitute(X))
+    OutputWindow <- matrix(NA, 1, K, dimnames=list("Window", dimnames(X)[[2]]))    
+    DNAME <- frml[1]
     X <- demean(X)
     vec <- apply(X, 2, sd)
     X <- sweep(X, MARGIN=2, 1/vec, `*`)
     beta0 <- apply(X,2,mean)
     AveragedProcess <- apply(X, 1, mean)
-    mod <- lm(AveragedProcess ~ t)  #common linear trend
+    placeholder = "AveragedProcess"
+    mod <- lm(as.formula(paste(placeholder, paste(sh), sep = "~")))  #common trend
     beta1 <- mod$fitted
     linear_trend <- summary(mod)$coefficients
 
@@ -175,7 +181,7 @@ sync.test <- function(X, B=1000, Window=NULL,
         }
     }
         
-    METHOD <- "Non-parametric test for synchronism of parametric linear trends"   
+    METHOD <- "Non-parametric test for synchronism of parametric trends"   
     names(STATISTIC) <- "Test statistic"
     ALTERNATIVE <- "trends are not synchronized."
     structure(list(method = METHOD, data.name = DNAME, statistic = STATISTIC,  p.value = P.VALUE,  alternative = ALTERNATIVE, estimate = ESTIMATE), class = "htest") 	

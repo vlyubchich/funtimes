@@ -4,12 +4,12 @@ wavk.test.new.R <- function(formula, factor.length=c("user.defined", "adaptive.s
   {
     ### Perform various checks.
     frml <- deparse(substitute(formula))
-    DNAME <- substr(frml,1,1)
+    splt <- strsplit(frml, "~")[[1]]
+    DNAME <- splt[1]
     x <- eval(parse(text = DNAME))
     if (is.null(Window)) {
       Window = round(0.1*length(x))
     }
-    #browser()
     if (NCOL(x) > 1 | !is.numeric(x)) {
       stop("x is not a vector or univariate time series.")
     }
@@ -66,7 +66,6 @@ wavk.test.new.R <- function(formula, factor.length=c("user.defined", "adaptive.s
     if (is.null(ar.order)) {
       ar.order <- floor(10*log10(n))
     }
-    #browser()
     mod <- lm(as.formula(frml))
     linear <- mod$coefficients
     TS <- mod$residuals
