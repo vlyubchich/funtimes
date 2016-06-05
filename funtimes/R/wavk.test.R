@@ -1,4 +1,4 @@
-wavk.test.new.R <- function(formula, factor.length=c("user.defined", "adaptive.selection"), 
+wavk.test <- function(formula, factor.length=c("user.defined", "adaptive.selection"), 
            Window=NULL, q=3/4, j=c(8:11), B=1000, method=c("boot", "asympt"), 
            ar.order=NULL, BIC=TRUE, robust=TRUE, out=FALSE)
   {
@@ -17,11 +17,7 @@ wavk.test.new.R <- function(formula, factor.length=c("user.defined", "adaptive.s
     if (any(is.na(x))) {
       stop("x contains missing values.")
     }
-    if (any(ls() == "factor.length")) {
-      factor.length <- match.arg(factor.length)
-    } else {
-      factor.length <- "user.defined"
-    }
+    factor.length <- match.arg(factor.length)
     if (NCOL(q) > 1 | !is.numeric(q) | NROW(q) > 1) {
       stop("q is not a scalar.")
     }

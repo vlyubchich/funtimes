@@ -2,7 +2,7 @@
 \alias{sync.test}
 \title{Time series trend synchronism test}
 \description{
-Non-parametric test for synchronism of parametric trends in multiple time series. The method tests whether \eqn{N} observed time series exhibit the same trend of some pre-specified smooth parametric form. Current version of the code assumes a linear trend \eqn{f(\theta,t) = \theta_0 + \theta_1t}, where \eqn{\theta}'s are trend parameters, \eqn{t} is a regular sequence on the interval (0,1]. Note that an assumption of `no trend' among all \eqn{N} observed time series is a subcase of a linear trend.
+Non-parametric test for synchronism of parametric trends in multiple time series. The method tests whether \eqn{N} observed time series exhibit the same trend of some pre-specified smooth parametric form. 
 }
 
 \usage{
@@ -10,7 +10,7 @@ sync.test(formula, B=1000, Window=NULL, q=NULL, j=NULL, ar_order=NULL, BIC=TRUE,
 }
 
 \arguments{
-  \item{formula}{an object of class "formula", specifying the form of the common parametric time trend to be tested. Variable 't' should be used to specify the form. See 'Details' and 'Examples' for more information.}
+  \item{formula}{an object of class "formula", specifying the form of the common parametric time trend to be tested. Variable \eqn{t} should be used to specify the form, where \eqn{t} is specified internally as a regular sequence on the interval (0,1]. See 'Examples'.}
 
   \item{B}{number of bootstrap resamples.} 
   
@@ -51,6 +51,8 @@ A list of class htest containing the following components:
 \references{
 Bickel, P. J. and Sakov, A. (2008) On the choice of \eqn{m} in the \eqn{m} out of \eqn{n} bootstrap and confidence bounds for extrema. \emph{Statistica Sinica} 18, 967--985.
 
+Lyubchich, V. and Gel, Y. R. (2016). A local factor nonparametric test for trend synchronism in multiple time series. \emph{Journal of Multivariate Analysis}, http://dx.doi.org/10.1016/j.jmva.2016.05.004
+
 Lyubchich, V., Gel, Y. R. and El-Shaarawi, A. (2013) On detecting non-monotonic trends in environmental time series: a fusion of local regression and bootstrap. \emph{Environmetrics} 24, 209--226.
 
 Wang, L., Akritas, M. G. and Van Keilegom, I. (2008) An ANOVA-type nonparametric diagnostic test for heteroscedastic regression models. \emph{Journal of Nonparametric Statistics} 20(5), 365--382.
@@ -58,7 +60,7 @@ Wang, L., Akritas, M. G. and Van Keilegom, I. (2008) An ANOVA-type nonparametric
 Wang, L. and Van Keilegom, I. (2007) Nonparametric test for the form of parametric regression with time series errors. \emph{Statistica Sinica} 17, 369--386.
 }
 
-\author{Yulia R. Gel, Vyacheslav Lyubchich, Xingyu Wang, Ethan Schaeffer}
+\author{Yulia R. Gel, Vyacheslav Lyubchich, Ethan Schaeffer, Xingyu Wang}
 
 \seealso{\code{\link{HVK}}, 
          \code{\link{WAVK}},
@@ -70,15 +72,15 @@ Wang, L. and Van Keilegom, I. (2007) Nonparametric test for the form of parametr
 # Fix seed for reproduceable simulations.
 set.seed(123)
 
-# Simulate two autoregressive time series of length n without trend (i.e., with zero trend) 
-# and apply the synchronism test.
+# Simulate two autoregressive time series of length n without trend (i.e., with zero or constant trend) 
+# and arrange the series into a matrix
 n <- 200
 y1 <- arima.sim(n=n, list(order=c(1,0,0), ar=c(0.6)))
 y2 <- arima.sim(n=n, list(order=c(1,0,0), ar=c(-0.2)))
 X1 <- cbind(y1, y2)
 
 \dontrun{
-sync.test(X1~t, B=1000)
+sync.test(X1~t)
 }
 # Sample output:
 ##
@@ -143,6 +145,12 @@ sync.test(X2~t, B=1000)
 ##     11 0.3664799       0    1.614506e-06
 ##     15 0.4064099       0    1.042697e-07
 ##     20 0.4357487       0    1.176418e-08
+
+#Other hypothesized trend forms can be specified, for example:
+\dontrun{
+sync.test(X2~t + I(t^2)) #quadratic trend
+sync.test(X2~ poly(t, 3)) #cubic trend
+}
 }
 \keyword{ts}
 \keyword{htest}

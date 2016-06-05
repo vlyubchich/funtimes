@@ -3,9 +3,9 @@ sync.test <- function(formula, B=1000, Window=NULL,
   
     frml <- deparse(substitute(formula))
     frml <- strsplit(frml, "~")[[1]]
-    fh <- frml[1]
+    DNAME <- frml[1]
     sh <- frml[2]
-    X <- eval(parse(text = fh))
+    X <- eval(parse(text = DNAME))
     n <- nrow(X)
     K <- ncol(X)
     t <- c(1:n)/n
@@ -69,18 +69,15 @@ sync.test <- function(formula, B=1000, Window=NULL,
     sigma <- rep(NA, K)
     OutputARorder <- matrix(NA, 1, K, dimnames=list("ar_order", dimnames(X)[[2]]))
     OutputWindow <- matrix(NA, 1, K, dimnames=list("Window", dimnames(X)[[2]]))    
-    DNAME <- frml[1]
     X <- demean(X)
     vec <- apply(X, 2, sd)
     X <- sweep(X, MARGIN=2, 1/vec, `*`)
-    beta0 <- apply(X,2,mean)
     AveragedProcess <- apply(X, 1, mean)
-    placeholder = "AveragedProcess"
-    mod <- lm(as.formula(paste(placeholder, paste(sh), sep = "~")))  #common trend
+    mod <- lm(as.formula(paste("AveragedProcess", sh, sep = "~")))  #common trend
     beta1 <- mod$fitted
-    linear_trend <- summary(mod)$coefficients
+    TrendCoeff <- summary(mod)$coefficients
 
-    D <- X - (matrix(beta0, byrow=TRUE, n, K) + beta1)
+    D <- X - beta1
     U <- demean(D) #detrended time series
 	
     for (k in 1:K){
@@ -107,8 +104,8 @@ sync.test <- function(formula, B=1000, Window=NULL,
             pheta <- ar(U[,k], aic = FALSE, order.max = p, demean = TRUE)$ar
         }
         tmp <- filter(X[,k], pheta, sides = 1)
-        tmp2 <- filter(beta0[k]+beta1, pheta, sides = 1)
-        Z <- (X[(p + 1):n,k] - tmp[p:(n - 1)]) - (beta0[k]+beta1[(p+1):n] - tmp2[p:(n - 1)])
+        tmp2 <- filter(beta1, pheta, sides = 1)
+        Z <- (X[(p + 1):n,k] - tmp[p:(n - 1)]) - (beta1[(p+1):n] - tmp2[p:(n - 1)])
         Z <- Z - mean(Z)
         sigma[k] <- sqrt(sum(diff(Z)^2)/(2*(length(Z)-1)))
 		    boot <- array(data = rnorm(n*B), c(n,B))*sigma[k]
@@ -158,7 +155,7 @@ sync.test <- function(formula, B=1000, Window=NULL,
         p.value.ass <- crit.ass * 2
         p.value.ass[crit.ass>0.5] <- (1 - crit.ass[crit.ass>0.5]) * 2
         #
-        ESTIMATE <- list(linear_trend, OutputARorder, OutputWindow, cbind(kn, ST, p.value.boot.all, p.value.ass))
+        ESTIMATE <- list(TrendCoeff, OutputARorder, OutputWindow, cbind(kn, ST, p.value.boot.all, p.value.ass))
         names(ESTIMATE) <- list("common_trend_estimates", "ar_order_used", "Window_used", "all_considered_windows")
         dimnames(ESTIMATE[[4]]) <- list(rep("", NROW(ESTIMATE[[4]])), c("Window", "Statistic", "p-value", "Asympt. p-value"))
     }else{
@@ -171,11 +168,11 @@ sync.test <- function(formula, B=1000, Window=NULL,
         p.value.ass[crit.ass>0.5] <- (1 - crit.ass[crit.ass>0.5]) * 2
         #
         if(ONEwindow){
-            ESTIMATE <- list(linear_trend, OutputARorder, OutputWindow, cbind(Window[1], ST, p.value.boot.all, p.value.ass))
+            ESTIMATE <- list(TrendCoeff, OutputARorder, OutputWindow, cbind(Window[1], ST, p.value.boot.all, p.value.ass))
             names(ESTIMATE) <- list("common_trend_estimates", "ar_order_used", "Window_used", "all_considered_windows")
             dimnames(ESTIMATE[[4]]) <- list(rep("", NROW(ESTIMATE[[4]])), c("Window", "Statistic", "p-value", "Asympt. p-value"))
         }else{
-            ESTIMATE <- list(linear_trend, OutputARorder, OutputWindow, cbind(ST, p.value.boot.all, p.value.ass))
+            ESTIMATE <- list(TrendCoeff, OutputARorder, OutputWindow, cbind(ST, p.value.boot.all, p.value.ass))
             names(ESTIMATE) <- list("common_trend_estimates", "ar_order_used", "Window_used", "all_considered_windows")
             dimnames(ESTIMATE[[4]]) <- list(rep("", NROW(ESTIMATE[[4]])), c("Statistic", "p-value", "Asympt. p-value"))
         }

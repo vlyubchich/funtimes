@@ -12,7 +12,7 @@ wavk.test(formula, factor.length=c("user.defined", "adaptive.selection"),
     robust=TRUE, out=FALSE)
 }
 \arguments{
-  \item{formula}{an object of class "formula", specifying the form of the parametric time trend to be tested. Variable 't' should be used to specify the form. See 'Details' and 'Examples' for more information.}
+  \item{formula}{an object of class "formula", specifying the form of the parametric time trend to be tested. Variable \eqn{t} should be used to specify the form, where \eqn{t} is specified internally as a regular sequence on the interval (0,1]. See 'Examples'.}
 
   \item{factor.length}{method to define the length of local windows (factors). Default option \code{"user.defined"} allows to set only one value of the argument \code{Window}. The option \code{"adaptive.selection"} sets \code{method = "boot"} and employs heuristic \eqn{m}-out-of-\eqn{n} subsampling algorithm (Bickel and Sakov, 2008) to select an optimal window from the set of possible windows \code{length(x)*q^j} whose values are mapped to the largest previous integer and greater than 2.}
 
