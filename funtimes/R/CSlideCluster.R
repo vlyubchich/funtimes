@@ -3,7 +3,7 @@ CSlideCluster <- function(X, Alpha=NULL, Beta=NULL, Delta=NULL, Theta=0.8){
   N <- dim(X)[2]
   if(is.null(Alpha) | is.null(Beta)){
     Alpha <- quantile(X)[2]-1.5*(quantile(X)[4]-quantile(X)[2])
-    Beta <- quantile(X)[2]+1.5*(quantile(X)[4]-quantile(X)[2])
+    Beta <- quantile(X)[4]+1.5*(quantile(X)[4]-quantile(X)[2])
   }
   if(is.null(Delta)) {Delta <- 0.1*(Beta-Alpha)}
   TSclusters <- rep(NA, N)
