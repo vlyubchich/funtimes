@@ -8,7 +8,7 @@ This function clusters time series at a window level using TRUST algorithm by Ci
 }
 
 \usage{
-BICC(x, N, W, p, Alpha=NULL, Beta=NULL, Theta=0.8)
+BICC(x, w, p, Alpha=NULL, Beta=NULL, Theta=0.8)
 }
 
 \arguments{
@@ -18,10 +18,9 @@ BICC(x, N, W, p, Alpha=NULL, Beta=NULL, Theta=0.8)
   \item{Delta}{closeness parameter, passed to \code{\link{CSlideCluster}}.}
   \item{Theta}{connectivity parameter, passed to \code{\link{CSlideCluster}}.}
   \item{p}{number of layers (time series observations) in each slide.}
-  \item{W}{number of slides in each window.}
-  \item{N}{number of time series in x}
-  \item{s}{step to shift a window, calculated in number of slides. Recommended values are 1 (overlapping windows) or \code{W} (non-overlapping windows).}
-  \item{Epsilon}{a real value in [0,1] used to identify each pair of time series that are clustered together over at least \code{W*Epsilon} slides within a window (see Definition 7 by Ciampi et al., 2010). Default is 1.}
+  \item{w}{number of slides in each window.}
+  \item{s}{step to shift a window, calculated in number of slides. Recommended values are 1 (overlapping windows) or \code{w} (non-overlapping windows).}
+  \item{Epsilon}{a real value in [0,1] used to identify each pair of time series that are clustered together over at least \code{w*Epsilon} slides within a window (see Definition 7 by Ciampi et al., 2010). Default is 1.}
 }
 
 \details{
@@ -55,13 +54,13 @@ Vyacheslav Lyubchich, Ethan Schaeffer
 p <- 4 #number of layers in each slide (data come in a slide)
 
 #We want to analyze the trend clusters within a window of 1 year
-W <- 13 #number of slides in each window
-s <- W  #step to shift a window
+w <- 13 #number of slides in each window
+s <- w  #step to shift a window
 
 #Simulate 26 autoregressive time series with two years of weekly data (52*2 weeks), 
 #with a 'burn-in' period of 300.
 N <- 26
-T <- p*W
+T <- p*w
 
 set.seed(123) 
 phi <- c(0.5) #parameter of autoregression
@@ -69,7 +68,7 @@ X <- sapply(1:N, function(x) arima.sim(n=T+300,
   list(order=c(length(phi),0,0),ar=phi)))[301:(T+300),]
 colnames(X) <- paste("TS", c(1:dim(X)[2]), sep="")
 
-tmp <- BICC(x=X, N=26, p=p, w=W, s=s)
+tmp <- BICC(x=X, p=p, w=w, s=s)
 }
 
 \keyword{ cluster }
