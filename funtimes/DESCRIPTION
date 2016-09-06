@@ -1,12 +1,11 @@
 Package: funtimes
 Type: Package
 Title: Functions for Time Series Analysis
-Version: 2.2
-Date: 2016-04-15
+Version: 3.0
+Date: 2016-09-01
 Author: Vyacheslav Lyubchich;
         Yulia R. Gel;
         Calvin Chu;
-        Ethan Schaeffer;        
         Xingyu Wang
 Maintainer: Vyacheslav Lyubchich <lyubchic@umces.edu>
 Depends: Jmisc, R (>= 3.0.0)
