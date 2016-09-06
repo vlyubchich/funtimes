@@ -4,9 +4,10 @@ Title: Functions for Time Series Analysis
 Version: 2.2
 Date: 2016-04-15
 Author: Vyacheslav Lyubchich;
-        Yulia R. Gel;                
-        Xingyu Wang;
-        Calvin Chu
+        Yulia R. Gel;
+        Calvin Chu;
+        Ethan Schaeffer;        
+        Xingyu Wang
 Maintainer: Vyacheslav Lyubchich <lyubchic@umces.edu>
 Depends: Jmisc, R (>= 3.0.0)
 License: GPL (>= 2)
