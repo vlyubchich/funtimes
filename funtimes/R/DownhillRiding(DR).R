@@ -1,7 +1,5 @@
 DR<-function(X,method,minPts=3,theta =0.9,B=500,lb=-30,ub=10){
   
-  suppressMessages(require(funtimes))
-  suppressMessages(require(dbscan))
   control_para <- sapply(seq(lb,ub,by=0.5),function(x) 1.1^x)
   Nnodes <- floor(ncol(X)/2)
   
