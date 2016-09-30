@@ -1,10 +1,17 @@
 
 \name{DR}
 \alias{DR}
+
 \title{Downhill Riding (DR) procedure}
+
+\description{
+Downhill Riding procedure for selecting optimal tuning parameters in clustering algorithms, using an (in)stability probe.
+}
+            
 \usage{
 DR(X, method, minPts = 3, theta = 0.9, B = 500, lb = -30, ub = 10)
 }
+
 \arguments{
 \item{X}{a n \eqn{\times} k matrix where columns are k objects to be clustered, and each object contains n observations
 (objects could be a set of time series).}
@@ -21,6 +28,7 @@ The \code{minPts} is to be used only with \code{DBSCAN} method. Default value is
 
 \item{lb, ub}{ends points for a range of search for the optimal parameter.}
 }
+              
 \value{
 A list containing the following components:
 \itemize{
@@ -33,9 +41,8 @@ If method is \code{DBSCAN}, then the tuning paramter is \eqn{\epsilon}.
 If method is \code{TRUST}, then the tuning paramter is \eqn{\delta}. 
 }
 }
-\description{
-Downhill Riding procedure for selecting optimal tuning parameters in clustering algorithms, using an (in)stability probe.
-}
+              
+
 \note{
 Parameters \code{lb,ub} are ends points for a range of search for the optimal parameter.
 The parameter candidates are calculated in a way such that \eqn{\code{P}:=  1.1^x , x \in \{lb,lb+0.5,lb+1.0,...,ub \}.}
@@ -44,6 +51,28 @@ further extended if a warning message is given.
 
 For more discussion on properties of the considered clustering algorithms and DR procedure see Huang et al. (2016)
 }
+            
+\references{
+Huang, X., Iliev, I., Brenning, A., Gel, Y.R. (2016). Space-Time Clustering with Stability Probe while Riding Downhill. In
+\emph{KDD’16 workshop on Mining and Learning from Time Series (MiLeTS 2016)} \url{http://www-bcf.usc.edu/~liu32/milets16/#papers}.
+
+Ester, M., Kriegel, H. P., Sander, J., Xu, X. (1996). A density-based algorithm for discovering clusters in large spatial databases with noise. In
+\emph{Proc. KDD’96} (Vol. 96, No. 34, pp. 226-231).
+
+Ciampi, A., Appice, A., Malerba, D. (2010). Discovering trend-based clusters in spatially distributed data streams. In
+\emph{International Workshop of Mining Ubiquitous and Social Environments} (pp. 107-122).
+}
+            
+\author{
+Huang, Xin, Gel, Yulia R.
+}           
+            
+            
+\seealso{
+\code{\link{CSlideCluster}}, \code{\link[dbscan]{dbscan}}
+}
+         
+            
 \examples{
 ## example 1
 ## use iris data to test DR procedure
@@ -129,21 +158,5 @@ plot.zoo(X, type = "l",plot.type = "single",col = ground_truth_label,
 
              
 
-}
-\author{
-Huang, Xin, Gel, Yulia R.
-}
-\references{
-Huang, X., Iliev, I., Brenning, A., Gel, Y.R. (2016). Space-Time Clustering with Stability Probe while Riding Downhill. In
-\emph{KDD'16 workshop on Mining and Learning from Time Series (MiLeTS 2016)} \url{http://www-bcf.usc.edu/~liu32/milets16/#papers}.
-
-Ester, M., Kriegel, H. P., Sander, J., Xu, X. (1996). A density-based algorithm for discovering clusters in large spatial databases with noise. In
-\emph{Proc. KDD’96} (Vol. 96, No. 34, pp. 226-231).
-
-Ciampi, A., Appice, A., Malerba, D. (2010). Discovering trend-based clusters in spatially distributed data streams. In
-\emph{International Workshop of Mining Ubiquitous and Social Environments} (pp. 107-122).
-}
-\seealso{
-\code{\link{CSlideCluster}}, \code{\link[dbscan]{dbscan}}
 }
 
