@@ -78,7 +78,6 @@ Huang, Xin, Gel, Yulia R.
 ## use iris data to test DR procedure
 
 data(iris)  
-require(dbscan)
 require(clue)  # calculate NMI to compare the clustering result with the ground truth
 require(scatterplot3d)
 
