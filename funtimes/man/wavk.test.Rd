@@ -6,13 +6,13 @@ Non-parametric test to detect possibly non-monotonic parametric trend in a time 
 }
 
 \usage{
-wavk.test(x, factor.length=c("user.defined", "adaptive.selection"), 
+wavk.test(formula, factor.length=c("user.defined", "adaptive.selection"), 
     Window=round(0.1*length(x)), q=3/4, j=c(8:11), B=1000, 
-    H0=c("no trend","linear"), method=c("boot", "asympt"), 
-    ar.order=NULL, BIC=TRUE, robust=TRUE, out=FALSE)
+    method=c("boot", "asympt"), ar.order=NULL, BIC=TRUE, 
+    robust=TRUE, out=FALSE)
 }
 \arguments{
-  \item{x}{univariate time series. Missing values are not allowed.}
+  \item{formula}{an object of class "formula", specifying the form of the parametric time trend to be tested. Variable \eqn{t} should be used to specify the form, where \eqn{t} is specified internally as a regular sequence on the interval (0,1]. See 'Examples'.}
 
   \item{factor.length}{method to define the length of local windows (factors). Default option \code{"user.defined"} allows to set only one value of the argument \code{Window}. The option \code{"adaptive.selection"} sets \code{method = "boot"} and employs heuristic \eqn{m}-out-of-\eqn{n} subsampling algorithm (Bickel and Sakov, 2008) to select an optimal window from the set of possible windows \code{length(x)*q^j} whose values are mapped to the largest previous integer and greater than 2.}
 
@@ -24,7 +24,6 @@ wavk.test(x, factor.length=c("user.defined", "adaptive.selection"),
 
   \item{B}{number of bootstrap simulations to obtain empirical critical values. Default is 1000.}
 
-  \item{H0}{null hypothesis: \code{"no trend"} (default) for testing the absence of trend (in other words, constant trend) vs. any, possibly non-monotonic, trend; \code{"linear"} for testing the presence of parametric linear trend vs. alternative nonlinear trend.}
 
   \item{method}{method of obtaining critical values: from asymptotical (\code{"asympt"}) or bootstrap (\code{"boot"}) distribution. If \code{factor.length =} \code{"adaptive.selection"} the option \code{"boot"} is used.}
 
@@ -66,7 +65,7 @@ Wang, L., Akritas, M. G. and Van Keilegom, I. (2008) An ANOVA-type nonparametric
 Wang, L. and Van Keilegom, I. (2007) Nonparametric test for the form of parametric regression with time series errors. \emph{Statistica Sinica} 17, 369--386.
 }
 
-\author{Yulia R. Gel, Vyacheslav Lyubchich}
+\author{Yulia R. Gel, Vyacheslav Lyubchich, Ethan Schaeffer}
 
 \seealso{\code{\link{HVK}}, 
          \code{\link{WAVK}},
@@ -78,51 +77,45 @@ Wang, L. and Van Keilegom, I. (2007) Nonparametric test for the form of parametr
 # Fix seed for reproduceable simulations.
 set.seed(123)
 
-# Simulate autoregressive time series of length n with linear trend 1+2*t, 
-# where t is a regular sequence on the interval (0,1].
-n <- 100
-t <- c(1:n)/n
-U <- 1+2*t + arima.sim(n=n, list(order = c(2,0,0), ar = c(-0.7, -0.1)))
+#Simulate autoregressive time series of length n with smooth linear trend:
 
-# Test for linear trend with output of all results.
+n <- 100
+U <- 1+2*(1:n/n) + arima.sim(n=n, list(order = c(2,0,0), ar = c(-0.7, -0.1)))
+
+# Test for quadratic trend with m-out-of-n Windows selection and output of all results.
 \dontrun{
-wavk.test(U, factor.length = "adaptive.selection", H0="linear", out=TRUE, B=1000)
+wavk.test(U~poly(t,2), factor.length = "adaptive.selection", out=TRUE, B=1000)
 }
 # Sample output:
-##
-##  Trend test by Wang, Akritas and Van Keilegom
+##	Trend test by Wang, Akritas and Van Keilegom
 ##
 ##data:  U
-##WAVK test statistic = 0.8562, adaptively selected window = 4, p-value = 0.356
-##alternative hypothesis: presence of a nonlinear trend
+##WAVK test statistic = 0.54439, adaptively selected window = 4, p-value = 0.5
+##alternative hypothesis: alternative form of trend
 ##sample estimates:
-##$linear_trend_coefficients
-##(Intercept)           t 
-##  0.9917251   2.0224272 
+##$trend_coefficients
+##(Intercept) poly(t, 2)1 poly(t, 2)2 
+##  2.0130509   5.8379526  -0.7139714 
 ##
 ##$AR_coefficients
 ##     phi_1      phi_2 
-##-0.6814546 -0.2404422 
+##-0.6841828 -0.2432090 
 ##
 ##$all_considered_windows
 ## Window WAVK-statistic p-value
-##      4      0.8561654   0.356
-##      5      0.8620023   0.320
-##      7      0.8691870   0.288
-##     10      0.6837790   0.306
+##      4      0.5443881   0.500
+##      5      0.4987429   0.492
+##      7      0.5160588   0.410
+##     10      0.4505820   0.404
 
-
-# Test H0 of absence of a trend using asymptotic distribution of statistic.
-wavk.test(U, method="asympt")
-
-# Sample output:
+# Test H0 of no trend (constant trend) using asymptotic distribution of statistic.
+wavk.test(U~1, method="asympt")
 ##
-##        Trend test by Wang, Akritas and Van Keilegom
+##	Trend test by Wang, Akritas and Van Keilegom
 ##
 ##data:  U
-##WAVK test statistic = 18.4712, user-defined window = 10, p-value < 2.2e-16
-##alternative hypothesis: presence of a trend
- 
+##WAVK test statistic = 10.298, user-defined window = 10, p-value < 2.2e-16
+##alternative hypothesis: alternative form of trend
 }
 \keyword{ts}
 \keyword{htest}
