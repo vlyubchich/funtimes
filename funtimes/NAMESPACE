@@ -7,3 +7,4 @@ exportPattern(".")
 # Import all packages listed as Imports or Depends
 importFrom(Jmisc, demean)
 importFrom(stats, ar, as.formula, dist, filter, lm, median, pnorm, quantile, rnorm, sd, var)
+importFrom(dbscan, dbscan)
