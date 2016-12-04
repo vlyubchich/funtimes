@@ -11,11 +11,11 @@ sync.test(formula, B = 1000, Window = NULL, q = NULL, j = NULL,
 }
 
 \arguments{
-  \item{formula}{an object of class "formula", specifying the form of the common parametric time trend to be tested in a \eqn{TxN} matrix of time series (time series in columns). Variable \eqn{t} should be used to specify the form of the trend, where \eqn{t} is specified within the function as a regular sequence on the interval (0,1]. See 'Examples'.}
+  \item{formula}{an object of class "formula", specifying the form of the common parametric time trend to be tested in a \eqn{TxN} matrix of time series (time series in columns). Variable \eqn{t} should be used to specify the form of the trend, where \eqn{t} is specified within the function as a regular sequence on the interval (0,1]. See `Examples'.}
 
   \item{B}{number of bootstrap simulations to obtain empirical critical values.} 
   
-  \item{Window}{scalar or \eqn{N}-vector with lengths of the local windows (factors). If only one value is set, the same \code{Window} is applied to each time series. \eqn{N}-vector specifies a particular window for each time series. If no \code{Window} is specified, the automatic algorithm for optimal window selection is performed as a default option (see 'Details').}
+  \item{Window}{scalar or \eqn{N}-vector with lengths of the local windows (factors). If only one value is set, the same \code{Window} is applied to each time series. \eqn{N}-vector specifies a particular window for each time series. If no \code{Window} is specified, the automatic algorithm for optimal window selection is performed as a default option (see `Details').}
 
   \item{q}{scalar from 0 to 1 to define the set of possible windows \code{T*q^j} and to automatically select an optimal window for each time series. Default is \eqn{3/4}. This argument is ignored if \code{Window} is set by user.}
 
@@ -50,15 +50,15 @@ A list of class htest containing the following components:
 }
 
 \references{
-Bickel, P. J. and Sakov, A. (2008). On the choice of \eqn{m} in the \eqn{m} out of \eqn{n} bootstrap and confidence bounds for extrema. \emph{Statistica Sinica} 18, 967--985.
+Bickel, P. J. and Sakov, A. (2008). On the choice of \eqn{m} in the \eqn{m} out of \eqn{n} bootstrap and confidence bounds for extrema. \emph{Statistica Sinica} 18: 967--985.
 
 Lyubchich, V. and Gel, Y. R. (2016). A local factor nonparametric test for trend synchronism in multiple time series. \emph{Journal of Multivariate Analysis} 150: 91--104. DOI: \href{http://dx.doi.org/10.1016/j.jmva.2016.05.004}{10.1016/j.jmva.2016.05.004}
 
-Lyubchich, V., Gel, Y. R., and El-Shaarawi, A. (2013). On detecting non-monotonic trends in environmental time series: a fusion of local regression and bootstrap. \emph{Environmetrics} 24, 209--226. DOI: \href{http://dx.doi.org/10.1002/env.2212}{10.1002/env.2212}
+Lyubchich, V., Gel, Y. R., and El-Shaarawi, A. (2013). On detecting non-monotonic trends in environmental time series: a fusion of local regression and bootstrap. \emph{Environmetrics} 24: 209--226. DOI: \href{http://dx.doi.org/10.1002/env.2212}{10.1002/env.2212}
 
-Wang, L., Akritas, M. G., and Van Keilegom, I. (2008). An ANOVA-type nonparametric diagnostic test for heteroscedastic regression models. \emph{Journal of Nonparametric Statistics} 20(5), 365--382. DOI: \href{http://dx.doi.org/10.1080/10485250802066112}{10.1080/10485250802066112}
+Wang, L., Akritas, M. G., and Van Keilegom, I. (2008). An ANOVA-type nonparametric diagnostic test for heteroscedastic regression models. \emph{Journal of Nonparametric Statistics} 20(5): 365--382. DOI: \href{http://dx.doi.org/10.1080/10485250802066112}{10.1080/10485250802066112}
 
-Wang, L. and Van Keilegom, I. (2007). Nonparametric test for the form of parametric regression with time series errors. \emph{Statistica Sinica} 17, 369--386.
+Wang, L. and Van Keilegom, I. (2007). Nonparametric test for the form of parametric regression with time series errors. \emph{Statistica Sinica} 17: 369--386.
 }
 
 \author{Yulia R. Gel, Vyacheslav Lyubchich, Ethan Schaeffer, Xingyu Wang}

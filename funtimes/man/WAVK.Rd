@@ -27,7 +27,7 @@ A list with following components:
 \frac{1}{n(k_{n}-1)} \sum_{t=1}^n \sum_{j=1}^{k_{n}}\biggl(V_{tj}-\overline{V}_{t.}\biggr)^2,}
 where \eqn{\{V_{t1}, \ldots, V_{tk_n}\}=\{Z_j: j\in W_{t}\}}, \eqn{W_t} is a local window, \eqn{\overline{V}_{t.}} and \eqn{\overline{V}_{..}} are the mean of the \eqn{t}th group and the grand mean, respectively.} 
   \item{Tns}{standardized version of \code{Tn} according to Theorem 3.1 by Wang and Van Keilegom (2007): 
-  \deqn{Tns = \left( \frac{n}{kn} \right)^{\frac{1}{2}}Tn \bigg/  \left(\frac{4}{3}\right)^{\frac{1}{2}} \sigma^2,}{Tns = Tn*(n/kn)^0.5 / (sigma^2 * (4/3)^0.5),}
+  \deqn{T_{ns} = \left( \frac{n}{k_n} \right)^{\frac{1}{2}}T_n \bigg/  \left(\frac{4}{3}\right)^{\frac{1}{2}} \sigma^2,}{Tns = Tn*(n/kn)^0.5 / (sigma^2 * (4/3)^0.5),}
   where \eqn{n} is length and \eqn{\sigma^2}{sigma^2} is variance of the time series. Robust difference-based 
   Rice's estimator (Rice, 1984) is used to estimate \eqn{\sigma^2}{sigma^2}.} 
 
@@ -35,11 +35,11 @@ where \eqn{\{V_{t1}, \ldots, V_{tk_n}\}=\{Z_j: j\in W_{t}\}}, \eqn{W_t} is a loc
 }
 
 \references{
-Rice, J. (1984). Bandwidth choice for nonparametric regression. \emph{The Annals of Statistics} 12, 1215--1230. DOI: \href{http://dx.doi.org/10.1214/aos/1176346788}{10.1214/aos/1176346788}
+Rice, J. (1984). Bandwidth choice for nonparametric regression. \emph{The Annals of Statistics} 12: 1215--1230. DOI: \href{http://dx.doi.org/10.1214/aos/1176346788}{10.1214/aos/1176346788}
 
-Wang, L., Akritas, M. G., and Van Keilegom, I. (2008). An ANOVA-type nonparametric diagnostic test for heteroscedastic regression models. \emph{Journal of Nonparametric Statistics} 20(5), 365--382. DOI: \href{http://dx.doi.org/10.1080/10485250802066112}{10.1080/10485250802066112}
+Wang, L., Akritas, M. G., and Van Keilegom, I. (2008). An ANOVA-type nonparametric diagnostic test for heteroscedastic regression models. \emph{Journal of Nonparametric Statistics} 20(5): 365--382. DOI: \href{http://dx.doi.org/10.1080/10485250802066112}{10.1080/10485250802066112}
 
-Wang, L. and Van Keilegom, I. (2007). Nonparametric test for the form of parametric regression with time series errors. \emph{Statistica Sinica} 17, 369--386.
+Wang, L. and Van Keilegom, I. (2007). Nonparametric test for the form of parametric regression with time series errors. \emph{Statistica Sinica} 17: 369--386.
 }
 
 \author{Yulia R. Gel, Vyacheslav Lyubchich}

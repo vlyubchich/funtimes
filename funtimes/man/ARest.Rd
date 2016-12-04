@@ -4,7 +4,7 @@
 \description{
 Estimate parameters \eqn{\phi} of autoregressive time series model
 \deqn{X_t = \sum_{i=1}^p\phi_iX_{t-i} + e_t,} 
-by default using robust difference-based estimator and BIC to select the order \eqn{p}. It is mainly employed in functions \code{\link{sync.test}} and \code{\link{wavk.test}} for time series filtering.
+by default using robust difference-based estimator and BIC to select the order \eqn{p}. This function is mainly employed for time series filtering in functions \code{\link{sync.test}} and \code{\link{wavk.test}}.
 }
 
 \usage{

@@ -11,11 +11,12 @@ wavk.test(formula, factor.length=c("user.defined", "adaptive.selection"),
          ar.order=NULL, ar.method = "HVK", BIC=TRUE, out=FALSE)
 }
 \arguments{
-  \item{formula}{an object of class "formula", specifying the form of the parametric time trend to be tested. Variable \eqn{t} should be used to specify the form, where \eqn{t} is specified within the function as a regular sequence on the interval (0,1]. See 'Examples'.}
+  \item{formula}{an object of class "\code{\link[stats]{formula}}", specifying the form of the parametric time trend to be tested. Variable \eqn{t} should be used to specify the form, where \eqn{t} is specified within the function as a regular sequence on the interval (0,1]. See `Examples'.}
 
   \item{factor.length}{method to define the length of local windows (factors). Default option \code{"user.defined"} allows to set only one value of the argument \code{Window}. The option \code{"adaptive.selection"} sets \code{method = "boot"} and employs heuristic \eqn{m}-out-of-\eqn{n} subsampling algorithm (Bickel and Sakov, 2008) to select an optimal window from the set of possible windows \code{length(x)*q^j} whose values are mapped to the largest previous integer and greater than 2. \code{x} is the time series tested.}
 
-  \item{Window}{length of the local window (factor), default is \code{round(0.1*length(x))}, where \code{x} is the time series tested. This argument is ignored if \code{factor.length = "adaptive.selection"}.}
+  \item{Window}{length of the local window (factor), default is \code{round(0.1*length(x))}, where \code{x} is the time series tested. This argument is ignored if 
+  \code{factor.length = "adaptive.selection"}.}
 
   \item{q}{scalar from 0 to 1 to define the set of possible windows when \code{factor.length =} \code{"adaptive.selection"}. Default is \eqn{3/4}. This argument is ignored if \code{factor.length =} \code{"user.defined"}.}
 
@@ -54,15 +55,15 @@ A list with class htest containing the following components:
 }
 
 \references{
-Bickel, P. J. and Sakov, A. (2008). On the choice of \eqn{m} in the \eqn{m} out of \eqn{n} bootstrap and confidence bounds for extrema. \emph{Statistica Sinica} 18, 967--985.
+Bickel, P. J. and Sakov, A. (2008). On the choice of \eqn{m} in the \eqn{m} out of \eqn{n} bootstrap and confidence bounds for extrema. \emph{Statistica Sinica} 18: 967--985.
 
 Hall, P. and Van Keilegom, I. (2003). Using difference-based methods for inference in nonparametric regression with time series errors. \emph{Journal of the Royal Statistical Society: Series B (Statistical Methodology)}, 65: 443--456. DOI: \href{http://dx.doi.org/10.1111/1467-9868.00395}{10.1111/1467-9868.00395}
 
-Lyubchich, V., Gel, Y. R., and El-Shaarawi, A. (2013). On detecting non-monotonic trends in environmental time series: a fusion of local regression and bootstrap. \emph{Environmetrics} 24, 209--226. DOI: \href{http://dx.doi.org/10.1002/env.2212}{10.1002/env.2212}
+Lyubchich, V., Gel, Y. R., and El-Shaarawi, A. (2013). On detecting non-monotonic trends in environmental time series: a fusion of local regression and bootstrap. \emph{Environmetrics} 24: 209--226. DOI: \href{http://dx.doi.org/10.1002/env.2212}{10.1002/env.2212}
 
-Wang, L., Akritas, M. G., and Van Keilegom, I. (2008). An ANOVA-type nonparametric diagnostic test for heteroscedastic regression models. \emph{Journal of Nonparametric Statistics} 20(5), 365--382. DOI: \href{http://dx.doi.org/10.1080/10485250802066112}{10.1080/10485250802066112}
+Wang, L., Akritas, M. G., and Van Keilegom, I. (2008). An ANOVA-type nonparametric diagnostic test for heteroscedastic regression models. \emph{Journal of Nonparametric Statistics} 20(5): 365--382. DOI: \href{http://dx.doi.org/10.1080/10485250802066112}{10.1080/10485250802066112}
 
-Wang, L. and Van Keilegom, I. (2007). Nonparametric test for the form of parametric regression with time series errors. \emph{Statistica Sinica} 17, 369--386.
+Wang, L. and Van Keilegom, I. (2007). Nonparametric test for the form of parametric regression with time series errors. \emph{Statistica Sinica} 17: 369--386.
 }
 
 \author{Yulia R. Gel, Vyacheslav Lyubchich, Ethan Schaeffer}
