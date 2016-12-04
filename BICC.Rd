@@ -1,19 +1,18 @@
-\name{CWindowCluster}
-\alias{CWindowCluster}
+\name{BICC}
+\alias{BICC}
 
-\title{
-Window-Level Time Series Clustering
+\title{BIC-Based Clustering Algorithm}
+
+\description{
+This function clusters time series at a window level using TRUST algorithm by Ciampi et al. (2010) and provides automatic selection of the parameters Delta and Epsilon, based on Bayesian information criterion (BIC).
 }
 
-\description{This function clusters time series at a window level, based on the Algorithm 2 of Ciampi et al. (2010).}
-
 \usage{
-CWindowCluster(X, Alpha = NULL, Beta = NULL, Delta = NULL, Theta = 0.8, 
-  p, w, s, Epsilon = 1)
+BICC(x, w, p, Alpha=NULL, Beta=NULL, Theta=0.8)
 }
 
 \arguments{
-  \item{X}{a matrix of time series to be clustered (time series in columns).}
+  \item{x}{a matrix of time series to be clustered (time series in columns).}
   \item{Alpha}{lower limit of the time series domain, passed to \code{\link{CSlideCluster}}.}
   \item{Beta}{upper limit of the time series domain, passed to \code{\link{CSlideCluster}}.}
   \item{Delta}{closeness parameter, passed to \code{\link{CSlideCluster}}.}
@@ -36,17 +35,20 @@ A vector (if \code{X} contains only one window) or matrix with cluster labels fo
 
 \references{
 Ciampi, A., Appice, A., and Malerba, D. (2010) Discovering trend-based clusters in spatially distributed data streams. In \emph{International Workshop of Mining Ubiquitous and Social Environments}, pages 107--122.
+
+Schaeffer, E. D., Testa, J. M., Gel, Y. R., and Lyubchich, V. (2016). On information criteria for dynamic spatio-temporal clustering. In A. Banerjee et al. (Eds.) \emph{Proceedings of the 6th International Workshop on Climate Informatics: CI 2016}. NCAR Technical Note NCAR/TN-529+PROC, September 2016, pages 5--8. DOI: \href{http://dx.doi.org/10.5065/D6K072N6}{10.5065/D6K072N6}
 }
 
 \author{
-Vyacheslav Lyubchich
+Vyacheslav Lyubchich, Ethan Schaeffer
 }
 
 \seealso{\code{\link{CNeighbor}}, 
          \code{\link{CHomogeneity}},
          \code{\link{CExpandSlideCluster}},
          \code{\link{CExpandWindowCluster}},
-         \code{\link{CSlideCluster}}
+         \code{\link{CSlideCluster}},
+         \code{\link{CWindowCluster}}
 }
 
 \examples{
@@ -60,7 +62,7 @@ s <- w  #step to shift a window
 #Simulate 26 autoregressive time series with two years of weekly data (52*2 weeks), 
 #with a 'burn-in' period of 300.
 N <- 26
-T <- 2*p*w
+T <- p*w
 
 set.seed(123) 
 phi <- c(0.5) #parameter of autoregression
@@ -68,21 +70,9 @@ X <- sapply(1:N, function(x) arima.sim(n=T+300,
   list(order=c(length(phi),0,0),ar=phi)))[301:(T+300),]
 colnames(X) <- paste("TS", c(1:dim(X)[2]), sep="")
 
-tmp <- CWindowCluster(X, Delta=NULL, Theta=0.8, p=p, w=w, s=s, Epsilon=1)
-
-#Time series were simulated with the same parameters, but based on the clustering parameters,
-#not all time series join the same cluster. We can plot the main cluster for each window, and 
-#time series out of the cluster:
-par(mfrow=c(2,2))
-ts.plot(X[c(1:(p*w)),tmp[1,]==1], ylim=c(-4,4), 
-  main="Time series cluster 1 in window 1")
-ts.plot(X[c(1:(p*w)),tmp[1,]!=1], ylim=c(-4,4), 
-  main="The rest of the time series in window 1")
-ts.plot(X[c(1:(p*w))+s*p,tmp[2,]==1], ylim=c(-4,4), 
-  main="Time series cluster 1 in window 2")
-ts.plot(X[c(1:(p*w))+s*p,tmp[2,]!=1], ylim=c(-4,4), 
-  main="The rest of the time series in window 2")
+tmp <- BICC(x=X, p=p, w=w, s=s)
 }
 
-\keyword{ts}
-\keyword{trend}
+\keyword{ cluster }
+\keyword{ ts }
+\keyword{ trend }

@@ -2,7 +2,7 @@
 \alias{CSlideCluster}
 
 \title{
-Slide-level time series clustering
+Slide-Level Time Series Clustering
 }
 
 \description{This function clusters time series at a slide level, based on the Algorithm 1 of Ciampi et al. (2010).}
@@ -26,7 +26,7 @@ CSlideCluster(X, Alpha = NULL, Beta = NULL, Delta = NULL, Theta = 0.8)
 \value{A vector of length \code{dim(X)[2]} with cluster labels.}
 
 \references{
-Ciampi, A., Appice, A. and Malerba, D. (2010) Discovering trend-based clusters in spatially distributed data streams. In \emph{International Workshop of Mining Ubiquitous and Social Environments}, pages 107--122.
+Ciampi, A., Appice, A., and Malerba, D. (2010) Discovering trend-based clusters in spatially distributed data streams. In \emph{International Workshop of Mining Ubiquitous and Social Environments}, pages 107--122.
 }
 
 \author{
@@ -37,7 +37,7 @@ Vyacheslav Lyubchich
          \code{\link{CHomogeneity}},
          \code{\link{CExpandSlideCluster}},
          \code{\link{CExpandWindowCluster}},
-         \code{\link{CWindowCluster}}.
+         \code{\link{CWindowCluster}}
 }
 
 \examples{
