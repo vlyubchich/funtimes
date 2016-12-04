@@ -24,7 +24,7 @@ CHomogeneity(Bu, Bv, Alpha, Beta, Delta)
 A logical value indicating whether time series in \code{Bu} and \code{Bv} form a homogeneous cluster.}
 
 \references{
-Ciampi, A., Appice, A., and Malerba, D. (2010) Discovering trend-based clusters in spatially distributed data streams. In \emph{International Workshop of Mining Ubiquitous and Social Environments}, pages 107--122.
+Ciampi, A., Appice, A., and Malerba, D. (2010). Discovering trend-based clusters in spatially distributed data streams. In \emph{International Workshop of Mining Ubiquitous and Social Environments}, pages 107--122.
 }
 
 \author{

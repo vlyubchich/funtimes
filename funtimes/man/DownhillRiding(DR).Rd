@@ -1,8 +1,7 @@
-
 \name{DR}
 \alias{DR}
 
-\title{Downhill Riding (DR) procedure}
+\title{Downhill Riding (DR) Procedure}
 
 \description{
 Downhill Riding procedure for selecting optimal tuning parameters in clustering algorithms, using an (in)stability probe.
@@ -13,58 +12,48 @@ DR(X, method, minPts = 3, theta = 0.9, B = 500, lb = -30, ub = 10)
 }
 
 \arguments{
-\item{X}{a n \eqn{\times} k matrix where columns are k objects to be clustered, and each object contains n observations
-(objects could be a set of time series).}
+\item{X}{a \eqn{n\times k} matrix where columns are \eqn{k} objects to be clustered, and each object contains n observations (objects could be a set of time series).}
 
-\item{method}{the clustering method to be used (currently either \code{"TRUST"} or \code{"DBSCAN"}). If method is \code{DBSCAN}, then set \code{MinPts} 
-and optimal \eqn{\epsilon} is selected using DR. If method is \code{TRUST}, then set \code{theta} and optimal \eqn{\delta} is selected using DR.}
+\item{method}{the clustering method to be used (currently either \code{"TRUST"} or \code{"DBSCAN"}). If method is \code{DBSCAN}, then set \code{MinPts} and optimal \eqn{\epsilon} is selected using DR. If method is \code{TRUST}, then set \code{theta} and optimal \eqn{\delta} is selected using DR.}
 
-\item{minPts}{the minimum number of samples in an \eqn{\epsilon}-neighborhood of a point to be considered as a core point. 
-The \code{minPts} is to be used only with \code{DBSCAN} method. Default value is 3.}
+\item{minPts}{the minimum number of samples in an \eqn{\epsilon}-neighborhood of a point to be considered as a core point. The \code{minPts} is to be used only with \code{DBSCAN} method. Default value is 3.}
 
 \item{theta}{connectivity parameter \eqn{\theta \in (0,1)}, which is to be used only with \code{TRUST} method. Default value is 0.9.}
 
 \item{B}{number of random splits in calculating the \code{Average Cluster Deviation (ACD)}. Default value is 500.}
 
-\item{lb, ub}{ends points for a range of search for the optimal parameter.}
+\item{lb, ub}{end points for a range of search for the optimal parameter.}
 }
               
 \value{
 A list containing the following components:
-\itemize{
-\item \code{P_opt}: the value of optimal parameter. If method is \code{DBSCAN}, then \code{P_opt} is optimal \eqn{\epsilon}. 
-If method is \code{TRUST}, then \code{P_opt} is optimal \eqn{\delta}.
 
+\item{P_opt}{the value of optimal parameter. If method is \code{DBSCAN}, then \code{P_opt} is optimal \eqn{\epsilon}. 
+If method is \code{TRUST}, then \code{P_opt} is optimal \eqn{\delta}.}
 
-\item \code{ACD_matrix}: a matrix that returns \code{ACD} for different values of a tuning parameter.
+\item{ACD_matrix}{a matrix that returns \code{ACD} for different values of a tuning parameter.
 If method is \code{DBSCAN}, then the tuning paramter is \eqn{\epsilon}. 
-If method is \code{TRUST}, then the tuning paramter is \eqn{\delta}. 
-}
+If method is \code{TRUST}, then the tuning paramter is \eqn{\delta}.}
 }
               
 
 \note{
-Parameters \code{lb,ub} are ends points for a range of search for the optimal parameter.
-The parameter candidates are calculated in a way such that \eqn{\code{P}:=  1.1^x , x \in \{lb,lb+0.5,lb+1.0,...,ub \}.}
-Although the default range of search is sufficiently wide, in some cases \code{lb,ub} can be 
-further extended if a warning message is given.
+Parameters \code{lb,ub} are end points for a range of search for the optimal parameter.
+The parameter candidates are calculated in a way such that \eqn{P:=  1.1^x , x \in {lb,lb+0.5,lb+1.0,...,ub }}. Although the default range of search is sufficiently wide, in some cases \code{lb,ub} can be further extended if a warning message is given.
 
-For more discussion on properties of the considered clustering algorithms and DR procedure see Huang et al. (2016)
+For more discussion on properties of the considered clustering algorithms and DR procedure see Huang et al. (2016).
 }
             
 \references{
-Huang, X., Iliev, I., Brenning, A., Gel, Y.R. (2016). Space-Time Clustering with Stability Probe while Riding Downhill. In
-\emph{KDD’16 workshop on Mining and Learning from Time Series (MiLeTS 2016)} \url{http://www-bcf.usc.edu/~liu32/milets16/#papers}.
+Ciampi, A., Appice, A., and Malerba, D. (2010). Discovering trend-based clusters in spatially distributed data streams. In \emph{International Workshop of Mining Ubiquitous and Social Environments}, pages 107--122.
 
-Ester, M., Kriegel, H. P., Sander, J., Xu, X. (1996). A density-based algorithm for discovering clusters in large spatial databases with noise. In
-\emph{Proc. KDD’96} (Vol. 96, No. 34, pp. 226-231).
+Ester, M., Kriegel, H. P., Sander, J., and Xu, X. (1996). A density-based algorithm for discovering clusters in large spatial databases with noise. In \emph{Proc. KDD'96} (Vol. 96, No. 34, pp. 226--231).
 
-Ciampi, A., Appice, A., Malerba, D. (2010). Discovering trend-based clusters in spatially distributed data streams. In
-\emph{International Workshop of Mining Ubiquitous and Social Environments} (pp. 107-122).
+Huang, X., Iliev, I., Brenning, A., and Gel, Y. R. (2016). Space-Time Clustering with Stability Probe while Riding Downhill. In \emph{KDD'16 workshop on Mining and Learning from Time Series (MiLeTS 2016)} \url{http://www-bcf.usc.edu/~liu32/milets16/#papers}.
 }
             
 \author{
-Huang, Xin, Gel, Yulia R.
+Xin Huang, Yulia R. Gel
 }           
             
             
@@ -86,7 +75,7 @@ ground_truth_label <- iris[,5]
 
 # perform DR procedure to select optimal eps for DBSCAN 
 # and save it in variable eps_opt
-eps_opt <- DR (t(Data),method="DBSCAN", minPts = 5)$P_opt   
+eps_opt <- DR(t(Data), method="DBSCAN", minPts = 5)$P_opt   
 
 # apply DBSCAN with the optimal eps on iris data 
 # and save the clustering result in variable res

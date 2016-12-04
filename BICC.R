@@ -1,3 +1,9 @@
+# My comments on GitHub to Ethan:
+# - N should be identified from the input x.
+# -library() exclude
+# -add the DELTA_opt and EPSILON_opt to the output of this function.
+
+
 BICC <- function(x, N = NULL, WINDOW = NULL, p = NULL, SHIFT = NULL, TREND = NULL)
   
 {
@@ -13,7 +19,7 @@ BICC <- function(x, N = NULL, WINDOW = NULL, p = NULL, SHIFT = NULL, TREND = NUL
       
       #---------------------------------------------------------------------------------------------
       #Apply Clustering to Data(x) using the DELTA values above in order to obtain BIC
-      library(funtimes)
+      #library(funtimes)
       
       bic <- matrix(NA, length(DELTA), length(EPS))
       for (i in 1:length(DELTA)){ #i=1
