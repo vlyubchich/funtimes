@@ -30,6 +30,7 @@ Purity <- function(classes, clusters)
       }else{ #tmp should be a row-vector
         tmp <- t(as.matrix(tmp))
         rownames(tmp) <- unique(classes)[!is.element(unique(classes), ClassLabels)]
+        if(length(tmp)==1) colnames(tmp) <- unique(clusters)[!is.element(unique(clusters), ClusterLabels)]
       }
     }
   }

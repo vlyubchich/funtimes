@@ -11,7 +11,7 @@ sync.test(formula, B = 1000, Window = NULL, q = NULL, j = NULL,
 }
 
 \arguments{
-  \item{formula}{an object of class "formula", specifying the form of the common parametric time trend to be tested in a \eqn{TxN} matrix of time series (time series in columns). Variable \eqn{t} should be used to specify the form of the trend, where \eqn{t} is specified within the function as a regular sequence on the interval (0,1]. See `Examples'.}
+  \item{formula}{an object of class "formula", specifying the form of the common parametric time trend to be tested in a \eqn{T\times N} matrix of time series (time series in columns). Variable \eqn{t} should be used to specify the form of the trend, where \eqn{t} is specified within the function as a regular sequence on the interval (0,1]. See `Examples'.}
 
   \item{B}{number of bootstrap simulations to obtain empirical critical values.} 
   
