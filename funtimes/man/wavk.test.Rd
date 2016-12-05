@@ -76,7 +76,7 @@ Wang, L. and Van Keilegom, I. (2007). Nonparametric test for the form of paramet
 
 \examples{
 
-# Fix seed for reproduceable simulations:
+# Fix seed for reproducible simulations:
 set.seed(1)
 
 #Simulate autoregressive time series of length n with smooth quadratic trend:

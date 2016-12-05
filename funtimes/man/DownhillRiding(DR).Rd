@@ -32,8 +32,8 @@ A list containing the following components:
 If method is \code{TRUST}, then \code{P_opt} is optimal \eqn{\delta}.}
 
 \item{ACD_matrix}{a matrix that returns \code{ACD} for different values of a tuning parameter.
-If method is \code{DBSCAN}, then the tuning paramter is \eqn{\epsilon}. 
-If method is \code{TRUST}, then the tuning paramter is \eqn{\delta}.}
+If method is \code{DBSCAN}, then the tuning parameter is \eqn{\epsilon}. 
+If method is \code{TRUST}, then the tuning parameter is \eqn{\delta}.}
 }
               
 

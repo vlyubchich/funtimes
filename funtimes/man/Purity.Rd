@@ -42,7 +42,7 @@ Vyacheslav Lyubchich
 }
 
 \examples{
-# Fix seed for reproduceable simulations:
+# Fix seed for reproducible simulations:
 set.seed(1)
 
 ##### Example 1

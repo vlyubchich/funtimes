@@ -26,7 +26,7 @@ ARest <- function(x, ar.order = NULL, ar.method = "HVK", BIC = TRUE)
         }
         tmp <- filter(x, pheta0, sides=1)
         et <- x[i:n] - tmp[(i-1):(n-1)]
-        bic[i] <- (n-i+1)*log(var(et)) + (i-1)*log(n-i+1)
+        bic[i] <- n*log(var(et)) + i*log(n) #here use i = ARorder p + 1 (variance)
       }
       if(which.min(bic)>1){
         if(ar.method == "HVK"){

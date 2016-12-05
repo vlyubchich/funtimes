@@ -11,7 +11,7 @@ sync.test(formula, B = 1000, Window = NULL, q = NULL, j = NULL,
 }
 
 \arguments{
-  \item{formula}{an object of class "formula", specifying the form of the common parametric time trend to be tested in a \eqn{TxN} matrix of time series (time series in columns). Variable \eqn{t} should be used to specify the form of the trend, where \eqn{t} is specified within the function as a regular sequence on the interval (0,1]. See `Examples'.}
+  \item{formula}{an object of class "formula", specifying the form of the common parametric time trend to be tested in a \eqn{T\times N} matrix of time series (time series in columns). Variable \eqn{t} should be used to specify the form of the trend, where \eqn{t} is specified within the function as a regular sequence on the interval (0,1]. See `Examples'.}
 
   \item{B}{number of bootstrap simulations to obtain empirical critical values.} 
   
@@ -29,7 +29,6 @@ sync.test(formula, B = 1000, Window = NULL, q = NULL, j = NULL,
 }
 
 \details{
-
 Arguments \code{Window}, \code{j}, and \code{q} are used to set windows for the local regression. Current version of the function assumes two options: (1) user specifies one fixed window for each time series using the argument \code{Window} (if \code{Window} is set, \code{j} and \code{q} are ignored), and (2) user specifies a set of windows by \code{j} and \code{q} to apply this set to each time series and to select an optimal window using a heuristic \eqn{m}-out-of-\eqn{n} subsampling algorithm (Bickel and Sakov, 2008). The option of selecting windows automatically for some of the time series, while for other time series the window is fixed, is not available yet. If none of these three arguments is set, default \code{j} and \code{q} are used. Values \code{T*q^j} are mapped to the largest previous integer, then only those greater than 2 are used.
 }
 
@@ -71,7 +70,7 @@ Wang, L. and Van Keilegom, I. (2007). Nonparametric test for the form of paramet
 
 \examples{
 
-# Fix seed for reproduceable simulations:
+# Fix seed for reproducible simulations:
 set.seed(1)
 
 # Simulate two autoregressive time series of length n without trend 

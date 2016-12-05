@@ -6,7 +6,7 @@ Slide-Level Time Series Cluster Expansion
 }
 
 \description{
-This is an auxillary function to expand a slide-level time series cluster, based on Ciampi et al. (2010).}
+This is an auxiliary function to expand a slide-level time series cluster, based on Ciampi et al. (2010).}
 
 \usage{
 CExpandSlideCluster(u, Xuncl, Alpha, Beta, Delta, Theta)

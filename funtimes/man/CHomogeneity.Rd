@@ -6,7 +6,7 @@ Time Series Cluster Homogeneity
 }
 
 \description{
-This is an auxillary function to check homogeneity of time series cluster, based on Definition 4 by Ciampi et al. (2010).}
+This is an auxiliary function to check homogeneity of time series cluster, based on Definition 4 by Ciampi et al. (2010).}
 
 \usage{
 CHomogeneity(Bu, Bv, Alpha, Beta, Delta)

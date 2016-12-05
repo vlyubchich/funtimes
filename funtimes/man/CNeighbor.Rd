@@ -6,7 +6,7 @@ Neighborhood of Time Series
 }
 
 \description{
-This is an auxillary function to identify which time series in \code{Bv} are \eqn{E^\theta_\delta}-neighbors of \code{Bu}, based on Definition 2 by Ciampi et al. (2010).
+This is an auxiliary function to identify which time series in \code{Bv} are \eqn{E^\theta_\delta}-neighbors of \code{Bu}, based on Definition 2 by Ciampi et al. (2010).
 }
 
 \usage{

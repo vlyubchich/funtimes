@@ -4,7 +4,7 @@
 \description{
 Estimate parameters \eqn{\phi} of autoregressive time series model
 \deqn{X_t = \sum_{i=1}^p\phi_iX_{t-i} + e_t,} 
-by default using robust difference-based estimator and BIC to select the order \eqn{p}. This function is mainly employed for time series filtering in functions \code{\link{sync.test}} and \code{\link{wavk.test}}.
+by default using robust difference-based estimator and Bayesian information criterion (BIC) to select the order \eqn{p}. This function is mainly employed for time series filtering in functions \code{\link{sync.test}} and \code{\link{wavk.test}}.
 }
 
 \usage{
@@ -20,6 +20,11 @@ ARest(x, ar.order = NULL, ar.method = "HVK", BIC = TRUE)
   \item{BIC}{logical value indicates whether the order of autoregressive filter should be selected by Bayesian information criterion (BIC). If \code{TRUE} (default), models of orders \eqn{p=} 0,1,...,\code{ar.order} or \eqn{p=} 0,1,...,\code{round(10*log10(length(x)))} are considered, depending on whether \code{ar.order} is defined or not.}
 }
 
+\details{
+The same formula for BIC is used consistently for all methods:
+\deqn{BIC=n\ln(\widehat{\sigma^2}) + k\ln(n),}
+where \eqn{n} = \code{length(x)}, \eqn{k=p+1}.
+}
 
 \value{A vector of estimated AR coefficients. Returns \code{numeric(0)} if the final \eqn{p=0}.}
 
@@ -35,7 +40,7 @@ Hall, P. and Van Keilegom, I. (2003). Using difference-based methods for inferen
 
 
 \examples{
-# Fix seed for reproduceable simulations:
+# Fix seed for reproducible simulations:
 set.seed(1)
 
 #Simulate some time series, possibly with trend:
