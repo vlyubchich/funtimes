@@ -52,7 +52,11 @@ Vyacheslav Lyubchich, Ethan Schaeffer
 }
 
 \examples{
+<<<<<<< HEAD
 # Fix seed for reproducible simulations:
+=======
+# Fix seed for reproduceable simulations:
+>>>>>>> 3840f31c57e8f0298ddf920c8770d5e9e0ba02e8
 set.seed(1)
 
 ##### Example 1
@@ -70,7 +74,11 @@ colnames(X) <- paste("TS", c(1:dim(X)[2]), sep="")
 # 1.2 Clustering
 # Assume that information arrives in year-long slides or data chunks
 p <- 12 #number of time layers (months) in a slide
+<<<<<<< HEAD
 # Let the upper level of clustering (window) be the whole period of 3 years, so
+=======
+# Let the upper level of clistering (window) be the whole period of 3 years, so
+>>>>>>> 3840f31c57e8f0298ddf920c8770d5e9e0ba02e8
 w <- 3 #number of slides in a window
 s <- w #step to shift a window, but it does not matter much here as we have only one window of data
 tmp <- BICC(X, p=p, w=w, s=s)
