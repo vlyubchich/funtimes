@@ -15,11 +15,11 @@ CSlideCluster(X, Alpha = NULL, Beta = NULL, Delta = NULL, Theta = 0.8)
   \item{X}{a matrix of time series observed within a slide (time series in columns).}
   \item{Alpha}{lower limit of the time series domain.
   
-  Default is \code{quantile(X)[2]-1.5*(quantile(X)[4]-quantile(X)[2])}.}
+  Default is \code{quantile(X)[2] - 1.5*(quantile(X)[4] - quantile(X)[2])}.}
   \item{Beta}{upper limit of the time series domain. 
   
-  Default is \code{quantile(X)[2]+1.5*(quantile(X)[4]-quantile(X)[2])}.}
-  \item{Delta}{closeness parameter, a real value in [0,1]. Default is \code{0.1*(Beta-Alpha)}.}
+  Default is \code{quantile(X)[2] + 1.5*(quantile(X)[4] - quantile(X)[2])}.}
+  \item{Delta}{closeness parameter, a real value in [0,1]. Default is \code{0.1*(Beta - Alpha)}.}
   \item{Theta}{connectivity parameter, a real value in [0,1]. Default is 0.8.}
 }
 

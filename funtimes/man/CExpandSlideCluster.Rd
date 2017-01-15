@@ -42,9 +42,9 @@ Vyacheslav Lyubchich
 set.seed(123)
 u <- rnorm(10)
 Xuncl <- matrix(rt(50, 5), 10, 5)
-Alpha <- min(cbind(u,Xuncl))
-Beta <- max(cbind(u,Xuncl))
-CExpandSlideCluster(u, Xuncl, Alpha, Beta, Delta=0.15, Theta=0.8)
+Alpha <- min(cbind(u, Xuncl))
+Beta <- max(cbind(u, Xuncl))
+CExpandSlideCluster(u, Xuncl, Alpha, Beta, Delta = 0.15, Theta = 0.8)
 }
 
 \keyword{ts}

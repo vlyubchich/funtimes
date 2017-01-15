@@ -43,9 +43,9 @@ Vyacheslav Lyubchich
 \examples{
 Bu <- rnorm(10)
 Bv <- rnorm(10)
-Alpha <- min(c(Bu,Bv))
-Beta <- max(c(Bu,Bv))
-CNeighbor(Bu, Bv, Alpha, Beta, Delta=0.5, Theta=0.8)
+Alpha <- min(c(Bu, Bv))
+Beta <- max(c(Bu, Bv))
+CNeighbor(Bu, Bv, Alpha, Beta, Delta = 0.5, Theta = 0.8)
 }
 
 \keyword{ts}

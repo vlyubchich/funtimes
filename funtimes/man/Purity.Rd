@@ -1,5 +1,5 @@
-\name{Purity}
-\alias{Purity}
+\name{purity}
+\alias{purity}
 
 \title{Clustering Purity}
 
@@ -8,7 +8,7 @@ Calculate purity of the clustering results.
 }
 
 \usage{
-Purity(classes, clusters)
+purity(classes, clusters)
 }
 
 \arguments{
@@ -25,7 +25,7 @@ If \eqn{\max_{j}|\omega_k\cap c_j|} is not unique for some \eqn{j}, it is assign
 
 \value{
 A list with two elements:
-\item{purity}{purity value.}
+\item{pur}{purity value.}
 
 \item{out}{table with \eqn{\min(K,J)} = \code{min(length(unique(classes)), length(unique(clusters)))} rows and the following columns: \code{ClassLabels}, \code{ClusterLabels}, and \code{ClusterSize}.}
 }
@@ -47,13 +47,15 @@ set.seed(1)
 
 ##### Example 1
 #Create some classes and cluster labels:
-classes <- rep(LETTERS[1:3], each=5)
-clusters <- sample(letters[1:5], length(classes), replace=TRUE)
+classes <- rep(LETTERS[1:3], each = 5)
+clusters <- sample(letters[1:5], length(classes), replace = TRUE)
 
-#From the table below, it is clear that 
-#for j=1 (Class A), cluster 'b' should be chosen, however,
-#for j=2 (Class B), between clusters 'd' and 'e', 'e' should be chosen,
-#because cluster 'd' also highly intersects with Class C:
+#From the table below:
+# - cluster 'b' corresponds to class A;
+# - either of the clusters 'd' and 'e' can correspond to class B,
+#   however, 'e' should be chosen, because cluster 'd' also highly 
+#   intersects with Class C. Thus,
+# - cluster 'd' corresponds to class C.
 table(classes, clusters)
 ##       clusters
 ##classes a b c d e
@@ -62,10 +64,10 @@ table(classes, clusters)
 ##      C 1 2 0 2 0
 
 #The function does this choice automatically:
-Purity(classes, clusters)
+purity(classes, clusters)
 
 #Sample output:
-##$purity
+##$pur
 ##[1] 0.4666667
 ##
 ##$out
@@ -77,9 +79,9 @@ Purity(classes, clusters)
 
 ##### Example 2
 #The labels can be also numeric:
-classes <- rep(1:5, each=3)
-clusters <- sample(1:3, length(classes), replace=TRUE)
-Purity(classes, clusters)
+classes <- rep(1:5, each = 3)
+clusters <- sample(1:3, length(classes), replace = TRUE)
+purity(classes, clusters)
 }
 
 \keyword{cluster}

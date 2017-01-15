@@ -22,7 +22,7 @@ ARest(x, ar.order = NULL, ar.method = "HVK", BIC = TRUE)
 
 \details{
 The same formula for BIC is used consistently for all methods:
-\deqn{BIC=n\ln(\widehat{\sigma^2}) + k\ln(n),}
+\deqn{BIC=n\ln(\hat{\sigma}^2) + k\ln(n),}
 where \eqn{n} = \code{length(x)}, \eqn{k=p+1}.
 }
 
@@ -45,13 +45,13 @@ set.seed(1)
 
 #Simulate some time series, possibly with trend:
 n <- 100
-Y <- arima.sim(n=n, list(order=c(2,0,0), ar=c(-0.7, -0.1)))
+Y <- arima.sim(n = n, list(order = c(2, 0, 0), ar = c(-0.7, -0.1)))
 plot.ts(Y)
 
 #Estimate the coefficients:
 ARest(Y) #HVK by default
-ARest(Y, ar.method="yw") #Yule--Walker
-ARest(Y, ar.method="burg") #Burg
+ARest(Y, ar.method = "yw") #Yule--Walker
+ARest(Y, ar.method = "burg") #Burg
 }
 
 \keyword{ts}

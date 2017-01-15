@@ -2,31 +2,34 @@
 \alias{i.tails}
 \title{Interval-based tails comparison}
 \description{
-This function compares right tails of two sample distributions using an interval-based approach. 
+This function compares right tails of two sample distributions using an interval-based approach (IBA). 
 }
 
 \usage{
-i.tails(x, y, d=NULL)
+i.tails(x0, x1, d=NULL)
 }
 
 \arguments{
-  \item{x,y}{vectors of the same length (preferably). Tail in \eqn{y} is compared against the tail in \eqn{x}. \eqn{x \ge d} is used to obtain interval width.}
+  \item{x0,x1}{vectors of the same length (preferably). Tail in \code{x1} is compared against the tail in \code{x0}. }
   
-  \item{d}{a threshold defining the tail. The threshold is the same for both \eqn{x} and \eqn{y}. Default is \code{quantile(x, probs=0.99)}.}
+  \item{d}{a threshold defining the tail. The threshold is the same for both \code{x0} and \code{x1}. Default is \code{quantile(x0, probs=0.99)}.}
 }
 
 \details{
-Sturges' formula is used to calculate number of intervals for \eqn{x \ge d}, then interval width is derived. The same interval width is applied to \eqn{y \ge d}. The tails, \eqn{x \ge d} and \eqn{y \ge d}, are divided into the intervals, and number of \eqn{y}-values is compared with the number of \eqn{x}-values within each interval. 
+Sturges' formula is used to calculate number of intervals (\eqn{k}) for \code{x0} \eqn{\ge} \code{d}, then interval width is derived. The tails, \code{x0} \eqn{\ge} \code{d} and \code{x1} \eqn{\ge} \code{d}, are divided into the intervals. Number of \code{x1}-values within each interval is compared with the number of \code{x0}-values within the same interval (this difference is reported as \code{Nk}).
 }
 
 \value{
 A list with two elements:
-\item{Nk}{vector that tells how many more \eqn{y}-values compared with \eqn{x}-values there are within each interval.}
+\item{Nk}{vector that tells how many more \code{x1}-values compared with \code{x0}-values there are within each interval.}
 \item{Ck}{vector of intervals' centers.}
 }
 
 \references{
-Chu, C., Gel, Y. R. and Lyubchich, V. (2015) Climate change from an insurance perspective: a case study of Norway. In \emph{Proceedings of the 5th International Workshop on Climate Informatics}.
+Chu, C., Gel, Y. R., and Lyubchich, V. (2015) Climate change from an insurance perspective: a case study of Norway. In \emph{Proceedings of the 5th International Workshop on Climate Informatics}.
+
+Lyubchich, V. and Gel, Y. R. (2016) Can we weather proof our insurance?
+\emph{Environmetrics}. DOI: \href{http://dx.doi.org/10.1002/env.2433}{10.1002/env.2433}
 }
 
 \author{Calvin Chu, Yulia R. Gel, Vyacheslav Lyubchich}
@@ -36,8 +39,9 @@ Chu, C., Gel, Y. R. and Lyubchich, V. (2015) Climate change from an insurance pe
 
 
 \examples{
-x <- rnorm(1000); y <- rt(1000, 5)
-i.tails(x, y)
+x0 <- rnorm(1000)
+x1 <- rt(1000, 5)
+i.tails(x0, x1)
 }
 
 \keyword{ts}

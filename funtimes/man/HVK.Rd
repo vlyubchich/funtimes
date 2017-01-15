@@ -6,7 +6,7 @@ Estimates coefficients in non-parametric autoregression using the difference-bas
 }
 
 \usage{
-HVK(X, m1=NULL, m2=NULL, ar.order=1)
+HVK(X, m1 = NULL, m2 = NULL, ar.order = 1)
 }
 
 \arguments{
@@ -34,8 +34,8 @@ Hall, P. and Van Keilegom, I. (2003). Using difference-based methods for inferen
 \author{Yulia R. Gel, Vyacheslav Lyubchich, Xingyu Wang}
 
 \examples{
-X <- arima.sim(n=300, list(order=c(1,0,0), ar=c(0.6)))
-HVK(as.vector(X), ar.order=1)
+X <- arima.sim(n = 300, list(order = c(1, 0, 0), ar = c(0.6)))
+HVK(as.vector(X), ar.order = 1)
 }
 
 \keyword{ts}

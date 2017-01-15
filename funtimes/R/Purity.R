@@ -1,4 +1,4 @@
-Purity <- function(classes, clusters) 
+purity <- function(classes, clusters) 
 {
   tmp <- cbind(classes, clusters)
   tmp <- tmp[order(tmp[,1]), ]
@@ -36,5 +36,5 @@ Purity <- function(classes, clusters)
   }
   out <- data.frame(ClassLabels, ClusterLabels, ClusterSize)
   out <- out[order(out$ClassLabels),]
-  list(purity=sum(ClusterSize)/length(classes), out=out)
+  list(pur=sum(ClusterSize)/length(classes), out=out)
 }
