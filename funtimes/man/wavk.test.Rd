@@ -6,9 +6,9 @@ Non-parametric test to detect (non-)monotonic parametric trends in time series.
 }
 
 \usage{
-wavk.test(formula, factor.length=c("user.defined", "adaptive.selection"), 
-          Window=NULL, q=3/4, j=c(8:11), B=1000, method=c("boot", "asympt"), 
-         ar.order=NULL, ar.method = "HVK", BIC=TRUE, out=FALSE)
+wavk.test(formula, factor.length = c("user.defined", "adaptive.selection"), 
+          Window = NULL, q = 3/4, j = c(8:11), B = 1000, method = c("boot", "asympt"), 
+          ar.order = NULL, ar.method = "HVK", BIC = TRUE, out = FALSE)
 }
 \arguments{
   \item{formula}{an object of class "\code{\link[stats]{formula}}", specifying the form of the parametric time trend to be tested. Variable \eqn{t} should be used to specify the form, where \eqn{t} is specified within the function as a regular sequence on the interval (0,1]. See `Examples'.}
@@ -81,13 +81,15 @@ set.seed(1)
 
 #Simulate autoregressive time series of length n with smooth quadratic trend:
 n <- 100
-U <- 1 + 2*(1:n/n) + 4*(1:n/n)^2 + arima.sim(n=n, list(order=c(2,0,0), ar=c(-0.7, -0.1)))
+tsTrend <- 1 + 2*(1:n/n) + 4*(1:n/n)^2
+tsNoise <- arima.sim(n = n, list(order = c(2, 0, 0), ar = c(-0.7, -0.1)))
+U <- tsTrend + tsNoise
 plot.ts(U)
 
 
 #Test H0 of a linear trend, with m-out-of-n selection of the local window:
 \dontrun{
-wavk.test(U~t, factor.length="adaptive.selection")}
+wavk.test(U ~ t, factor.length = "adaptive.selection")}
 # Sample output:
 ##	Trend test by Wang, Akritas, and Van Keilegom (bootstrap p-values)
 ##
@@ -99,7 +101,7 @@ wavk.test(U~t, factor.length="adaptive.selection")}
 #Test H0 of a quadratic trend, with m-out-of-n selection of the local window 
 #and output of all results:
 \dontrun{
-wavk.test(U~poly(t,2), factor.length="adaptive.selection", out=TRUE)}
+wavk.test(U ~ poly(t, 2), factor.length = "adaptive.selection", out = TRUE)}
 # Sample output:
 ##	Trend test by Wang, Akritas, and Van Keilegom (bootstrap p-values)
 ##
@@ -127,7 +129,7 @@ wavk.test(U~poly(t,2), factor.length="adaptive.selection", out=TRUE)}
 
 
 # Test H0 of no trend (constant trend) using asymptotic distribution of statistic.
-wavk.test(U~1, method="asympt")
+wavk.test(U ~ 1, method = "asympt")
 # Sample output:
 ##	Trend test by Wang, Akritas, and Van Keilegom (asymptotic p-values)
 ##

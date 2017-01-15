@@ -36,8 +36,8 @@ Vyacheslav Lyubchich
 
 \examples{
 set.seed(123)
-e <- sample(c(TRUE, FALSE), 5, replace=TRUE)
-Euncl <- matrix(sample(c(TRUE, FALSE), 5, replace=TRUE), 5, 5)
+e <- sample(c(TRUE, FALSE), 5, replace = TRUE)
+Euncl <- matrix(sample(c(TRUE, FALSE), 5, replace = TRUE), 5, 5)
 CExpandWindowCluster(e, Euncl)
 }
 

@@ -1,6 +1,8 @@
 BICC <- function(X, Alpha=NULL, Beta=NULL, Theta=0.8, p, w, s) 
 {
-  N <- ncol(X)
+  i <- dim(X)
+  N <- i[2] #number of time series
+  n <- i[1] #length of time series
   IQRx <- median(apply(X, 2, IQR))
   DELTA <- seq(IQRx/50, IQRx/2, IQRx/10)
   EPS <- seq(1.0/w, 1.0, 1.0/w)
@@ -10,7 +12,7 @@ BICC <- function(X, Alpha=NULL, Beta=NULL, Theta=0.8, p, w, s)
       outputTMP <- CWindowCluster(X, Delta=DELTA[i], Epsilon=EPS[j], Alpha=Alpha, Beta=Beta, Theta=Theta, p=p, w=w, s=s)
       k <- max(outputTMP) 
       Res <- sapply(1:k, function(v) as.matrix(X[,v==outputTMP])-rowMeans(as.matrix(X[,v==outputTMP])))
-      VarRes <- var(as.vector(unlist(Res)))
+      VarRes <- var(as.vector(unlist(Res)))*(n*N-1)/(n*N) #biased variance estimate for BIC
       IC[i,j] <- N*log(VarRes) + k*log(N) #BIC
     }
   }

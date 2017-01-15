@@ -41,9 +41,9 @@ Vyacheslav Lyubchich
 \examples{
 Bu <- rnorm(10)
 Bv <- rnorm(10)
-Alpha <- min(c(Bu,Bv))
-Beta <- max(c(Bu,Bv))
-CHomogeneity(Bu, Bv, Alpha, Beta, Delta=0.5)
+Alpha <- min(c(Bu, Bv))
+Beta <- max(c(Bu, Bv))
+CHomogeneity(Bu, Bv, Alpha, Beta, Delta = 0.5)
 }
 
 \keyword{ts}

@@ -11,7 +11,7 @@ sync.test(formula, B = 1000, Window = NULL, q = NULL, j = NULL,
 }
 
 \arguments{
-  \item{formula}{an object of class "formula", specifying the form of the common parametric time trend to be tested in a \eqn{T\times N} matrix of time series (time series in columns). Variable \eqn{t} should be used to specify the form of the trend, where \eqn{t} is specified within the function as a regular sequence on the interval (0,1]. See `Examples'.}
+  \item{formula}{an object of class "formula", specifying the form of the common parametric time trend to be tested in a \eqn{T} by \eqn{N} matrix of time series (time series in columns). Variable \eqn{t} should be used to specify the form of the trend, where \eqn{t} is specified within the function as a regular sequence on the interval (0,1]. See `Examples'.}
 
   \item{B}{number of bootstrap simulations to obtain empirical critical values.} 
   
@@ -77,15 +77,15 @@ set.seed(1)
 #(i.e., with zero or constant trend) 
 # and arrange the series into a matrix:
 n <- 200
-y1 <- arima.sim(n=n, list(order=c(1,0,0), ar=c(0.6)))
-y2 <- arima.sim(n=n, list(order=c(1,0,0), ar=c(-0.2)))
+y1 <- arima.sim(n = n, list(order = c(1, 0, 0), ar = c(0.6)))
+y2 <- arima.sim(n = n, list(order = c(1, 0, 0), ar = c(-0.2)))
 Y <- cbind(y1, y2)
 plot.ts(Y)
 
 
 #Test H0 of a common linear trend:
 \dontrun{
-sync.test(Y ~ t, B=500)}
+sync.test(Y ~ t, B = 500)}
 # Sample output:
 ##	Non-parametric test for synchronism of parametric trends
 ##
@@ -115,11 +115,11 @@ sync.test(Y ~ t, B=500)}
 
 
 # Add a time series y3 with a different linear trend and re-apply the test:
-y3 <- 1 + 3*((1:n)/n) + arima.sim(n=n, list(order=c(1,0,0), ar=c(-0.2)))
+y3 <- 1 + 3*((1:n)/n) + arima.sim(n = n, list(order = c(1, 0, 0), ar = c(-0.2)))
 Y2 <- cbind(Y, y3)
 plot.ts(Y2)
 \dontrun{
-sync.test(Y2 ~ t, B=500)}
+sync.test(Y2 ~ t, B = 500)}
 # Sample output:
 ##	Non-parametric test for synchronism of parametric trends
 ##

@@ -2,39 +2,38 @@
 \alias{q.tails}
 \title{Quantile-based tails comparison}
 \description{
-This function compares right tails of two sample distributions using a quantile-based approach. 
+This function compares right tails of two sample distributions using a quantile-based approach (QBA). 
 }
 
 \usage{
-q.tails(x, y, q=0.99)
+q.tails(x0, x1, q=0.99)
 }
 
 \arguments{
-  \item{x,y}{vectors of the same length (preferably). Tail in \eqn{y} is compared against the tail in \eqn{x}.}
-  \item{q}{a threshold defining the tail for both \eqn{x} and \eqn{y}, set as a quantile. Default is 99th percentile.}
+  \item{x0,x1}{vectors of the same length (preferably). Tail in \code{x1} is compared against the tail in \code{x0}.}
+  \item{q}{a quantile defining the right tail for both \code{x0} and \code{x1}. Values above the  thresholds \code{quantile(x0, probs=q)} and \code{quantile(x1, probs=q)} are considered as the respective right tails.}
 }
 
 \details{
-Sturges' formula is used to calculate number of intervals (\eqn{k}) to split the upper \eqn{100(1-q)}\% portion of \eqn{x} and \eqn{y} (the right tail). Then, the tail is divided into equally-filled intervals with a quantile step \eqn{d=(1-q)/k}. \eqn{Pk} reports the difference between corresponding intervals' centers obtained from \eqn{x} and \eqn{y}.
+Sturges' formula is used to calculate number of intervals (\eqn{k}) to split the upper \eqn{100(1-q)}\% portion of \code{x0} and \code{x1} (the right tails). Then, each tail is divided into equally-filled intervals with a quantile step \eqn{d=(1-q)/k}. \code{Pk} reports the difference between corresponding intervals' centers obtained from \code{x0} and \code{x1}.
 }
 
 \value{
 A list with two elements:
 \item{d}{the quantile step.}
-\item{Pk}{vector of differences of intervals' centers.}
+\item{Pk}{vector of differences of the intervals' centers.}
 }
 
 \references{
-Soliman, M., Lyubchich, V., Gel, Y. R., Naser, D. and Esterby, S. (2015)
+Soliman, M., Lyubchich, V., Gel, Y. R., Naser, D., and Esterby, S. (2015)
 Evaluating the impact of climate change on dynamics of house insurance claims.
-In V. Lakshmanan et al. (eds.) \emph{Machine Learning and Data Mining Approaches to Climate Science}, pages 175--183. Springer International Publishing Switzerland.
-\url{http://www.springer.com/us/book/9783319172194#}
+Ch. 16 in V. Lakshmanan et al. (Eds.) \emph{Machine Learning and Data Mining Approaches to Climate Science}, pages 175--183. Springer International Publishing.
+DOI: \href{http://dx.doi.org/10.1007/978-3-319-17220-0}{10.1007/978-3-319-17220-0}
 
-Soliman, M., Naser, D., Lyubchich, V., Gel, Y. R. and Esterby, S. (2014)
+Soliman, M., Naser, D., Lyubchich, V., Gel, Y. R., and Esterby, S. (2014)
 Evaluating the impact of climate change on dynamics of house insurance claims.
 In \emph{Proceedings of the 4th International Workshop on Climate Informatics}.
-\url{https://www2.image.ucar.edu/sites/default/files/35-%20InsuranceAbstractRevisedJan19.pdf#overlay-context=event/ci2014/poster35
-}
+\url{http://esc.cbl.umces.edu/pubs/2014-Soliman et al-CI_proceedings.pdf}
 }
 
 \author{Vyacheslav Lyubchich, Yulia R. Gel}
@@ -44,8 +43,9 @@ In \emph{Proceedings of the 4th International Workshop on Climate Informatics}.
 
 
 \examples{
-x <- rnorm(1000); y <- rt(1000, 5)
-q.tails(x, y)
+x0 <- rnorm(1000)
+x1 <- rt(1000, 5)
+q.tails(x0, x1)
 }
 
 \keyword{ts}

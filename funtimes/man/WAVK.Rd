@@ -11,9 +11,9 @@ WAVK(z, kn = NULL)
 
 \arguments{
   \item{z}{pre-filtered univariate time series (see formula (2.1) by Wang and Van Keilegom, 2007):
-  \deqn{Z_i=\left(Y_{i+p}-\sum_{j=1}^p{\hat{\phi}_{j,n}Y_{i+p-j}} \right)-\left( f(\hat{\theta},t_{i+p})-\sum_{j=1}^p{\widehat{\phi}_{j,n}f(\widehat{\theta},t_{i+p-j})} \right)
+  \deqn{Z_i=\left(Y_{i+p}-\sum_{j=1}^p{\hat{\phi}_{j,n}Y_{i+p-j}} \right)-\left( f(\hat{\theta},t_{i+p})-\sum_{j=1}^p{\hat{\phi}_{j,n}f(\hat{\theta},t_{i+p-j})} \right)
 ,} 
-where \eqn{Y_i} is observed time series of length \eqn{n}, \eqn{\widehat{\theta}} is an estimator of hypothesized parametric trend \eqn{f(\theta, t)}, and \eqn{\hat{\phi}_p=(\hat{\phi}_{1,n}, \ldots, \hat{\phi}_{p,n})'} are estimated coefficients of an autoregressive filter of order \eqn{p}. Missing values are not allowed.}
+where \eqn{Y_i} is observed time series of length \eqn{n}, \eqn{\hat{\theta}} is an estimator of hypothesized parametric trend \eqn{f(\theta, t)}, and \eqn{\hat{\phi}_p=(\hat{\phi}_{1,n}, \ldots, \hat{\phi}_{p,n})'} are estimated coefficients of an autoregressive filter of order \eqn{p}. Missing values are not allowed.}
 
   \item{kn}{length of the local window.}
 }
@@ -49,7 +49,7 @@ Wang, L. and Van Keilegom, I. (2007). Nonparametric test for the form of paramet
 
 \examples{
 z <- rnorm(300)
-WAVK(z, kn=7)
+WAVK(z, kn = 7)
 }
 
 \keyword{ts}
