@@ -11,3 +11,4 @@ Maintainer: Vyacheslav Lyubchich <lyubchic@umces.edu>
 Depends: Jmisc, R (>= 3.0.0)
 License: GPL (>= 2)
 Description: Includes non-parametric estimators and tests for time series analysis. The functions are to test for presence of possibly non-monotonic trends and for synchronism of trends in multiple time series, using modern bootstrap techniques and robust non-parametric difference-based estimators.
+Imports: dbscan

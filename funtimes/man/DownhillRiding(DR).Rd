@@ -74,6 +74,7 @@ Huang, Xin, Gel, Yulia R.
          
             
 \examples{
+\dontrun{
 ## example 1
 ## use iris data to test DR procedure
 
@@ -93,7 +94,7 @@ eps_opt <- DR (t(Data),method="DBSCAN", minPts = 5)$P_opt
 res <- dbscan(Data, eps = eps_opt, minPts =5)$cluster  
 
 # calculate NMI to compare the clustering result with the ground truth label
-cl_agreement(as.cl_partition(ground_truth_label),
+clue::cl_agreement(as.cl_partition(ground_truth_label),
             as.cl_partition(as.numeric(res)), method = "NMI") 
 # visualize the clustering result and compare it with the ground truth result
 # 3D visualization of clustering result using variables Sepal.Width, Sepal.Length, 
@@ -113,27 +114,25 @@ require(zoo)
 
 # simulate 16 time series for 4 clusters, each cluster contains 4 time series
 set.seed(114) 
-samp_Ind <- sample(16,replace=F)
-time_points <- 60
-X <- matrix(0,nrow=time_points,ncol = 16)
+samp_Ind <- sample(12,replace=F)
+time_points <- 30
+X <- matrix(0,nrow=time_points,ncol = 12)
 cluster1 <- sapply(1:4,function(x) arima.sim(list(order=c(1,0,0),ar=c(0.2)),
-                                            n=time_points,mean=0,sd=1))
+                                             n=time_points,mean=0,sd=1))
 cluster2 <- sapply(1:4,function(x) arima.sim(list(order=c(2,0,0),ar=c(0.1,-0.2)),
-                                            n=time_points,mean=2,sd=1))
+                                             n=time_points,mean=2,sd=1))
 cluster3 <- sapply(1:4,function(x) arima.sim(list(order=c(1,0,1),ar=c(0.3),ma=c(0.1)),
-                                            n=time_points,mean=6,sd=1))
-cluster4 <- sapply(1:4,function(x) arima.sim(list(order=c(1,0,0),ar=c(0.4)),
-                                            n=time_points,mean=8,sd=1))
+                                             n=time_points,mean=6,sd=1))
 
 X[,samp_Ind[1:4]] <- t(round(cluster1,4))
 X[,samp_Ind[5:8]] <- t(round(cluster2,4))
 X[,samp_Ind[9:12]] <- t(round(cluster3,4))
-X[,samp_Ind[13:16]] <- t(round(cluster4,4))
+
 
 # create ground truth label of the synthetic data
-ground_truth_label = matrix(1,nrow=16,ncol=1) 
-for(k in 1:4){
- ground_truth_label[samp_Ind[(4*k-4+1):(4*k)]] = k
+ground_truth_label = matrix(1,nrow=12,ncol=1) 
+for(k in 1:3){
+  ground_truth_label[samp_Ind[(4*k-4+1):(4*k)]] = k
 }
 
 # perform DR procedure to select optimal delta for TRUST
@@ -145,17 +144,17 @@ delta_opt <- DR(X,method="TRUST")$P_opt
 res <- CSlideCluster(X,Delta=delta_opt ,Theta=0.9)  
 
 # calculate NMI to compare the clustering result with the ground truth label
-cl_agreement(as.cl_partition(as.numeric(ground_truth_label)),
-            as.cl_partition(as.numeric(res)),method = "NMI")
+clue::cl_agreement(as.cl_partition(as.numeric(ground_truth_label)),
+             as.cl_partition(as.numeric(res)),method = "NMI")
 
 # visualize the clustering result and compare it with the ground truth result
 # visualization of the clustering result obtained by TRUST
 plot.zoo(X, type = "l",plot.type = "single",col = res, xlab = "Time Index", ylab ="")
 # visualization of the ground truth result 
 plot.zoo(X, type = "l",plot.type = "single",col = ground_truth_label,
-        xlab = "Time Index", ylab ="")
+         xlab = "Time Index", ylab ="")
 
              
-
+}
 }
 
