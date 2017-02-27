@@ -14,7 +14,12 @@ DR(X, method, minPts = 3, theta = 0.9, B = 500, lb = -30, ub = 10)
 \arguments{
 \item{X}{a \eqn{n\times k} matrix where columns are \eqn{k} objects to be clustered, and each object contains n observations (objects could be a set of time series).}
 
+<<<<<<< HEAD:DownhillRiding(DR).Rd
 \item{method}{the clustering method to be used (currently either \code{"TRUST"} or \code{"DBSCAN"}). If method is \code{DBSCAN}, then set \code{MinPts} and optimal \eqn{\epsilon} is selected using DR. If method is \code{TRUST}, then set \code{theta} and optimal \eqn{\delta} is selected using DR.}
+=======
+\item{method}{the clustering method to be used (currently either \dQuote{TRUST} or \dQuote{DBSCAN}). If method is \code{DBSCAN}, then set \code{MinPts} 
+and optimal \eqn{\epsilon} is selected using DR. If method is \code{TRUST}, then set \code{theta} and optimal \eqn{\delta} is selected using DR.}
+>>>>>>> 8b518a03c427650affd288dbacb8b610ea632964:funtimes/man/DownhillRiding(DR).Rd
 
 \item{minPts}{the minimum number of samples in an \eqn{\epsilon}-neighborhood of a point to be considered as a core point. The \code{minPts} is to be used only with \code{DBSCAN} method. Default value is 3.}
 
@@ -45,9 +50,17 @@ For more discussion on properties of the considered clustering algorithms and DR
 }
             
 \references{
+<<<<<<< HEAD:DownhillRiding(DR).Rd
 Ciampi, A., Appice, A., and Malerba, D. (2010). Discovering trend-based clusters in spatially distributed data streams. In \emph{International Workshop of Mining Ubiquitous and Social Environments}, pages 107--122.
 
 Ester, M., Kriegel, H. P., Sander, J., and Xu, X. (1996). A density-based algorithm for discovering clusters in large spatial databases with noise. In \emph{Proc. KDD'96} (Vol. 96, No. 34, pp. 226--231).
+=======
+Huang, X., Iliev, I., Brenning, A., Gel, Y.R. (2016). Space-Time Clustering with Stability Probe while Riding Downhill. In
+\emph{KDD 2016 workshop on Mining and Learning from Time Series (MiLeTS 2016)} \url{http://www-bcf.usc.edu/~liu32/milets16/#papers}.
+
+Ester, M., Kriegel, H. P., Sander, J., Xu, X. (1996). A density-based algorithm for discovering clusters in large spatial databases with noise. In
+\emph{Proc. KDD 1996} (Vol. 96, No. 34, pp. 226-231).
+>>>>>>> 8b518a03c427650affd288dbacb8b610ea632964:funtimes/man/DownhillRiding(DR).Rd
 
 Huang, X., Iliev, I., Brenning, A., and Gel, Y. R. (2016). Space-Time Clustering with Stability Probe while Riding Downhill. In \emph{KDD'16 workshop on Mining and Learning from Time Series (MiLeTS 2016)} \url{http://www-bcf.usc.edu/~liu32/milets16/#papers}.
 }
@@ -63,6 +76,7 @@ Xin Huang, Yulia R. Gel
          
             
 \examples{
+\dontrun{
 ## example 1
 ## use iris data to test DR procedure
 
@@ -82,7 +96,7 @@ eps_opt <- DR(t(Data), method="DBSCAN", minPts = 5)$P_opt
 res <- dbscan(Data, eps = eps_opt, minPts =5)$cluster  
 
 # calculate NMI to compare the clustering result with the ground truth label
-cl_agreement(as.cl_partition(ground_truth_label),
+clue::cl_agreement(as.cl_partition(ground_truth_label),
             as.cl_partition(as.numeric(res)), method = "NMI") 
 # visualize the clustering result and compare it with the ground truth result
 # 3D visualization of clustering result using variables Sepal.Width, Sepal.Length, 
@@ -102,27 +116,25 @@ require(zoo)
 
 # simulate 16 time series for 4 clusters, each cluster contains 4 time series
 set.seed(114) 
-samp_Ind <- sample(16,replace=F)
-time_points <- 60
-X <- matrix(0,nrow=time_points,ncol = 16)
+samp_Ind <- sample(12,replace=F)
+time_points <- 30
+X <- matrix(0,nrow=time_points,ncol = 12)
 cluster1 <- sapply(1:4,function(x) arima.sim(list(order=c(1,0,0),ar=c(0.2)),
-                                            n=time_points,mean=0,sd=1))
+                                             n=time_points,mean=0,sd=1))
 cluster2 <- sapply(1:4,function(x) arima.sim(list(order=c(2,0,0),ar=c(0.1,-0.2)),
-                                            n=time_points,mean=2,sd=1))
+                                             n=time_points,mean=2,sd=1))
 cluster3 <- sapply(1:4,function(x) arima.sim(list(order=c(1,0,1),ar=c(0.3),ma=c(0.1)),
-                                            n=time_points,mean=6,sd=1))
-cluster4 <- sapply(1:4,function(x) arima.sim(list(order=c(1,0,0),ar=c(0.4)),
-                                            n=time_points,mean=8,sd=1))
+                                             n=time_points,mean=6,sd=1))
 
 X[,samp_Ind[1:4]] <- t(round(cluster1,4))
 X[,samp_Ind[5:8]] <- t(round(cluster2,4))
 X[,samp_Ind[9:12]] <- t(round(cluster3,4))
-X[,samp_Ind[13:16]] <- t(round(cluster4,4))
+
 
 # create ground truth label of the synthetic data
-ground_truth_label = matrix(1,nrow=16,ncol=1) 
-for(k in 1:4){
- ground_truth_label[samp_Ind[(4*k-4+1):(4*k)]] = k
+ground_truth_label = matrix(1,nrow=12,ncol=1) 
+for(k in 1:3){
+  ground_truth_label[samp_Ind[(4*k-4+1):(4*k)]] = k
 }
 
 # perform DR procedure to select optimal delta for TRUST
@@ -134,17 +146,17 @@ delta_opt <- DR(X,method="TRUST")$P_opt
 res <- CSlideCluster(X,Delta=delta_opt ,Theta=0.9)  
 
 # calculate NMI to compare the clustering result with the ground truth label
-cl_agreement(as.cl_partition(as.numeric(ground_truth_label)),
-            as.cl_partition(as.numeric(res)),method = "NMI")
+clue::cl_agreement(as.cl_partition(as.numeric(ground_truth_label)),
+             as.cl_partition(as.numeric(res)),method = "NMI")
 
 # visualize the clustering result and compare it with the ground truth result
 # visualization of the clustering result obtained by TRUST
 plot.zoo(X, type = "l",plot.type = "single",col = res, xlab = "Time Index", ylab ="")
 # visualization of the ground truth result 
 plot.zoo(X, type = "l",plot.type = "single",col = ground_truth_label,
-        xlab = "Time Index", ylab ="")
+         xlab = "Time Index", ylab ="")
 
              
-
+}
 }
 
