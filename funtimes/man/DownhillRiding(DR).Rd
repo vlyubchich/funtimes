@@ -14,12 +14,7 @@ DR(X, method, minPts = 3, theta = 0.9, B = 500, lb = -30, ub = 10)
 \arguments{
 \item{X}{a \eqn{n\times k} matrix where columns are \eqn{k} objects to be clustered, and each object contains n observations (objects could be a set of time series).}
 
-<<<<<<< HEAD:DownhillRiding(DR).Rd
-\item{method}{the clustering method to be used (currently either \code{"TRUST"} or \code{"DBSCAN"}). If method is \code{DBSCAN}, then set \code{MinPts} and optimal \eqn{\epsilon} is selected using DR. If method is \code{TRUST}, then set \code{theta} and optimal \eqn{\delta} is selected using DR.}
-=======
-\item{method}{the clustering method to be used (currently either \dQuote{TRUST} or \dQuote{DBSCAN}). If method is \code{DBSCAN}, then set \code{MinPts} 
-and optimal \eqn{\epsilon} is selected using DR. If method is \code{TRUST}, then set \code{theta} and optimal \eqn{\delta} is selected using DR.}
->>>>>>> 8b518a03c427650affd288dbacb8b610ea632964:funtimes/man/DownhillRiding(DR).Rd
+\item{method}{the clustering method to be used (currently either \dQuote{TRUST} or \dQuote{DBSCAN}). If method is \code{DBSCAN}, then set \code{MinPts} and optimal \eqn{\epsilon} is selected using DR. If method is \code{TRUST}, then set \code{theta} and optimal \eqn{\delta} is selected using DR.}
 
 \item{minPts}{the minimum number of samples in an \eqn{\epsilon}-neighborhood of a point to be considered as a core point. The \code{minPts} is to be used only with \code{DBSCAN} method. Default value is 3.}
 
@@ -50,19 +45,11 @@ For more discussion on properties of the considered clustering algorithms and DR
 }
             
 \references{
-<<<<<<< HEAD:DownhillRiding(DR).Rd
 Ciampi, A., Appice, A., and Malerba, D. (2010). Discovering trend-based clusters in spatially distributed data streams. In \emph{International Workshop of Mining Ubiquitous and Social Environments}, pages 107--122.
 
-Ester, M., Kriegel, H. P., Sander, J., and Xu, X. (1996). A density-based algorithm for discovering clusters in large spatial databases with noise. In \emph{Proc. KDD'96} (Vol. 96, No. 34, pp. 226--231).
-=======
-Huang, X., Iliev, I., Brenning, A., Gel, Y.R. (2016). Space-Time Clustering with Stability Probe while Riding Downhill. In
-\emph{KDD 2016 workshop on Mining and Learning from Time Series (MiLeTS 2016)} \url{http://www-bcf.usc.edu/~liu32/milets16/#papers}.
+Ester, M., Kriegel, H. P., Sander, J., and Xu, X. (1996). A density-based algorithm for discovering clusters in large spatial databases with noise. In \emph{Proc. KDD 1996} (Vol. 96, No. 34, pp. 226--231).
 
-Ester, M., Kriegel, H. P., Sander, J., Xu, X. (1996). A density-based algorithm for discovering clusters in large spatial databases with noise. In
-\emph{Proc. KDD 1996} (Vol. 96, No. 34, pp. 226-231).
->>>>>>> 8b518a03c427650affd288dbacb8b610ea632964:funtimes/man/DownhillRiding(DR).Rd
-
-Huang, X., Iliev, I., Brenning, A., and Gel, Y. R. (2016). Space-Time Clustering with Stability Probe while Riding Downhill. In \emph{KDD'16 workshop on Mining and Learning from Time Series (MiLeTS 2016)} \url{http://www-bcf.usc.edu/~liu32/milets16/#papers}.
+Huang, X., Iliev, I., Brenning, A., and Gel, Y. R. (2016). Space-Time Clustering with Stability Probe while Riding Downhill. In \emph{KDD 2016 workshop on Mining and Learning from Time Series (MiLeTS 2016)} \url{http://www-bcf.usc.edu/~liu32/milets16/#papers}.
 }
             
 \author{
@@ -160,3 +147,5 @@ plot.zoo(X, type = "l",plot.type = "single",col = ground_truth_label,
 }
 }
 
+\keyword{ts}
+\keyword{trend}
