@@ -45,6 +45,7 @@ For more discussion on properties of the considered clustering algorithms and DR
 }
             
 \references{
+
 Ciampi, A., Appice, A., and Malerba, D. (2010). Discovering trend-based clusters in spatially distributed data streams. In \emph{International Workshop of Mining Ubiquitous and Social Environments}, pages 107--122.
 
 Ester, M., Kriegel, H. P., Sander, J., and Xu, X. (1996). A density-based algorithm for discovering clusters in large spatial databases with noise. In \emph{Proc. KDD 1996} (Vol. 96, No. 34, pp. 226--231).
