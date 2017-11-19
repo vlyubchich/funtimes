@@ -1,14 +1,16 @@
 Package: funtimes
 Type: Package
 Title: Functions for Time Series Analysis
-Version: 3.0
-Date: 2016-09-01
-Author: Vyacheslav Lyubchich;
-        Yulia R. Gel;
-        Calvin Chu;
-        Xingyu Wang
-Maintainer: Vyacheslav Lyubchich <lyubchic@umces.edu>
-Depends: Jmisc, R (>= 3.0.0)
+Version: 4.0
+Date: 2017-02-28
+Authors@R: c(person("Vyacheslav", "Lyubchich", role = c("aut", "cre"),
+                    email="lyubchic@umces.edu"),
+             person("Yulia R.", "Gel", role = "aut"),
+             person("Calvin", "Chu", role = "ctb"),
+             person("Xin", "Huang", role = "ctb"),
+             person("Ethan D.", "Schaeffer", role = "ctb"),
+             person("Xingyu", "Wang", role = "ctb"))
+Depends: dbscan, Jmisc, Kendall, R (>= 3.0.0)
 License: GPL (>= 2)
 Description: Includes non-parametric estimators and tests for time series analysis. The functions are to test for presence of possibly non-monotonic trends and for synchronism of trends in multiple time series, using modern bootstrap techniques and robust non-parametric difference-based estimators.
 Imports: dbscan

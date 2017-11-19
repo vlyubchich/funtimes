@@ -1,12 +1,12 @@
 \name{HVK}
 \alias{HVK}
-\title{HVK estimator}
+\title{HVK Estimator}
 \description{
 Estimates coefficients in non-parametric autoregression using the difference-based approach by Hall and Van Keilegom (2003).
 }
 
 \usage{
-HVK(X, m1=NULL, m2=NULL, ar.order=1)
+HVK(X, m1 = NULL, m2 = NULL, ar.order = 1)
 }
 
 \arguments{
@@ -28,14 +28,14 @@ Vector of length \code{ar.order} with estimated autoregression coefficients.
 }
 
 \references{
-Hall, P. and Van Keilegom, I. (2003) Using difference-based methods for inference in nonparametric regression with time series errors. \emph{J. R. Statist. Soc. B} 65, Part 2, 443--456.
+Hall, P. and Van Keilegom, I. (2003). Using difference-based methods for inference in nonparametric regression with time series errors. \emph{Journal of the Royal Statistical Society: Series B (Statistical Methodology)}, 65: 443--456. DOI: \href{http://dx.doi.org/10.1111/1467-9868.00395}{10.1111/1467-9868.00395}
 }
 
 \author{Yulia R. Gel, Vyacheslav Lyubchich, Xingyu Wang}
 
 \examples{
-X <- arima.sim(n=300, list(order=c(1,0,0), ar=c(0.6)))
-HVK(as.vector(X), ar.order=1)
+X <- arima.sim(n = 300, list(order = c(1, 0, 0), ar = c(0.6)))
+HVK(as.vector(X), ar.order = 1)
 }
 
 \keyword{ts}

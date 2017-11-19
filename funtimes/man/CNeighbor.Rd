@@ -2,11 +2,11 @@
 \alias{CNeighbor}
 
 \title{
-Neighborhood of time series
+Neighborhood of Time Series
 }
 
 \description{
-This is an auxillary function to identify which time series in \code{Bv} are \eqn{E^\theta_\delta}-neighbors of \code{Bu}, based on Definition 2 by Ciampi et al. (2010).
+This is an auxiliary function to identify which time series in \code{Bv} are \eqn{E^\theta_\delta}-neighbors of \code{Bu}, based on Definition 2 by Ciampi et al. (2010).
 }
 
 \usage{
@@ -26,7 +26,7 @@ CNeighbor(Bu, Bv, Alpha, Beta, Delta, Theta)
 A vector of logical values indicating which time series in \code{Bv} are \eqn{E^\theta_\delta}-neighbors of \code{Bu}.}
 
 \references{
-Ciampi, A., Appice, A. and Malerba, D. (2010) Discovering trend-based clusters in spatially distributed data streams. In \emph{International Workshop of Mining Ubiquitous and Social Environments}, pages 107--122.
+Ciampi, A., Appice, A., and Malerba, D. (2010). Discovering trend-based clusters in spatially distributed data streams. In \emph{International Workshop of Mining Ubiquitous and Social Environments}, pages 107--122.
 }
 
 \author{
@@ -37,15 +37,15 @@ Vyacheslav Lyubchich
          \code{\link{CExpandSlideCluster}},
          \code{\link{CSlideCluster}},
          \code{\link{CExpandWindowCluster}},
-         \code{\link{CWindowCluster}}.
+         \code{\link{CWindowCluster}}
 }
 
 \examples{
 Bu <- rnorm(10)
 Bv <- rnorm(10)
-Alpha <- min(c(Bu,Bv))
-Beta <- max(c(Bu,Bv))
-CNeighbor(Bu, Bv, Alpha, Beta, Delta=0.5, Theta=0.8)
+Alpha <- min(c(Bu, Bv))
+Beta <- max(c(Bu, Bv))
+CNeighbor(Bu, Bv, Alpha, Beta, Delta = 0.5, Theta = 0.8)
 }
 
 \keyword{ts}

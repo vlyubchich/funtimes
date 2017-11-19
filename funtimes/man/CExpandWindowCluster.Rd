@@ -2,11 +2,11 @@
 \alias{CExpandWindowCluster}
 
 \title{
-Window-level time series cluster expansion
+Window-Level Time Series Cluster Expansion
 }
 
 \description{
-This is an auxillary function to expand a window-level time series cluster, based on Ciampi et al. (2010).}
+This is an auxiliary function to expand a window-level time series cluster, based on Ciampi et al. (2010).}
 
 \usage{
 CExpandWindowCluster(e, Euncl)
@@ -20,7 +20,7 @@ CExpandWindowCluster(e, Euncl)
 \value{A vector of logical values indicating which time series in \code{Euncl} should be included in the window-level cluster with \code{e}.}
 
 \references{
-Ciampi, A., Appice, A. and Malerba, D. (2010) Discovering trend-based clusters in spatially distributed data streams. In \emph{International Workshop of Mining Ubiquitous and Social Environments}, pages 107--122.
+Ciampi, A., Appice, A., and Malerba, D. (2010). Discovering trend-based clusters in spatially distributed data streams. In \emph{International Workshop of Mining Ubiquitous and Social Environments}, pages 107--122.
 }
 
 \author{
@@ -31,13 +31,13 @@ Vyacheslav Lyubchich
          \code{\link{CHomogeneity}},
          \code{\link{CSlideCluster}},
          \code{\link{CExpandSlideCluster}},
-         \code{\link{CWindowCluster}}.
+         \code{\link{CWindowCluster}}
 }
 
 \examples{
 set.seed(123)
-e <- sample(c(TRUE, FALSE), 5, replace=TRUE)
-Euncl <- matrix(sample(c(TRUE, FALSE), 5, replace=TRUE), 5, 5)
+e <- sample(c(TRUE, FALSE), 5, replace = TRUE)
+Euncl <- matrix(sample(c(TRUE, FALSE), 5, replace = TRUE), 5, 5)
 CExpandWindowCluster(e, Euncl)
 }
 

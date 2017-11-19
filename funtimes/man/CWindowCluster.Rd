@@ -2,7 +2,7 @@
 \alias{CWindowCluster}
 
 \title{
-Window-level time series clustering
+Window-Level Time Series Clustering
 }
 
 \description{This function clusters time series at a window level, based on the Algorithm 2 of Ciampi et al. (2010).}
@@ -35,7 +35,7 @@ A vector (if \code{X} contains only one window) or matrix with cluster labels fo
 }
 
 \references{
-Ciampi, A., Appice, A. and Malerba, D. (2010) Discovering trend-based clusters in spatially distributed data streams. In \emph{International Workshop of Mining Ubiquitous and Social Environments}, pages 107--122.
+Ciampi, A., Appice, A., and Malerba, D. (2010). Discovering trend-based clusters in spatially distributed data streams. In \emph{International Workshop of Mining Ubiquitous and Social Environments}, pages 107--122.
 }
 
 \author{
@@ -46,7 +46,7 @@ Vyacheslav Lyubchich
          \code{\link{CHomogeneity}},
          \code{\link{CExpandSlideCluster}},
          \code{\link{CExpandWindowCluster}},
-         \code{\link{CSlideCluster}}.
+         \code{\link{CSlideCluster}}
 }
 
 \examples{
@@ -64,24 +64,24 @@ T <- 2*p*w
 
 set.seed(123) 
 phi <- c(0.5) #parameter of autoregression
-X <- sapply(1:N, function(x) arima.sim(n=T+300, 
-  list(order=c(length(phi),0,0),ar=phi)))[301:(T+300),]
-colnames(X) <- paste("TS", c(1:dim(X)[2]), sep="")
+X <- sapply(1:N, function(x) arima.sim(n = T + 300, 
+  list(order = c(length(phi), 0, 0), ar = phi)))[301:(T + 300),]
+colnames(X) <- paste("TS", c(1:dim(X)[2]), sep = "")
 
-tmp <- CWindowCluster(X, Delta=NULL, Theta=0.8, p=p, w=w, s=s, Epsilon=1)
+tmp <- CWindowCluster(X, Delta = NULL, Theta = 0.8, p = p, w = w, s = s, Epsilon = 1)
 
 #Time series were simulated with the same parameters, but based on the clustering parameters,
 #not all time series join the same cluster. We can plot the main cluster for each window, and 
 #time series out of the cluster:
-par(mfrow=c(2,2))
-ts.plot(X[c(1:(p*w)),tmp[1,]==1], ylim=c(-4,4), 
-  main="Time series cluster 1 in window 1")
-ts.plot(X[c(1:(p*w)),tmp[1,]!=1], ylim=c(-4,4), 
-  main="The rest of the time series in window 1")
-ts.plot(X[c(1:(p*w))+s*p,tmp[2,]==1], ylim=c(-4,4), 
-  main="Time series cluster 1 in window 2")
-ts.plot(X[c(1:(p*w))+s*p,tmp[2,]!=1], ylim=c(-4,4), 
-  main="The rest of the time series in window 2")
+par(mfrow = c(2, 2))
+ts.plot(X[c(1:(p*w)), tmp[1,] == 1], ylim = c(-4, 4), 
+  main = "Time series cluster 1 in window 1")
+ts.plot(X[c(1:(p*w)), tmp[1,] != 1], ylim = c(-4, 4), 
+  main = "The rest of the time series in window 1")
+ts.plot(X[c(1:(p*w)) + s*p, tmp[2,] == 1], ylim = c(-4, 4), 
+  main = "Time series cluster 1 in window 2")
+ts.plot(X[c(1:(p*w)) + s*p, tmp[2,] != 1], ylim = c(-4, 4), 
+  main = "The rest of the time series in window 2")
 }
 
 \keyword{ts}

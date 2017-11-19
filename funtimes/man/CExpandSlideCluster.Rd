@@ -2,11 +2,11 @@
 \alias{CExpandSlideCluster}
 
 \title{
-Slide-level time series cluster expansion
+Slide-Level Time Series Cluster Expansion
 }
 
 \description{
-This is an auxillary function to expand a slide-level time series cluster, based on Ciampi et al. (2010).}
+This is an auxiliary function to expand a slide-level time series cluster, based on Ciampi et al. (2010).}
 
 \usage{
 CExpandSlideCluster(u, Xuncl, Alpha, Beta, Delta, Theta)
@@ -24,7 +24,7 @@ CExpandSlideCluster(u, Xuncl, Alpha, Beta, Delta, Theta)
 \value{A vector of logical values indicating which time series in \code{Xuncl} should be included in the slide-level cluster with \code{u}.}
 
 \references{
-Ciampi, A., Appice, A. and Malerba, D. (2010) Discovering trend-based clusters in spatially distributed data streams. In \emph{International Workshop of Mining Ubiquitous and Social Environments}, pages 107--122.
+Ciampi, A., Appice, A., and Malerba, D. (2010). Discovering trend-based clusters in spatially distributed data streams. In \emph{International Workshop of Mining Ubiquitous and Social Environments}, pages 107--122.
 }
 
 \author{
@@ -35,16 +35,16 @@ Vyacheslav Lyubchich
          \code{\link{CHomogeneity}},
          \code{\link{CSlideCluster}},
          \code{\link{CExpandWindowCluster}},
-         \code{\link{CWindowCluster}}.
+         \code{\link{CWindowCluster}}
 }
 
 \examples{
 set.seed(123)
 u <- rnorm(10)
 Xuncl <- matrix(rt(50, 5), 10, 5)
-Alpha <- min(cbind(u,Xuncl))
-Beta <- max(cbind(u,Xuncl))
-CExpandSlideCluster(u, Xuncl, Alpha, Beta, Delta=0.15, Theta=0.8)
+Alpha <- min(cbind(u, Xuncl))
+Beta <- max(cbind(u, Xuncl))
+CExpandSlideCluster(u, Xuncl, Alpha, Beta, Delta = 0.15, Theta = 0.8)
 }
 
 \keyword{ts}
