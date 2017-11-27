@@ -6,8 +6,8 @@ Date: 2017-02-28
 Authors@R: c(person("Vyacheslav", "Lyubchich", role = c("aut", "cre"),
                     email="lyubchic@umces.edu"),
              person("Yulia R.", "Gel", role = "aut"),
+             person("Xin", "Huang", role = "aut"),
              person("Calvin", "Chu", role = "ctb"),
-             person("Xin", "Huang", role = "ctb"),
              person("Ethan D.", "Schaeffer", role = "ctb"),
              person("Xingyu", "Wang", role = "ctb"))
 Depends: dbscan, Jmisc, Kendall, R (>= 3.0.0)
