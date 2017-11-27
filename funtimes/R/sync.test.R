@@ -128,8 +128,8 @@ sync.test <- function(formula, B = 1000, Window = NULL, q = NULL, j = NULL,
     p.value.ass <- crit.ass * 2
     p.value.ass[crit.ass>0.5] <- (1 - crit.ass[crit.ass>0.5]) * 2
     #
-    ESTIMATE <- list(TrendCoeff, OutputARorder, OutputWindow, cbind(kn, ST, p.value.boot.all, p.value.ass))
-    names(ESTIMATE) <- list("common_trend_estimates", "ar.order_used", "Window_used", "all_considered_windows")
+    ESTIMATE <- list(TrendCoeff, OutputARorder, OutputWindow, cbind(kn, ST, p.value.boot.all, p.value.ass), wavk_obs)
+    names(ESTIMATE) <- list("common_trend_estimates", "ar.order_used", "Window_used", "all_considered_windows", "wavk_obs")
     dimnames(ESTIMATE[[4]]) <- list(rep("", NROW(ESTIMATE[[4]])), c("Window", "Statistic", "p-value", "Asympt. p-value"))
   }else{
     p.value.boot.all <- P.VALUE
@@ -141,12 +141,12 @@ sync.test <- function(formula, B = 1000, Window = NULL, q = NULL, j = NULL,
     p.value.ass[crit.ass>0.5] <- (1 - crit.ass[crit.ass>0.5]) * 2
     #
     if(ONEwindow){
-      ESTIMATE <- list(TrendCoeff, OutputARorder, OutputWindow, cbind(Window[1], ST, p.value.boot.all, p.value.ass))
-      names(ESTIMATE) <- list("common_trend_estimates", "ar.order_used", "Window_used", "all_considered_windows")
+      ESTIMATE <- list(TrendCoeff, OutputARorder, OutputWindow, cbind(Window[1], ST, p.value.boot.all, p.value.ass), wavk_obs)
+      names(ESTIMATE) <- list("common_trend_estimates", "ar.order_used", "Window_used", "all_considered_windows", "wavk_obs")
       dimnames(ESTIMATE[[4]]) <- list(rep("", NROW(ESTIMATE[[4]])), c("Window", "Statistic", "p-value", "Asympt. p-value"))
     }else{
-      ESTIMATE <- list(TrendCoeff, OutputARorder, OutputWindow, cbind(ST, p.value.boot.all, p.value.ass))
-      names(ESTIMATE) <- list("common_trend_estimates", "ar.order_used", "Window_used", "all_considered_windows")
+      ESTIMATE <- list(TrendCoeff, OutputARorder, OutputWindow, cbind(ST, p.value.boot.all, p.value.ass), wavk_obs)
+      names(ESTIMATE) <- list("common_trend_estimates", "ar.order_used", "Window_used", "all_considered_windows", "wavk_obs")
       dimnames(ESTIMATE[[4]]) <- list(rep("", NROW(ESTIMATE[[4]])), c("Statistic", "p-value", "Asympt. p-value"))
     }
   }

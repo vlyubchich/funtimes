@@ -45,7 +45,7 @@ A list of class htest containing the following components:
 
   \item{alternative}{alternative hypothesis.}
 
-  \item{estimate}{list with elements \code{common_trend_estimates}, \code{ar_order_used}, \code{Window_used}, and \code{all_considered_windows}. The latter is a table with bootstrap and asymptotic test results for all considered windows, i.e., without adaptive selection of the local window.}
+  \item{estimate}{list with elements \code{common_trend_estimates}, \code{ar_order_used}, \code{Window_used}, \code{wavk_obs}, and \code{all_considered_windows}. The latter is a table with bootstrap and asymptotic test results for all considered windows, i.e., without adaptive selection of the local window.}
 }
 
 \references{
@@ -112,7 +112,9 @@ sync.test(Y ~ t, B = 500)}
 ##     11 -0.024994408   0.860       0.7886005
 ##     15 -0.047030164   0.976       0.6138976
 ##     20 -0.015078579   0.668       0.8714980
-
+##
+##$wavk_obs
+##[1]  0.05827148 -0.06117136
 
 # Add a time series y3 with a different linear trend and re-apply the test:
 y3 <- 1 + 3*((1:n)/n) + arima.sim(n = n, list(order = c(1, 0, 0), ar = c(-0.2)))
@@ -146,7 +148,9 @@ sync.test(Y2 ~ t, B = 500)}
 ##     11 0.5637067       0    5.620248e-07
 ##     15 0.6369703       0    1.566057e-08
 ##     20 0.7431621       0    4.201484e-11
-
+##
+##$wavk_obs
+##[1]  0.08941797 -0.07985614  0.34672734
 
 #Other hypothesized trend forms can be specified, for example:
 \dontrun{
