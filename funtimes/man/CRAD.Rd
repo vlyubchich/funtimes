@@ -7,7 +7,7 @@ A density-based clustering algorithm, named CRAD, which is based on an adaptive 
 }
 
 \usage{
-crad(X, Nbin, StepSize, Rcov = FALSE)
+crad(X, Nbin, StepSize = 1, Rcov = FALSE)
 }
 
 \arguments{
@@ -17,7 +17,7 @@ crad(X, Nbin, StepSize, Rcov = FALSE)
 
 \item{StepSize}{the size of neighbor buckets in histogram \code{H} to compare for each \eqn{h_{i},i = 1, 1-width, 1-2*width, . . . , width}. Default value is 1.}
 
-\item{Rcov}{a robust covariance matrix estimator, Minimum Covariance Determinant (MCD), will be used when \code{Rcov = FALSE} (a default option), or the sample covariance matrix \code{cov(X)}.}
+\item{Rcov}{a robust covariance matrix estimator, Minimum Covariance Determinant (MCD), will be used when \code{Rcov = TRUE}, or the sample covariance matrix \code{cov(X)} (a default option).}
 }
 \value{a \eqn{n \times 1} numeric vector indicating class memembership for each observation from CRAD clustering.}
 
