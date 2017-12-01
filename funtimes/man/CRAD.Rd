@@ -1,5 +1,5 @@
-\name{CRAD}
-\alias{CRAD}
+\name{crad}
+\alias{crad}
 \title{CRAD Clustering Algorithm}
 
 \description{
@@ -7,21 +7,21 @@ A density-based clustering algorithm, named CRAD, which is based on an adaptive 
 }
 
 \usage{
-crad(X, StepSize, Nbin, Rcov = FALSE)
+crad(X, Nbin, StepSize = 1, Rcov = FALSE)
 }
 
 \arguments{
-\item{X}{a n \eqn{\times} k matrix where n is a number of observations and k is a number of features. }
+\item{X}{a \eqn{n \times k} matrix where \eqn{n} is a number of observations and \eqn{k} is a number of features. }
 
-\item{Nbin}{the number of bins in generating histogram H.}
+\item{Nbin}{the number of bins in generating histogram \code{H}.}
 
-\item{StepSize}{the size of neighbor buckets in histogram H to compare for each \eqn{h_{i},i = 1, 1-width, 1-2*width, . . . , width}. Default value is 1.}
+\item{StepSize}{the size of neighbor buckets in histogram \code{H} to compare for each \eqn{h_{i},i = 1, 1-width, 1-2*width, . . . , width}. Default value is 1.}
 
-\item{Rcov}{a robust covariance matrix estimator, Minimum Covariance Determinant (MCD), will be used. If False (a default option), a sample covariance matrix \code{cov(X)} will used as the estimator.}
+\item{Rcov}{a robust covariance matrix estimator, Minimum Covariance Determinant (MCD), will be used when \code{Rcov = TRUE}, or the sample covariance matrix \code{cov(X)} (a default option).}
 }
-\value{a n \eqn{\times}1 numeric vector indicating class memembership for each observation from CRAD clustering.}
+\value{a \eqn{n \times 1} numeric vector indicating class memembership for each observation from CRAD clustering.}
 
-\note{Since the code is calling Python from R, the data format requirement is that \code{dimnames} of argument \code{X} are to be NULL.}
+\note{Since the code is calling Python from R, the data format requirement is that \code{dimnames} of argument \code{X} are to be \code{NULL}.}
 
 
 \references{
@@ -57,3 +57,4 @@ plot(p, col=as.factor(res_cl))
 
 }
 }
+
