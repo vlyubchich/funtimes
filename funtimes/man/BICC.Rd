@@ -39,7 +39,7 @@ The total length of time series (number of levels, i.e., \code{nrow(X)}) should 
 \references{
 Ciampi, A., Appice, A., and Malerba, D. (2010). Discovering trend-based clusters in spatially distributed data streams. In \emph{International Workshop of Mining Ubiquitous and Social Environments}, pages 107--122.
 
-Schaeffer, E. D., Testa, J. M., Gel, Y. R., and Lyubchich, V. (2016). On information criteria for dynamic spatio-temporal clustering. In A. Banerjee et al. (Eds.) \emph{Proceedings of the 6th International Workshop on Climate Informatics: CI 2016}. NCAR Technical Note NCAR/TN-529+PROC, September 2016, pages 5--8. DOI: \href{http://dx.doi.org/10.5065/D6K072N6}{10.5065/D6K072N6}
+Schaeffer, E. D., Testa, J. M., Gel, Y. R., and Lyubchich, V. (2016). On information criteria for dynamic spatio-temporal clustering. In A. Banerjee et al. (Eds.) \emph{Proceedings of the 6th International Workshop on Climate Informatics: CI 2016}. NCAR Technical Note NCAR/TN-529+PROC, September 2016, pages 5--8. DOI: 10.5065/D6K072N6
 }
 
 \author{

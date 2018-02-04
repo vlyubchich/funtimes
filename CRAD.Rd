@@ -19,21 +19,20 @@ crad(X, Nbin, StepSize = 1, Rcov = FALSE)
 
 \item{Rcov}{a robust covariance matrix estimator, Minimum Covariance Determinant (MCD), will be used when \code{Rcov = TRUE}, or the sample covariance matrix \code{cov(X)} (a default option).}
 }
-\value{a \eqn{n \times 1} numeric vector indicating class memembership for each observation from CRAD clustering.}
+
+\value{A \eqn{n \times 1} numeric vector indicating class membership for each observation from CRAD clustering.}
 
 \note{Since the code is calling Python from R, the data format requirement is that \code{dimnames} of argument \code{X} are to be \code{NULL}.}
 
 
 \references{
-Xin Huang, Yulia R. Gel. CRAD: Clustering with Robust Autocuts and Depth. In \emph{Proc. 17th IEEE International
-Conference on Data Mining (ICDM).} 2017.
+Huang, X. and Gel, Y. R. (2017). CRAD: Clustering with Robust Autocuts and Depth. In \emph{Proc. 17th IEEE International Conference on Data Mining (ICDM).}
 }
-
-
 
 \author{
-Huang, Xin, Gel, Yulia R.
+Xin Huang, Yulia R. Gel
 }
+
 \examples{
 \dontrun{
 require(mlbench)

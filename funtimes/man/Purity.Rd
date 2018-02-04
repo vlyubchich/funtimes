@@ -34,7 +34,7 @@ A list with two elements:
 Manning, C. D., Raghavan, P., and  Schutze, H. (2008). \emph{Introduction to
 Information Retrieval}. New York: Cambridge University Press.
 
-Schaeffer, E. D., Testa, J. M., Gel, Y. R., and Lyubchich, V. (2016). On information criteria for dynamic spatio-temporal clustering. In A. Banerjee et al. (Eds.) \emph{Proceedings of the 6th International Workshop on Climate Informatics: CI 2016}. NCAR Technical Note NCAR/TN-529+PROC, September 2016, pages 5--8. DOI: \href{http://dx.doi.org/10.5065/D6K072N6}{10.5065/D6K072N6}
+Schaeffer, E. D., Testa, J. M., Gel, Y. R., and Lyubchich, V. (2016). On information criteria for dynamic spatio-temporal clustering. In A. Banerjee et al. (Eds.) \emph{Proceedings of the 6th International Workshop on Climate Informatics: CI 2016}. NCAR Technical Note NCAR/TN-529+PROC, September 2016, pages 5--8. DOI: 10.5065/D6K072N6
 }
 
 \author{
