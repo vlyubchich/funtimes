@@ -16,7 +16,11 @@ Clustering(formula, rate = 1, alpha = 0.05, ...)
 
 \item{alpha}{significance level for testing hypothesis of having a common trend of some specific parametric form in the selected time series}
 
-\item{...}{contains other input parameters for sync.test. For example, number of bootstrap (B), Window (Window), \item{q}{scalar from 0 to 1 to define the set of possible windows \code{T*q^j} and to automatically select an optimal window for each time series. Default is \eqn{3/4}. This argument is ignored if \code{Window} is set by user.}
+\item{...}{contains other input parameters for sync.test. For example, number of bootstrap (B), Window (Window), etc.}
+
+\item{B}{number of bootstrap simulations to obtain empirical critical values.} 
+
+\item{q}{scalar from 0 to 1 to define the set of possible windows \code{T*q^j} and to automatically select an optimal window for each time series. Default is \eqn{3/4}. This argument is ignored if \code{Window} is set by user.}
 
 \item{j}{numeric vector to define the set of possible windows \code{T*q^j} and to automatically select an optimal window for each time series. Default is \code{c(8:11)}. This argument is ignored if \code{Window} is set by user.}
   
