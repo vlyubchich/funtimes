@@ -11,14 +11,17 @@ Clustering(formula, rate = 1, alpha = 0.05, ...)
 }
 
 \argument{
-\item{formula}{An object of class "formula", to specify the type of common trend in a \eqn{T} by \eqn{N} matrix of time series (time series in colyumns). Formula can be linear, quadratic or complex }
-\item{rate}{rate of removal of time series}
+\item{formula}{An object of class "formula", to specify the type of common trend in a \eqn{T} by \eqn{N} matrix of time series (time series in colyumns). Formula can be linear, quadratic or complex. }
+\item{rate}{rate of removal of time series.}
 
-\item{alpha}{significance level for testing hypothesis of having a common trend of some specific parametric form in the selected time series}
+\item{alpha}{significance level for testing hypothesis of having a common trend of some specific parametric form in the selected time series. }
 
 \item{...}{contains other input parameters for sync.test. For example, number of bootstrap (B), Window (Window), etc.}
 
 \item{B}{number of bootstrap simulations to obtain empirical critical values.} 
+
+\item{Window}{scalar or \eqn{N}-vector with lengths of the local windows (factors). If only one value is set, the same \code{Window} is applied to each time series. \eqn{N}-vector specifies a particular window for each time series. If no \code{Window} is specified, the automatic algorithm for optimal window selection is performed as a default option (see `Details').}
+
 
 \item{q}{scalar from 0 to 1 to define the set of possible windows \code{T*q^j} and to automatically select an optimal window for each time series. Default is \eqn{3/4}. This argument is ignored if \code{Window} is set by user.}
 
