@@ -1,4 +1,4 @@
-sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...){
+sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...) {
     # Storing the final list of clusters 
     Lfinal <- list() 
     clus_col.Idx <- list() # Storing the index of columns in cluster
