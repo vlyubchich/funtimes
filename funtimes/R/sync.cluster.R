@@ -72,7 +72,11 @@ sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...) {
             #sorting the WAVK result
             WAVKtmp <- sort(WAVKResults)
             # rate of removal of time series
-            nRM <- max(1, round(rate*length(WAVKResults)))
+            if (rate > 1) {
+                nRM <- rate
+            } else {
+                nRM <- max(1, round(rate*length(WAVKResults)))
+            }
             WAVKtmp.rmv <- WAVKtmp[(length(WAVKtmp)-nRM+1):length(WAVKtmp)]
             # removing the time series as per the rate
             Y_star <- Y_star[, !(WAVKResults == WAVKtmp.rmv)]
