@@ -36,12 +36,14 @@ sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...){
     colnames(Y_star) <- 1:N
     colnames(Y) <- 1:N
     
-    while(!is.null(ncol(Y))){
-        if (ncol(Y_star) == 0 || is.null(ncol(Y_star))){break}
-        # synchornism test on Ystar
+    while (!is.null(ncol(Y))) {
+        if (ncol(Y_star) == 0 || is.null(ncol(Y_star))) {break}
+        
+        # synchronism test on Ystar
         SyncResults <- do.call(sync.test,args=list(as.formula(paste("Y_star","~",sh)), ...))
+        
         # if we fail to reject the Null Hypothesis
-        if(SyncResults$p.value>= alpha)
+        if (SyncResults$p.value>= alpha)
         {
             # finding common series
             j = intersect(colnames(Y),colnames(Y_star))
@@ -61,7 +63,9 @@ sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...){
             sync.window_used.Lst[[K]] = SyncResults$estimate$Window_used
             sync.all_consideredWindow.Lst[[K]] = SyncResults$estimate$all_considered_windows
             sync.wavk_obs.Lst[[K]] = SyncResults$estimate$wavk_obs
+            
             K = K+1
+            
         } else {
             # extracting local factor statistics
             WAVKResults <- abs(SyncResults$estimate$wavk_obs)
@@ -92,8 +96,8 @@ sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...){
     clus_col.Idx <- sapply(1:max(unique(L[!is.nan(L)])), function(x) which(L == x)) 
     clus_col.NoBind <- which(L == 0)
     print(list(Clusters=table(Lfinal)))
-    invisible(structure(list(Clusters = Lfinal,Column.Index=clus_col.Idx,Pval = sync.pval.Lst,
-                             TestStatistics = sync.Teststat.Lst,Estimate = sync.stat.Est.Lst, AROrder = sync.ar_order.Lst,
+    invisible(structure(list(Clusters = Lfinal, Column.Index = clus_col.Idx, Pval = sync.pval.Lst, 
+                             TestStatistics = sync.Teststat.Lst, Estimate = sync.stat.Est.Lst, AROrder = sync.ar_order.Lst,
                              WindowUsed = sync.window_used.Lst,
                              allConsideredWindow = sync.all_consideredWindow.Lst, WAVKobs = sync.wavk_obs.Lst)))
     # removing Y_star 
