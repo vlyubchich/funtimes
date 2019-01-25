@@ -20,12 +20,21 @@ sync.cluster(formula, rate = 1, alpha = 0.05, ...)
 }
 
 \details{
-SL: In 1-2 sentences, describe what the function does.
-
+%SL: In 1-2 sentences, describe what the function does.
+The \code{sync.cluster} function recursively clusters the time series having a pre-specified common parametric trend until there are no time series in the matrix to test. With the given N time series, the \code{sync.test} function is used to check the common trend. In the presence of a common trend, countries are grouped together. Othewise, the time series with largest contribution to the test statistics is removed based on the rate of removal.The largest contribution to the test statistics is assessed by WAVK test statistics. The output of the function is the number of clusters obtained.
 }
 
 \value{
-SL: What is the output?
+%SL: What is the output?
+\item{Clusters} {Number of Clusters Obtained}
+\item{Column.Index} {Index of columns of time series (based on the main matrix) with each cluster}
+\item{Pval}{\code{p}-value of the \code{sync.test} statistics}
+\item{TestStatistics}{\code{sync.test} test statistics}
+\item{Estimate}{Parametric trend estimates of a cluster}
+\item{AROrder}{AR filter order}
+\item{WindowUsed}{Window used for the test}
+\item{allConsideredWindow}{Different windows used in the \code{sync.test}}
+\item{WAVKobs}{WAVK test statistics for each cluster}
 }
 
 
@@ -37,25 +46,43 @@ Lyubchich, V. and Gel, Y. R. (2016). A local factor nonparametric test for trend
 }
 
 \examples{
-SL: make examples more meaningful, for example, show/simulate a case with several clusters and detect them; At the same time, demonstrate a couple of different trend shapes.
+%SL: make examples more meaningful, for example, show/simulate a case with several clusters and detect them; At the same time, demonstrate a couple of different trend shapes.
 
+#######  Testing linear trend
 set.seed(1)
+n=60
+nc = 30
+Y = matrix(NA,nrow = n, ncol = nc)
 
-Y <- matrix(rnorm(5000),nrow=50,ncol=100)
+# Matrix of 20 autoregressive time series of length n
+for ( i in 1:nc){
+   
+   Y[,i]<-  arima.sim(n = n, list(order = c(1, 0, 0), ar = c(0.6)))
+    
+}
+# Rate of removal is default
+LinTrend <- sync.cluster(Y~t)
 
-#  Testing linear trend
-Clustering(Y~t)
-# $`Clusters`
-# Lfinal
-#   1 
-# 100
+## Sample output:
+## $`Clusters`
+## Lfinal
+## 0  1  2  3  4 
+## 2 21  2  3  2 
 
-# Testing quadratic trend with increased bootstrap simulations and different window size
-Clustering(Y~poly(t,2),B=5000,Window=10)
-# $`Clusters`
-# Lfinal
-#   1 
-# 100
+## Zero denoting that one time series is not tied to any other series
+## 1, 2, 3 and 4 denote the number of clusters obtained. 
+## The second row shows the number of time series in each cluster.
+
+
+##### Testing Quadaratic Trend
+## Rate of removal is default
+QuadTrend <- sync.cluster(Y~poly(t,2))
+
+
+## $`Clusters`
+## Lfinal
+## 0  1  2  3 
+## 1 20  6  2 
 }
 
 \keyword{trend}
