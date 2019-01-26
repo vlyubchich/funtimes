@@ -37,14 +37,18 @@ sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...) {
     colnames(Y) <- 1:N
     
     while (!is.null(ncol(Y))) {
+        
         if (ncol(Y_star) == 0 || is.null(ncol(Y_star))) {break}
         
         # synchronism test on Ystar
         SyncResults <- do.call(sync.test,args=list(as.formula(paste("Y_star","~",sh)), ...))
         
+        
         # if we fail to reject the Null Hypothesis
         if (SyncResults$p.value>= alpha)
         {
+          
+            
             # finding common series
             j = intersect(colnames(Y),colnames(Y_star))
             # assigning the cluster number to cluster label variable
@@ -67,21 +71,33 @@ sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...) {
             K = K+1
             
         } else {
+            
             # extracting local factor statistics
             WAVKResults <- abs(SyncResults$estimate$wavk_obs)
+           
             #sorting the WAVK result
-            WAVKtmp <- sort(WAVKResults)
-            # rate of removal of time series
-            if (rate > 1) {
+            WAVKtmp <- sort(WAVKResults, index.return = TRUE)
+            if (rate >= 1) {
                 nRM <- rate
             } else {
-                nRM <- max(1, round(rate*length(WAVKResults)))
+                nRM <- round(rate*length(WAVKResults))
             }
-            WAVKtmp.rmv <- WAVKtmp[(length(WAVKtmp)-nRM+1):length(WAVKtmp)]
+            
             # removing the time series as per the rate
-            Y_star <- Y_star[, !(WAVKResults == WAVKtmp.rmv)]
+            if (rate == 1) {
+                
+                Y_star <- Y_star[, !(WAVKResults == max(WAVKResults))]
+                
+            } else {
+                
+                WAVKtmp.rmv <- WAVKtmp$ix[(length(WAVKtmp$ix)-nRM+1):length(WAVKtmp$ix)]
+                Y_star <- Y_star[, -WAVKtmp.rmv]
+            }
+           
+            
         }
         if (is.vector(Y_star)) {
+            
             # finding the position of the matching series
             for ( idx.j in 1:length(colnames(Y))){if (length(which(Y[,idx.j] == Y_star) == TRUE) == nrows){j = idx.j}}
             # Extracting the correct column name from the original Y
@@ -95,15 +111,16 @@ sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...) {
             Y_star <- Y
             N <- ncol(Y_star)
         }
+        Y_star <<- Y_star
     }
     Lfinal <- L
     clus_col.Idx <- sapply(1:max(unique(L[!is.nan(L)])), function(x) which(L == x)) 
     clus_col.NoBind <- which(L == 0)
     print(list(Clusters=table(Lfinal)))
-    invisible(structure(list(Clusters = Lfinal, Column.Index = clus_col.Idx, Pval = sync.pval.Lst, 
+    return(invisible(structure(list(Clusters = Lfinal, Column.Index = clus_col.Idx, Pval = sync.pval.Lst, 
                              TestStatistics = sync.Teststat.Lst, Estimate = sync.stat.Est.Lst, AROrder = sync.ar_order.Lst,
                              WindowUsed = sync.window_used.Lst,
-                             allConsideredWindow = sync.all_consideredWindow.Lst, WAVKobs = sync.wavk_obs.Lst)))
+                             allConsideredWindow = sync.all_consideredWindow.Lst, WAVKobs = sync.wavk_obs.Lst))))
     # removing Y_star 
     rm(Y_star, envir = parent.frame())
 }
