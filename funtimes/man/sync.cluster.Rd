@@ -21,7 +21,7 @@ sync.cluster(formula, rate = 1, alpha = 0.05, ...)
 
 \details{
 %SL: In 1-2 sentences, describe what the function does.
-The \code{sync.cluster} function recursively clusters the time series having a pre-specified common parametric trend until there are no time series in the matrix to test. With the given N time series, the \code{sync.test} function is used to check the common trend. In the presence of a common trend, countries are grouped together. Othewise, the time series with largest contribution to the test statistics is removed based on the rate of removal.The largest contribution to the test statistics is assessed by WAVK test statistics. The output of the function is the number of clusters obtained.
+The \code{sync.cluster} function recursively clusters the time series having a pre-specified common parametric trend until there are no time series in the matrix to test. With a given \eqn{N} time series, the \code{sync.test} function is used to check the common trend. In the presence of a common trend, time series are grouped together. Othewise, the time series with largest contribution to the test statistics is removed based on the rate of removal.The largest contribution to the test statistics is assessed by WAVK test statistics. Output of the function is the number of clusters obtained.
 }
 
 \value{
@@ -83,6 +83,33 @@ QuadTrend <- sync.cluster(Y~poly(t,2))
 ## Lfinal
 ## 0  1  2  3 
 ## 1 20  6  2 
+
+
+# Rate of removal is 2
+set.seed(1)
+n=60
+nc = 50
+Y1= matrix(NA,nrow = n, ncol = nc)
+
+# Matrix of 20 autoregressive time series of length n
+for ( i in 1:nc){
+    
+    Y1[,i]<-  arima.sim(n = n, list(order = c(1, 0, 0), ar = c(0.6)))
+    
+}
+LinTrendR2 <- sync.cluster(Y1~t, rate = 2)
+
+## $`Clusters`
+## Lfinal
+## 1  2  3  4  5  6  7 
+## 30  6  2  2  2  2  2 
+
+QuadTrendR2 <- sync.cluster(Y1~poly(t,2), rate = 2)
+
+## $`Clusters`
+## Lfinal
+## 1  2  3  4  5 
+## 28  4  8  4  2
 }
 
 \keyword{trend}
