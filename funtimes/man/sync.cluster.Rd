@@ -12,7 +12,7 @@ sync.cluster(formula, rate = 1, alpha = 0.05, ...)
 \arguments{
 \item{formula}{an object of class "formula", specifying the type of common trend for clustering the time series in a \eqn{T} by \eqn{N} matrix of time series (time series in columns). Variable \eqn{t} should be used to specify the form of the trend, where \eqn{t} is specified within the function as a regular sequence on the interval (0,1]. See `Examples'.}
 
-\item{rate}{rate of removal of time series. Default is 1 (i.e., one time series is removed at a time to re-test the remaining time series). Values above 1 are treated as number of time series to be removed. Values below 1 are treated as a fraction of time series to be removed.}
+\item{rate}{rate of removal of time series. Default is 1 (i.e., one time series is removed at a time to re-test the remaining time series). Values above 1 are treated as number of time series to be removed. Values from 0 to 1 are treated as a fraction of time series to be removed.}
 
 \item{alpha}{significance level for testing hypothesis of a common trend of the parametric form specified in \code{formula}. }
 
@@ -21,13 +21,14 @@ sync.cluster(formula, rate = 1, alpha = 0.05, ...)
 
 \details{
 %SL: In 1-2 sentences, describe what the function does.
-The \code{sync.cluster} function recursively clusters the time series having a pre-specified common parametric trend until there are no time series in the matrix to test. With a given \eqn{N} time series, the \code{sync.test} function is used to check the common trend. In the presence of a common trend, time series are grouped together. Othewise, the time series with largest contribution to the test statistics is removed based on the rate of removal.The largest contribution to the test statistics is assessed by WAVK test statistics. Output of the function is the number of clusters obtained.
+The \code{sync.cluster} function recursively clusters the time series having a pre-specified common parametric trend until there are no time series in the matrix to test. With a given \eqn{N} time series, the \code{sync.test} function is used to check the common trend. In the presence of a common trend, time series are grouped together. Othewise, the time series with largest contribution to the test statistics is removed based on the rate of removal. The largest contribution to the test statistics is assessed by WAVK test statistics. Output of the function is the number of clusters obtained.
 }
 
 \value{
 %SL: What is the output?
-\item{Clusters} {Number of Clusters Obtained}
-\item{Column.Index} {Index of columns of time series (based on the main matrix) with each cluster}
+A list with the elements:
+\item{Clusters}{Number of Clusters Obtained}
+\item{Column.Index}{Index of columns of time series (based on the main matrix) with each cluster}
 \item{Pval}{\code{p}-value of the \code{sync.test} statistics}
 \item{TestStatistics}{\code{sync.test} test statistics}
 \item{Estimate}{Parametric trend estimates of a cluster}
