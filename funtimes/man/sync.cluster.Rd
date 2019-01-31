@@ -20,12 +20,10 @@ sync.cluster(formula, rate = 1, alpha = 0.05, ...)
 }
 
 \details{
-%SL: In 1-2 sentences, describe what the function does.
 The \code{sync.cluster} function recursively clusters the time series having a pre-specified common parametric trend until there are no time series in the matrix to test. With a given \eqn{N} time series, the \code{sync.test} function is used to check the common trend. In the presence of a common trend, time series are grouped together. Othewise, the time series with largest contribution to the test statistics is removed based on the rate of removal. The largest contribution to the test statistics is assessed by WAVK test statistics. Output of the function is the number of clusters obtained.
 }
 
 \value{
-%SL: What is the output?
 A list with the elements:
 \item{Clusters}{Number of Clusters Obtained}
 \item{Column.Index}{Index of columns of time series (based on the main matrix) in each cluster}
