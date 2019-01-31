@@ -97,19 +97,22 @@ sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...) {
             
         }
         if (is.vector(Y_star)) {
-            
-            # finding the position of the matching series
-            for ( idx.j in 1:length(colnames(Y))){if (length(which(Y[,idx.j] == Y_star) == TRUE) == nrows){j = idx.j}}
-            # Extracting the correct column name from the original Y
-            clm.nm <- colnames(Y)
-            # finding the index of that time series because we need to update the vector L
-            j1 = as.numeric(clm.nm[j])
-            # updating the L with correct index of time series
-            L[j1] = 0 # zero denotes that time series is not joined by any other series
-            # removing the matching series
-            Y <- Y[ , -j]
-            Y_star <- Y
-            N <- ncol(Y_star)
+            if (is.null(ncol(Y))) {
+                break
+                } else {
+                        # finding the position of the matching series
+                        for ( idx.j in 1:length(colnames(Y))){if (length(which(Y[,idx.j] == Y_star) == TRUE) == nrows){j = idx.j}}
+                        # Extracting the correct column name from the original Y
+                        clm.nm <- colnames(Y)
+                        # finding the index of that time series because we need to update the vector L
+                        j1 = as.numeric(clm.nm[j])
+                        # updating the L with correct index of time series
+                        L[j1] = 0 # zero denotes that time series is not joined by any other series
+                        # removing the matching series
+                        Y <- Y[ , -j]
+                        Y_star <- Y
+                        N <- ncol(Y_star)
+                        }
         }
         Y_star <<- Y_star
     }
