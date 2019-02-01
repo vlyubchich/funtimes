@@ -48,7 +48,6 @@ Lyubchich, V. and Gel, Y. R. (2016). A local factor nonparametric test for trend
 set.seed(1)
 ## Simulating four autoregressive time series 
 ## Three having linear trend and one without trend
-## storing them into a matrix
 
 n=50
 nc = 4
