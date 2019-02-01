@@ -12,7 +12,7 @@ sync.cluster(formula, rate = 1, alpha = 0.05, ...)
 \arguments{
 \item{formula}{an object of class "formula", specifying the type of common trend for clustering the time series in a \eqn{T} by \eqn{N} matrix of time series (time series in columns). Variable \eqn{t} should be used to specify the form of the trend, where \eqn{t} is specified within the function as a regular sequence on the interval (0,1]. See `Examples'.}
 
-\item{rate}{rate of removal of time series. Default is 1 (i.e., one time series is removed at a time to re-test the remaining time series). Values above 1 are treated as number of time series to be removed. Values from 0 to 1 are treated as a fraction of time series to be removed.}
+\item{rate}{rate of removal of time series. Default is 1 (i.e., one time series is removed at a time to re-test the remaining time series). Values above 1, which should be an integer, are treated as number of time series to be removed. Values from 0 to 1 are treated as a fraction of time series to be removed.}
 
 \item{alpha}{significance level for testing hypothesis of a common trend of the parametric form specified in \code{formula}. }
 
@@ -45,72 +45,93 @@ Lyubchich, V. and Gel, Y. R. (2016). A local factor nonparametric test for trend
 }
 
 \examples{
-%SL: make examples more meaningful, for example, show/simulate a case with several clusters and detect them; At the same time, demonstrate a couple of different trend shapes.
-
-####  Testing linear Trend ####
 set.seed(1)
+## Simulating four autoregressive time series 
+## Three having linear trend and one without trend
+## storing them into a matrix
+
 n=50
-nc = 8
+nc = 4
 Y = matrix(NA,nrow = n, ncol = nc)
 
-# Matrix of 20 autoregressive time series of length n
+# Matrix of 20 autoregressive time series of length 
+
 for ( i in 1:nc){
-    
-    Y[,i]<-  arima.sim(n = n, list(order = c(1, 0, 0), ar = c(0.6)))
+    if (i < 2){
+        Y[,i] <-  arima.sim(n = n, list(order = c(1, 0, 0), ar = c(0.6)))
+    } else {
+        Y[,i] <- -10 + 0.5 * (1:n) + arima.sim(n = n, list(order = c(1, 0, 0), ar = c(0.6)))
+    }
     
 }
-# Rate of removal is default
+
+plot.ts(Y)
+# Finding clusters with default parameters
+\dontrun{
 LinTrend <- sync.cluster(Y~t) 
 
+## Sample Output:
+## $`Clusters`
+## Lfinal
+## 1 
+## 3 
+
+}
+
+## simulating seven auroregressive time series 
+## Three have linear trend added and four have no trend
+n=50
+nc = 7
+Y = matrix(NA,nrow = n, ncol = nc)
+
+for ( i in 1:nc){
+    if (i < 5){
+        Y[,i] <-  arima.sim(n = n, list(order = c(1, 0, 0), ar = c(0.6)))
+    } else {
+        Y[,i] <- -10 + 0.5 * (1:n) + arima.sim(n = n, list(order = c(1, 0, 0), ar = c(0.6)))
+    }
+    
+}
+
+plot.ts(Y)
+## Clustering with rate of removal = 5 and window = 15
+\dontrun{
+LinTrendR5W15 <- sync.cluster(Y~t, rate = 5, Window = 15) 
+
+## Sample output:
 # $`Clusters`
 # Lfinal
-# 1
-# 7
-# Number of clusters = 1 with 7 time series out of 8
+# 1 
+# 2 
+}
 
+## simulating five autoregressive time series to test for quadratic trend
+## One has no trend, while rest of the series have quadratic trend
+n=30
+nc = 5
+Y = matrix(NA,nrow = n, ncol = nc)
+p <- 0.5
+q <- seq(1,n,1)
 
-#### Testing Quadratic Trend ####
+for ( i in 1:nc){
+    if (i < 2){
+        Y[,i] <- arima.sim(n = n, list(order = c(1, 0, 0), ar = c(0.6)))
+    } else {
+        Y[,i] <- -10 + p*(q+10)^2 + arima.sim(n = n, list(order = c(1, 0, 0), ar = c(0.6)))
+    }
+    
+}
+plot.ts(Y)
+# Clustering with default rate of removal
+\dontrun{
 QuadTrend <- sync.cluster(Y~poly(t,2))
 
-# $`Clusters`
-# Lfinal
-# 0 1 
-# 1 6 
-# Number of clusters = 1 with 6 time series
-
-
-##### Testing Linear Trend with rate of removal equal to 2 ####
-LinTrendR2 <- sync.cluster(Y~t,rate = 2) # 10 seconds
-
-# $`Clusters`
-# Lfinal
-# 1 
-# 6
-# Number of clusters = 1 with 6 time series
-
-
-#### Testing Linear Trned with rate of removal equal to 2 ####
-QuadTrendR2 <- sync.cluster(Y~poly(t,2),rate = 2)
-
-# $`Clusters`
-# Lfinal
-# 1 
-# 6 
-# Number of clusters = 1 with 6 time series
-
-
-#### Testing Linear Trned with rate of removal equal to 2 and window = 8 ####
-
-LinTrendR2W8 <- sync.cluster(Y~t,rate = 2, Window = 3) # 10 seconds
-
-# $`Clusters`
-# Lfinal
-# 1 
-# 6 
-# Number of clusters = 1 with 6 time series
-
-
-
+## Sample output:
+## $`Clusters`
+## Lfinal
+## 0 1 
+## 2 2 
+}
 }
 
 \keyword{trend}
