@@ -78,7 +78,7 @@ sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...) {
             #sorting the WAVK result
             WAVKtmp <- sort(WAVKResults, index.return = TRUE)
             if (rate >= 1) {
-                nRM <- rate
+                nRM <- round(rate)
             } else {
                 nRM <- round(rate*length(WAVKResults))
             }
