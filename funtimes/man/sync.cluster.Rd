@@ -3,29 +3,29 @@
 
 \title{Time Series Clustering based on Trend Synchronism}
 
-\description{Cluster time series with a common trend using the \code{sync.test} function.}
+\description{Cluster time series with a common trend using the \code{\link{sync.test}} function.}
 
 \usage{
 sync.cluster(formula, rate = 1, alpha = 0.05, ...)
 }
 
 \arguments{
-\item{formula}{an object of class "formula", specifying the type of common trend for clustering the time series in a \eqn{T} by \eqn{N} matrix of time series (time series in columns). Variable \eqn{t} should be used to specify the form of the trend, where \eqn{t} is specified within the function as a regular sequence on the interval (0,1]. See `Examples'.}
+\item{formula}{an object of class "formula", specifying the type of common trend for clustering the time series in a \eqn{T} by \eqn{N} matrix of time series (time series in columns). Variable \eqn{t} should be used to specify the form of the trend, where \eqn{t} is specified within the function automatically as a regular sequence of length \eqn{N} on the interval (0,1]. See `Examples'.}
 
-\item{rate}{rate of removal of time series. Default is 1 (i.e., one time series is removed at a time to re-test the remaining time series). Values above 1, which should be an integer, are treated as number of time series to be removed. Values from 0 to 1 are treated as a fraction of time series to be removed.}
+\item{rate}{rate of removal of time series. Default is 1 (i.e., if hypothesis of synchronism is rejected one time series is removed at a time to re-test the remaining time series). Integer values above 1 are treated as number of time series to be removed. Values from 0 to 1 are treated as a fraction of time series to be removed.}
 
-\item{alpha}{significance level for testing hypothesis of a common trend of the parametric form specified in \code{formula}. }
+\item{alpha}{significance level for testing hypothesis of a common trend (using \code{\link{sync.test}}) of the parametric form specified in \code{formula}.}
 
-\item{...}{arguments passed to \code{sync.test}, for example, number of bootstrap replications (\code{B}).}
+\item{...}{arguments passed to \code{\link{sync.test}}, for example, number of bootstrap replications (\code{B}).}
 }
 
 \details{
-The \code{sync.cluster} function recursively clusters the time series having a pre-specified common parametric trend until there are no time series in the matrix to test. With a given \eqn{N} time series, the \code{sync.test} function is used to check the common trend. In the presence of a common trend, time series are grouped together. Othewise, the time series with largest contribution to the test statistics is removed based on the rate of removal. The largest contribution to the test statistics is assessed by WAVK test statistics. Output of the function is the number of clusters obtained.
+The \code{sync.cluster} function recursively clusters time series having a pre-specified common parametric trend until there are no time series left. Starting with the given \eqn{N} time series, the \code{\link{sync.test}} function is used to test for a common trend. If null hypothesis of common trend is not rejected by \code{\link{sync.test}}, the time series are grouped together (i.e., assigned to a cluster). Othewise, the time series with the largest contribution to the test statistics are temporarily removed (the number of time series to remove depends on the \code{rate} of removal) and \code{\link{sync.test}} is applied again. The largest contribution to the test statistic is assessed by WAVK test statistic. Output of the function is the number of clusters obtained, assigned cluster labels, and parameters used for the trend synchronism testing.
 }
 
 \value{
 A list with the elements:
-\item{Clusters}{Number of Clusters Obtained}
+\item{Clusters}{Number of clusters obtained}
 \item{Column.Index}{Index of columns of time series (based on the main matrix) in each cluster}
 \item{Pval}{\code{p}-value of the \code{sync.test} statistics}
 \item{TestStatistics}{\code{sync.test} test statistics}
