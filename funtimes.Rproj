@@ -11,11 +11,3 @@ Encoding: UTF-8
 
 RnwWeave: knitr
 LaTeX: pdfLaTeX
-
-AutoAppendNewline: Yes
-
-BuildType: Package
-PackageUseDevtools: Yes
-PackagePath: funtimes
-PackageInstallArgs: --no-multiarch --with-keep.source
-PackageCheckArgs: --as-cran
