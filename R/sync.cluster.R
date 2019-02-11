@@ -18,7 +18,8 @@
 #' 
 #' @param formula an object of class "formula", specifying the type of common trend 
 #' for clustering the time series in a \eqn{T} by \eqn{N} matrix of time series 
-#' (time series in columns). Variable \eqn{t} should be used to specify the form 
+#' (time series in columns). It is passed to \code{\link{sync.test}}. 
+#' Variable \eqn{t} should be used to specify the form 
 #' of the trend, where \eqn{t} is specified within the function automatically as a 
 #' regular sequence of length \eqn{T} on the interval (0,1]. See `Examples'.
 #' @param rate rate of removal of time series. Default is 1 (i.e., if hypothesis 
@@ -35,13 +36,13 @@
 #' @return A list with the elements: #SL: need to make the output more user-friendly. Where are the clustering results (cluster assignments or so-called cluster labels)? #SL: Also, please, use similar notations to other functions.
 #' \item{Clusters}{number of clusters obtained.}
 #' \item{Column.Index}{index of columns of time series (based on the main matrix) in each cluster.}
-#' \item{Pval}{\code{p}-value of the \code{sync.test} statistics.}
-#' \item{TestStatistics}{\code{sync.test} test statistics.}
-#' \item{Estimate}{parametric trend estimates of a cluster.}
-#' \item{AROrder}{AR filter order.}
-#' \item{WindowUsed}{window used for the test.}
-#' \item{allConsideredWindow}{different windows used in the \code{sync.test}.}
-#' \item{WAVKobs}{WAVK test statistics for each cluster.}
+#' \item{Estimate}{parametric trend estimates of clusters obtained.}
+#' \item{Pval}{\code{p}-value of the \code{sync.test}.}
+#' \item{Statistics}{value of \code{sync.test} test statistics.}
+#' \item{ar.order}{AR filter order.}
+#' \item{window_used}{window used for the \code{sync.test} test.}
+#' \item{all_considered_Windows}{different windows considered in the \code{sync.test}.}
+#' \item{WAVK_obs}{WAVK test statistics for each cluster obtained from \code{sync.test}.}
 #' 
 #' @references
 #' \insertAllCited{}
@@ -125,6 +126,7 @@
 #'     
 sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...) 
 {
+    
     # Storing the final list of clusters 
     Lfinal <- list() 
     clus_col.Idx <- list() # Storing the index of columns in cluster
@@ -141,22 +143,24 @@ sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...)
     splt <- strsplit(frml,"~")[[1]]
     DNAME <- splt[1]
     sh <- splt[2]
-    Y <- as.data.frame(eval(parse(text = DNAME))) # Reading data 
+    Y <- as.data.frame(eval(parse(text = DNAME))) # Reading data
+    
+    # assigning column names
+    N <- ncol(Y)
+    colnames(Y) <- 1:N
     # initializing variables according to the algorithm
     Y_star <<- Y
     # number of columns in a matrix
-    N <- ncol(Y_star)
+    #N <- ncol(Y_star)
     # number of rows in a matrix
     nrows <- nrow(Y_star)
     # index for clusters
     K = 1
     # cluster labels
     L = rep(NaN,N)
-    # assigning column names
-    colnames(Y_star) <- 1:N 
-    colnames(Y) <- 1:N #SL: why two lines when you could do it before copying the object?
-                                                      while (!is.null(ncol(Y))) {
-        if (ncol(Y_star) == 0 || is.null(ncol(Y_star))) {break} #SL seems that this is the case of 1 TS left. Why break without assigning the last cluster?
+    
+    while (!is.null(ncol(Y))) {
+        #if (ncol(Y_star) == 0 || is.null(ncol(Y_star))) {break} #SL seems that this is the case of 1 TS left. Why break without assigning the last cluster?
         # synchronism test on Ystar
         SyncResults <- do.call(sync.test, args = list(as.formula(paste("Y_star", "~", sh)), ...))
         # if we fail to reject the Null Hypothesis
@@ -190,14 +194,20 @@ sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...)
                 nRM <- round(rate)
             } else {
                 nRM <- round(rate*length(WAVKResults))
-            } #SL: This will work with a big sample in the beginning of the iterations. What if user set rate=5, and you have only 3 TS left? What if user set rate=0.1 and with 2 TS left round(rate*length(WAVKResults)) is 0 (i.e., the algorithm is stuck becase cannot remove anything)? Need to put a condition that at least 1 TS shall be removed.
-            # removing the time series as per the rate
-            if (rate == 1) {  #SL: This IF can be avoided For example, can sort WAVK in decreasing order, then just select/remove first nRM ones
-                Y_star <- Y_star[, !(WAVKResults == max(WAVKResults))]
-            } else {
-                WAVKtmp.rmv <- WAVKtmp$ix[(length(WAVKtmp$ix)-nRM+1):length(WAVKtmp$ix)]
-                Y_star <- Y_star[, -WAVKtmp.rmv]
+            } 
+            #SL: This will work with a big sample in the beginning of the iterations. What if user set rate=5, and you have only 3 TS left? What if user set rate=0.1 and with 2 TS left round(rate*length(WAVKResults)) is 0 (i.e., the algorithm is stuck becase cannot remove anything)? Need to put a condition that at least 1 TS shall be removed.
+            # if rate is higher than the time series left in the matrix
+            # if rate becomes zero and algorithm runs infinitely
+            if (nRM > ncol(Y_star) || nRM == 0){
+                nRM <- 1 # atleast one time series shoud be deleted
             }
+            # removing the time series as per the rate
+            #if (rate == 1) {  #SL: This IF can be avoided For example, can sort WAVK in decreasing order, then just select/remove first nRM ones
+            #    Y_star <- Y_star[, !(WAVKResults == max(WAVKResults))]
+            #} else {
+            WAVKtmp.rmv <- WAVKtmp$ix[(length(WAVKtmp$ix)-nRM+1):length(WAVKtmp$ix)]
+            Y_star <- Y_star[, -WAVKtmp.rmv]
+            #}
         }
         if (is.vector(Y_star)) {
             if (is.null(ncol(Y))) {
@@ -219,14 +229,14 @@ sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...)
         }
         Y_star <<- Y_star
     }
-    Lfinal <- L
+    Lfinal <- L[!L==0]
     clus_col.Idx <- sapply(1:max(unique(L[!is.nan(L)])), function(x) which(L == x)) 
     clus_col.NoBind <- which(L == 0)
     print(list(Clusters=table(Lfinal)))
     return(invisible(structure(list(Clusters = Lfinal, Column.Index = clus_col.Idx, Pval = sync.pval.Lst, 
-                                    TestStatistics = sync.Teststat.Lst, Estimate = sync.stat.Est.Lst, AROrder = sync.ar_order.Lst,
-                                    WindowUsed = sync.window_used.Lst,
-                                    allConsideredWindow = sync.all_consideredWindow.Lst, WAVKobs = sync.wavk_obs.Lst))))
+                                    Statistics = sync.Teststat.Lst, Estimate = sync.stat.Est.Lst, ar.order = sync.ar_order.Lst,
+                                    window_used = sync.window_used.Lst,
+                                    all_considered_windows = sync.all_consideredWindow.Lst, WAVK_obs = sync.wavk_obs.Lst))))
     # removing Y_star 
     rm(Y_star, envir = parent.frame())
 }
