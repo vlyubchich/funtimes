@@ -72,7 +72,7 @@
 #' ## 3 
 #' 
 #' ## simulating seven auroregressive time series 
-#' ## Three have linear trend added and four have no trend
+#' ## Three have linear trend added and four have no  trend
 #' n = 50
 #' nc = 7
 #' Y = matrix(NA, nrow = n, ncol = nc)
