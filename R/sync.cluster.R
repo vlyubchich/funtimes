@@ -155,7 +155,7 @@ sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...)
     # assigning column names
     colnames(Y_star) <- 1:N 
     colnames(Y) <- 1:N #SL: why two lines when you could do it before copying the object?
-    while (!is.null(ncol(Y))) {
+                                                      while (!is.null(ncol(Y))) {
         if (ncol(Y_star) == 0 || is.null(ncol(Y_star))) {break} #SL seems that this is the case of 1 TS left. Why break without assigning the last cluster?
         # synchronism test on Ystar
         SyncResults <- do.call(sync.test, args = list(as.formula(paste("Y_star", "~", sh)), ...))
