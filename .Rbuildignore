@@ -1,3 +1,4 @@
+^oldrel$
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^README\.Rmd$
@@ -6,3 +7,5 @@
 ^cran-comments\.md$
 ^NEWS\.md$
 ^old*$
+
+CRAD

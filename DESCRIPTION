@@ -1,0 +1,21 @@
+Package: funtimes
+Type: Package
+Title: Functions for Time Series Analysis
+Version: 6.0
+Date: 2019-02-20
+Authors@R: c(person("Vyacheslav", "Lyubchich", role = c("aut", "cre"),
+                    email="lyubchic@umces.edu"),
+             person("Yulia R.", "Gel", role = "aut"),
+             person("Calvin", "Chu", role = "ctb"),
+             person("Xin", "Huang", role = "ctb"),
+             person("Ethan D.", "Schaeffer", role = "ctb"),
+             person("Srishti", "Vishwakarma", role = "ctb"),
+             person("Xingyu", "Wang", role = "ctb"))
+Depends: R (>= 3.0.0)            
+Imports: dbscan, Jmisc, Kendall, Rdpack
+License: GPL (>= 2)
+Description: Includes non-parametric estimators and tests for time series analysis. The functions are to test for presence of possibly non-monotonic trends and for synchronism of trends in multiple time series, using modern bootstrap techniques and robust non-parametric difference-based estimators.
+RdMacros: Rdpack
+RoxygenNote: 6.1.0
+Encoding: UTF-8
+Suggests: testthat
