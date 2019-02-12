@@ -12,7 +12,7 @@
 #' (i.e., assigned to a cluster). Othewise, the time series with the largest 
 #' contribution to the test statistics are temporarily removed (the number of time 
 #' series to remove depends on the \code{rate} of removal) and \code{\link{sync.test}} 
-#' is applied again. The largest contribution to the test statistic is assessed by the
+#' is applied again. The contribution to the test statistic is assessed by the
 #' WAVK test statistic calculated for each time series.
 #' 
 #' 
@@ -126,7 +126,6 @@
 #'     
 sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...) 
 {
-    
     # Storing the final list of clusters 
     Lfinal <- list() 
     clus_col.Idx <- list() # Storing the index of columns in cluster
@@ -201,6 +200,9 @@ sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...)
             if (nRM > ncol(Y_star) || nRM == 0){
                 nRM <- 1 # atleast one time series shoud be deleted
             }
+            #SL: I think this will work faster than the if() clause above: nRM <- max(1, nRM)
+            
+            
             # removing the time series as per the rate
             #if (rate == 1) {  #SL: This IF can be avoided For example, can sort WAVK in decreasing order, then just select/remove first nRM ones
             #    Y_star <- Y_star[, !(WAVKResults == max(WAVKResults))]
