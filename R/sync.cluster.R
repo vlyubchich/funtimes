@@ -16,7 +16,8 @@
 #' WAVK test statistic calculated for each time series.
 #' 
 #' 
-#' @param formula an object of class "formula", specifying the type of common trend 
+#' @param formula an object of class "\code{\link[stats]{formula}}", 
+#' specifying the type of common trend 
 #' for clustering the time series in a \eqn{T} by \eqn{N} matrix of time series 
 #' (time series in columns). It is passed to \code{\link{sync.test}}. 
 #' Variable \eqn{t} should be used to specify the form 
@@ -47,7 +48,7 @@
 #' @references
 #' \insertAllCited{}
 #' 
-#' @keywords cluster, trend, synchrony
+#' @keywords cluster trend synchrony
 #' 
 #' @author Srishti Vishwakarma, Vyacheslav Lyubchich
 #' 

@@ -8,8 +8,9 @@ sync.test(formula, B = 1000, Window = NULL, q = NULL, j = NULL,
   ar.order = NULL, ar.method = "HVK", BIC = TRUE)
 }
 \arguments{
-\item{formula}{an object of class "formula", specifying the form of the common 
-parametric time trend to be tested in a \eqn{T} by \eqn{N} matrix of time series 
+\item{formula}{an object of class "\code{\link[stats]{formula}}", 
+specifying the form of the common parametric time trend to be tested 
+in a \eqn{T} by \eqn{N} matrix of time series 
 (time series in columns). Variable \eqn{t} should be used to specify the form of 
 the trend, where \eqn{t} is specified within the function as a regular sequence 
 on the interval (0,1]. See `Examples'.}
@@ -63,7 +64,8 @@ asymptotic test results for all considered windows, that is, without adaptive
 selection of the local window.}
 }
 \description{
-Non-parametric test for synchronism of parametric trends in multiple time series. 
+Non-parametric test for synchronism of parametric trends in multiple time series
+\insertCite{Lyubchich_Gel_2016_synchronism}{funtimes}. 
 The method tests whether \eqn{N} observed time series exhibit the same trend 
 of some pre-specified smooth parametric form.
 }
@@ -80,6 +82,9 @@ while for other time series the window is fixed, is not available yet.
 If none of these three arguments is set, default \code{j} and \code{q} are used. 
 Values \code{T*q^j} are mapped to the largest previous integer, then only 
 those greater than 2 are used.
+
+See more details in \insertCite{Lyubchich_Gel_2016_synchronism;textual}{funtimes} 
+and \insertCite{Lyubchich_2016_trends;textual}{funtimes}.
 }
 \examples{
 #Fix seed for reproducible simulations:
@@ -183,6 +188,7 @@ plot.ts(Y2)
 \author{
 Yulia R. Gel, Vyacheslav Lyubchich, Ethan Schaeffer, Xingyu Wang
 }
-\keyword{htest,}
+\keyword{htest}
+\keyword{synchrony}
 \keyword{trend}
-\keyword{ts,}
+\keyword{ts}

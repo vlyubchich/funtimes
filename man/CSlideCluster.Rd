@@ -11,10 +11,10 @@ CSlideCluster(X, Alpha = NULL, Beta = NULL, Delta = NULL,
 \item{X}{a matrix of time series observed within a slide (time series in columns).}
 
 \item{Alpha}{lower limit of the time series domain. Default is 
-\code{quantile(X)[2] - 1.5*(quantile(X)[4] - quantile(X)[2])}.}
+\code{quantile(X)[2] -}\cr \code{1.5*(quantile(X)[4] - quantile(X)[2])}.}
 
 \item{Beta}{upper limit of the time series domain. 
-Default is \code{quantile(X)[2] + 1.5*(quantile(X)[4] - quantile(X)[2])}.}
+Default is \code{quantile(X)[2] +}\cr \code{1.5*(quantile(X)[4] - quantile(X)[2])}.}
 
 \item{Delta}{closeness parameter, a real value in \eqn{[0,1]}. 
 Default is \code{0.1*(Beta - Alpha)}.}
@@ -22,7 +22,7 @@ Default is \code{0.1*(Beta - Alpha)}.}
 \item{Theta}{connectivity parameter, a real value in \eqn{[0,1]}. Default is 0.8.}
 }
 \value{
-A vector of length \code{dim(X)[2]} with cluster labels.
+A vector of length \code{ncol(X)} with cluster labels.
 }
 \description{
 This function clusters time series at a slide level, 
@@ -44,6 +44,6 @@ and \code{\link{BICC}}
 \author{
 Vyacheslav Lyubchich
 }
-\keyword{cluster,}
+\keyword{cluster}
 \keyword{trend}
-\keyword{ts,}
+\keyword{ts}

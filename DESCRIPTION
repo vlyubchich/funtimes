@@ -18,4 +18,3 @@ Description: Includes non-parametric estimators and tests for time series analys
 RdMacros: Rdpack
 RoxygenNote: 6.1.0
 Encoding: UTF-8
-Suggests: testthat

@@ -23,8 +23,8 @@
 #' @param s step to shift a window, calculated in number of slides. The recommended 
 #' values are 1 (overlapping windows) or \code{w} (non-overlapping windows).
 #' @param Epsilon a real value in \eqn{[0,1]} used to identify each pair of time series 
-#' that are clustered together over at least \code{w*Epsilon} slides within a window 
-#' \insertCite{@see Definition 7 by Ciampi_etal_2010;textual}{funtimes}. Default is 1.
+#' that are clustered together over at least \code{w*Epsilon} slides within a window;  
+#' see Definition 7 by \insertCite{Ciampi_etal_2010;textual}{funtimes}. Default is 1.
 #' 
 #' 
 #' @return A vector (if \code{X} contains only one window) or matrix with cluster 
@@ -36,7 +36,7 @@
 #' @seealso \code{\link{CSlideCluster}}, \code{\link{CWindowCluster}}, 
 #' and \code{\link{BICC}}
 #' 
-#' @keywords cluster, ts, trend
+#' @keywords cluster ts trend
 #' 
 #' @author Vyacheslav Lyubchich
 #' 

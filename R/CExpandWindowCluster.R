@@ -6,7 +6,7 @@
 #' 
 #' @param e a vector of logical values identifying which time series among \code{Euncl} 
 #' were clustered together with \code{e} over at least \code{w*Epsilon} slides 
-#' within a window \insertCite{@see Definition 7 by Ciampi_etal_2010}{funtimes}. 
+#' within a window; see Definition 7 by \insertCite{Ciampi_etal_2010;textual}{funtimes}. 
 #' This is a seed for window-level clustering.
 #' @param Euncl a square matrix identifying the binary window cluster relation 
 #' for yet unclustered time series.
@@ -21,7 +21,7 @@
 #' @seealso \code{\link{CSlideCluster}}, \code{\link{CWindowCluster}}, 
 #' and \code{\link{BICC}}
 #' 
-#' @keywords cluster, ts, trend
+#' @keywords cluster ts trend
 #' 
 #' @author Vyacheslav Lyubchich
 #' 

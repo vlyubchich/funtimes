@@ -9,7 +9,7 @@ CExpandWindowCluster(e, Euncl)
 \arguments{
 \item{e}{a vector of logical values identifying which time series among \code{Euncl} 
 were clustered together with \code{e} over at least \code{w*Epsilon} slides 
-within a window \insertCite{@see Definition 7 by Ciampi_etal_2010}{funtimes}. 
+within a window; see Definition 7 by \insertCite{Ciampi_etal_2010;textual}{funtimes}. 
 This is a seed for window-level clustering.}
 
 \item{Euncl}{a square matrix identifying the binary window cluster relation 
@@ -40,6 +40,6 @@ and \code{\link{BICC}}
 \author{
 Vyacheslav Lyubchich
 }
-\keyword{cluster,}
+\keyword{cluster}
 \keyword{trend}
-\keyword{ts,}
+\keyword{ts}

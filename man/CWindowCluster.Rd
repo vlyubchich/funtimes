@@ -27,8 +27,8 @@ passed to \code{\link{CSlideCluster}}.}
 values are 1 (overlapping windows) or \code{w} (non-overlapping windows).}
 
 \item{Epsilon}{a real value in \eqn{[0,1]} used to identify each pair of time series 
-that are clustered together over at least \code{w*Epsilon} slides within a window 
-\insertCite{@see Definition 7 by Ciampi_etal_2010;textual}{funtimes}. Default is 1.}
+that are clustered together over at least \code{w*Epsilon} slides within a window;  
+see Definition 7 by \insertCite{Ciampi_etal_2010;textual}{funtimes}. Default is 1.}
 }
 \value{
 A vector (if \code{X} contains only one window) or matrix with cluster 
@@ -92,6 +92,6 @@ and \code{\link{BICC}}
 \author{
 Vyacheslav Lyubchich
 }
-\keyword{cluster,}
+\keyword{cluster}
 \keyword{trend}
-\keyword{ts,}
+\keyword{ts}

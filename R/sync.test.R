@@ -1,6 +1,7 @@
 #' Time Series Trend Synchronism Test
 #' 
-#' Non-parametric test for synchronism of parametric trends in multiple time series. 
+#' Non-parametric test for synchronism of parametric trends in multiple time series
+#' \insertCite{Lyubchich_Gel_2016_synchronism}{funtimes}. 
 #' The method tests whether \eqn{N} observed time series exhibit the same trend 
 #' of some pre-specified smooth parametric form.
 #' 
@@ -17,9 +18,13 @@
 #' Values \code{T*q^j} are mapped to the largest previous integer, then only 
 #' those greater than 2 are used.
 #' 
+#' See more details in \insertCite{Lyubchich_Gel_2016_synchronism;textual}{funtimes} 
+#' and \insertCite{Lyubchich_2016_trends;textual}{funtimes}.
 #' 
-#' @param formula an object of class "formula", specifying the form of the common 
-#' parametric time trend to be tested in a \eqn{T} by \eqn{N} matrix of time series 
+#' 
+#' @param formula an object of class "\code{\link[stats]{formula}}", 
+#' specifying the form of the common parametric time trend to be tested 
+#' in a \eqn{T} by \eqn{N} matrix of time series 
 #' (time series in columns). Variable \eqn{t} should be used to specify the form of 
 #' the trend, where \eqn{t} is specified within the function as a regular sequence 
 #' on the interval (0,1]. See `Examples'.
@@ -61,7 +66,7 @@
 #' @seealso \code{\link[stats]{ar}}, \code{\link{HVK}}, \code{\link{WAVK}}, 
 #' \code{\link{wavk.test}}
 #' 
-#' @keywords htest, ts, trend
+#' @keywords htest trend ts synchrony
 #' 
 #' @author Yulia R. Gel, Vyacheslav Lyubchich, Ethan Schaeffer, Xingyu Wang
 #' 

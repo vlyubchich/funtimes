@@ -7,9 +7,11 @@
 sync.cluster(formula, rate = 1, alpha = 0.05, ...)
 }
 \arguments{
-\item{formula}{an object of class "formula", specifying the type of common trend 
+\item{formula}{an object of class "\code{\link[stats]{formula}}", 
+specifying the type of common trend 
 for clustering the time series in a \eqn{T} by \eqn{N} matrix of time series 
-(time series in columns). Variable \eqn{t} should be used to specify the form 
+(time series in columns). It is passed to \code{\link{sync.test}}. 
+Variable \eqn{t} should be used to specify the form 
 of the trend, where \eqn{t} is specified within the function automatically as a 
 regular sequence of length \eqn{T} on the interval (0,1]. See `Examples'.}
 
@@ -29,13 +31,13 @@ number of bootstrap replications (\code{B}).}
 A list with the elements: #SL: need to make the output more user-friendly. Where are the clustering results (cluster assignments or so-called cluster labels)? #SL: Also, please, use similar notations to other functions.
 \item{Clusters}{number of clusters obtained.}
 \item{Column.Index}{index of columns of time series (based on the main matrix) in each cluster.}
-\item{Pval}{\code{p}-value of the \code{sync.test} statistics.}
-\item{TestStatistics}{\code{sync.test} test statistics.}
-\item{Estimate}{parametric trend estimates of a cluster.}
-\item{AROrder}{AR filter order.}
-\item{WindowUsed}{window used for the test.}
-\item{allConsideredWindow}{different windows used in the \code{sync.test}.}
-\item{WAVKobs}{WAVK test statistics for each cluster.}
+\item{Estimate}{parametric trend estimates of clusters obtained.}
+\item{Pval}{\code{p}-value of the \code{sync.test}.}
+\item{Statistics}{value of \code{sync.test} test statistics.}
+\item{ar.order}{AR filter order.}
+\item{window_used}{window used for the \code{sync.test} test.}
+\item{all_considered_Windows}{different windows considered in the \code{sync.test}.}
+\item{WAVK_obs}{WAVK test statistics for each cluster obtained from \code{sync.test}.}
 }
 \description{
 Cluster time series with a common parametric trend using the 
@@ -51,7 +53,7 @@ rejected by \code{\link{sync.test}}, the time series are grouped together
 (i.e., assigned to a cluster). Othewise, the time series with the largest 
 contribution to the test statistics are temporarily removed (the number of time 
 series to remove depends on the \code{rate} of removal) and \code{\link{sync.test}} 
-is applied again. The largest contribution to the test statistic is assessed by the
+is applied again. The contribution to the test statistic is assessed by the
 WAVK test statistic calculated for each time series.
 }
 \examples{
@@ -75,7 +77,7 @@ plot.ts(X)
 ## 3 
 
 ## simulating seven auroregressive time series 
-## Three have linear trend added and four have no trend
+## Three have linear trend added and four have no  trend
 n = 50
 nc = 7
 Y = matrix(NA, nrow = n, ncol = nc)
@@ -133,6 +135,6 @@ plot.ts(Y)
 \author{
 Srishti Vishwakarma, Vyacheslav Lyubchich
 }
-\keyword{cluster,}
+\keyword{cluster}
 \keyword{synchrony}
-\keyword{trend,}
+\keyword{trend}

@@ -43,6 +43,6 @@ and \code{\link{BICC}}
 \author{
 Vyacheslav Lyubchich
 }
-\keyword{cluster,}
+\keyword{cluster}
 \keyword{trend}
-\keyword{ts,}
+\keyword{ts}

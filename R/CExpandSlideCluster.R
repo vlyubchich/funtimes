@@ -19,7 +19,7 @@
 #' @seealso \code{\link{CSlideCluster}}, \code{\link{CWindowCluster}}, 
 #' and \code{\link{BICC}}
 #' 
-#' @keywords cluster, ts, trend
+#' @keywords cluster ts trend
 #' 
 #' @author Vyacheslav Lyubchich
 #' 
