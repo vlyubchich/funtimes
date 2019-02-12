@@ -2,10 +2,6 @@
 
 export(ARest)
 export(BICC)
-export(CExpandSlideCluster)
-export(CExpandWindowCluster)
-export(CHomogeneity)
-export(CNeighbor)
 export(CSlideCluster)
 export(CWindowCluster)
 export(DR)
