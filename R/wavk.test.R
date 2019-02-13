@@ -27,7 +27,8 @@
 #' @param j numeric vector to define the set of possible windows when 
 #' \code{factor.length =} \code{"adaptive.selection"}. Default is \code{c(8:11)}. 
 #' This argument is ignored if\cr \code{factor.length = "user.defined"}.
-#' @param B number of bootstrap simulations to obtain empirical critical values.
+#' @param B number of bootstrap simulations to obtain empirical critical values. 
+#' Default is 1000.
 #' @param method method of obtaining critical values: from asymptotical (\code{"asympt"}) 
 #' or bootstrap (\code{"boot"}) distribution. 
 #' If \code{factor.length =} \code{"adaptive.selection"} the option \code{"boot"} is used.
@@ -36,7 +37,7 @@
 #' Default is \code{FALSE}.
 #' 
 #' 
-#' @return A list with class htest containing the following components:
+#' @return A list with class \code{"htest"} containing the following components:
 #' \item{method}{name of the method.}
 #' \item{data.name}{name of the data.}
 #' \item{statistic}{value of the test statistic.}

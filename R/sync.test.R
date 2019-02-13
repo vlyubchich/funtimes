@@ -48,7 +48,7 @@
 #' @inheritParams ARest
 #' 
 #' 
-#' @return A list of class htest containing the following components:
+#' @return A list of class \code{"htest"} containing the following components:
 #' \item{method}{name of the method.}
 #' \item{data.name}{name of the data.}
 #' \item{statistic}{value of the test statistic.}

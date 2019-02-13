@@ -15,7 +15,8 @@ in a \eqn{T} by \eqn{N} matrix of time series
 the trend, where \eqn{t} is specified within the function as a regular sequence 
 on the interval (0,1]. See `Examples'.}
 
-\item{B}{number of bootstrap simulations to obtain empirical critical values.}
+\item{B}{number of bootstrap simulations to obtain empirical critical values. 
+Default is 1000.}
 
 \item{Window}{scalar or \eqn{N}-vector with lengths of the local windows (factors). 
 If only one value is set, the same \code{Window} is applied to each time series. 
@@ -51,7 +52,7 @@ depending on whether \code{ar.order} is defined or not
 (\code{x} is the time series).}
 }
 \value{
-A list of class htest containing the following components:
+A list of class \code{"htest"} containing the following components:
 \item{method}{name of the method.}
 \item{data.name}{name of the data.}
 \item{statistic}{value of the test statistic.}

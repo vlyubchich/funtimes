@@ -12,7 +12,8 @@ notrend.test(x, B = 1000, test = c("t", "MK", "WAVK"),
 \arguments{
 \item{x}{a vector containing a univariate time series. Missing values are not allowed.}
 
-\item{B}{number of bootstrap simulations to obtain empirical critical values.}
+\item{B}{number of bootstrap simulations to obtain empirical critical values. 
+Default is 1000.}
 
 \item{test}{trend test to implement: Student's t-test (\code{"t"}, default), 
 Mann-Kendall test (\code{"MK"}), or 
@@ -59,7 +60,7 @@ Used only if \code{test = "WAVK"}. Default is \code{c(8:11)}.
 This argument is ignored if \code{factor.length =} \code{"user.defined"}.}
 }
 \value{
-A list with class htest containing the following components:
+A list with class \code{"htest"} containing the following components:
 \item{method}{name of the method.}
 \item{data.name}{name of the data.}
 \item{statistic}{value of the test statistic.}
