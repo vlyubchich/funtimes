@@ -1,6 +1,6 @@
 #' WAVK Statistic
 #' 
-#' Computes statistic for testing the parametric form of a regression function, 
+#' Statistic for testing the parametric form of a regression function, 
 #' suggested by \insertCite{Wang_etal_2008;textual}{funtimes}.
 #' 
 #' 

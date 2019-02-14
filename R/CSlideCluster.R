@@ -1,7 +1,7 @@
 #' Slide-Level Time Series Clustering
 #' 
-#' This function clusters time series at a slide level, 
-#' based on the Algorithm 1 of \insertCite{Ciampi_etal_2010;textual}{funtimes}.
+#' Cluster time series at a slide level, 
+#' based on Algorithm 1 of \insertCite{Ciampi_etal_2010;textual}{funtimes}.
 #' 
 #' 
 #' @param X a matrix of time series observed within a slide (time series in columns).

@@ -30,9 +30,9 @@
 #' on the interval (0,1]. See `Examples'.
 #' @param Window scalar or \eqn{N}-vector with lengths of the local windows (factors). 
 #' If only one value is set, the same \code{Window} is applied to each time series. 
-#' An \eqn{N}-vector specifies a particular window for each time series. 
-#' If no \code{Window} is specified, the automatic algorithm for optimal 
-#' window selection is performed as a default option (see `Details').
+#' An \eqn{N}-vector gives a specific window for each time series. 
+#' If \code{Window} is not specified, an automatic algorithm for optimal 
+#' window selection is applied as a default option (see `Details').
 #' @param q scalar from 0 to 1 to define the set of possible windows \code{T*q^j} 
 #' and to automatically select an optimal window for each time series. 
 #' Default is \eqn{3/4}. This argument is ignored if \code{Window} is set by user.

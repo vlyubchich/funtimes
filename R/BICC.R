@@ -1,9 +1,9 @@
 #' BIC-Based Spatio-Temporal Clustering
 #'
-#' Apply the algorithm of unsupervised spatio-temporal clustering TRUST 
+#' Apply the algorithm of unsupervised spatio-temporal clustering, TRUST 
 #' \insertCite{Ciampi_etal_2010}{funtimes}, with automatic selection of its 
 #' tuning parameters \code{Delta} and \code{Epsilon} based on Bayesian 
-#' information criterion (BIC).
+#' information criterion, BIC \insertCite{Schaeffer_etal_2016_trust}{funtimes}.
 #'
 #' @details This is the upper-level function for time series clustering. 
 #' It exploits the functions \code{\link{CWindowCluster}} and 

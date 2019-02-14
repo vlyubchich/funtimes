@@ -1,7 +1,7 @@
 #' Beale's Estimator and Sample Size
 #' 
-#' Apply Beale's ratio estimator \insertCite{Beale_1962}{funtimes} 
-#' for estimating population total and obtain 
+#' Beale's ratio estimator \insertCite{Beale_1962}{funtimes} 
+#' for estimating population total and  
 #' confidence intervals, with an option of calculating sample size for a required
 #' relative error (\code{p}) or margin of error (\code{d}).
 #' 

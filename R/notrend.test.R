@@ -2,9 +2,11 @@
 #' 
 #' A combination of time series trend tests for testing the null hypothesis of no trend, 
 #' versus the alternative hypothesis of a linear trend (Student's t-test), 
-#' or monotonic trend (Mann-Kendall test), or possibly non-monotonic trend (WAVK test).
+#' or monotonic trend (Mann-Kendall test), or more general, 
+#' possibly non-monotonic trend (WAVK test).
 #' 
-#' @details This function tests the null hypothesis of no trend. 
+#' @details This function tests the null hypothesis of no trend 
+#' versus different alternatives.
 #' To set some other shape of trend as the null hypothesis, use \code{\link{wavk.test}}. 
 #' Note that \code{\link{wavk.test}} employs hybrid bootstrap, which is alternative 
 #' to the sieve bootstrap employed by the current function.
@@ -22,7 +24,7 @@
 #' heuristic \eqn{m}-out-of-\eqn{n} subsampling algorithm 
 #' \insertCite{Bickel_Sakov_2008}{funtimes} to select an optimal window from the set 
 #' of possible windows \code{length(x)*q^j} whose values are mapped to the largest 
-#' previous integer and greater than 2. \code{x} is the time series tested.
+#' previous integer and greater than 2. Vector \code{x} is the time series tested.
 #' @param Window length of the local window (factor), default is 
 #' \code{round(0.1*length(x))}. Used only if \code{test = "WAVK"}. 
 #' This argument is ignored if\cr \code{factor.length = "adaptive.selection"}.
