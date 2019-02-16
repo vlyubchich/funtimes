@@ -56,7 +56,7 @@
 #' ## Simulate four autoregressive time series, 
 #' ## three having a linear trend and one without a trend:
 #' set.seed(123)
-#' T = 100
+#' T = 30
 #' N = 4
 #' X = sapply(1:N, function(x) arima.sim(n = T + 100, list(order = c(1, 0, 0), ar = c(0.6)))[-c(1:100)])
 #' X[,1] <- 5 * (1:T)/T + X[,1]
@@ -70,25 +70,25 @@
 #' ## $`Clusters`
 #' ## Lfinal
 #' ## 1 
-#' ## 3 
+#' ## 2 
 #' 
 #' ## simulating seven auroregressive time series 
 #' ## Three have linear trend added and four have no  trend
-#' n = 50
-#' nc = 7
-#' Y = matrix(NA, nrow = n, ncol = nc)
-#' for ( i in 1:nc){
+#' T = 50
+#' N = 7
+#' X = matrix(NA, nrow = T, ncol = N)
+#' for ( i in 1:N){
 #'     if (i < 5){
-#'         Y[,i] <-  arima.sim(n = n, list(order = c(1, 0, 0), ar = c(0.6)))
+#'         X[,i] <-  arima.sim(n = T, list(order = c(1, 0, 0), ar = c(0.6)))
 #'     } else {
-#'         Y[,i] <- -10 + 0.5 * (1:n) + arima.sim(n = n, list(order = c(1, 0, 0), ar = c(0.6)))
+#'         X[,i] <- -10 + 0.5 * (1:T) + arima.sim(n = T, list(order = c(1, 0, 0), ar = c(0.6)))
 #'     }
 #' }
 #' 
-#' plot.ts(Y)
+#' plot.ts(X)
 #' ## Clustering with rate of removal = 5 and window = 15
 #' \dontrun{
-#'     LinTrendR5W15 <- sync.cluster(Y~t, rate = 5, Window = 15) 
+#'     LinTrendR5W15 <- sync.cluster(X~t, rate = 5, Window = 15) 
 #' }    
 #' ## Sample output:
 #' # $`Clusters`
@@ -99,34 +99,34 @@
 #' 
 #' ## simulating five autoregressive time series to test for quadratic trend
 #' ## One has no trend, while rest of the series have quadratic trend
-#' n = 30
-#' nc = 5
-#' Y = matrix(NA, nrow = n, ncol = nc)
+#' T = 30
+#' N = 5
+#' X = matrix(NA, nrow = T, ncol = N)
 #' p <- 0.5
-#' q <- 1:n
+#' q <- 1:T
 #' 
-#' for ( i in 1:nc){
+#' for ( i in 1:N){
 #'     if (i < 2){
-#'         Y[,i] <- arima.sim(n = n, list(order = c(1, 0, 0), ar = c(0.6)))
+#'         X[,i] <- arima.sim(n = T, list(order = c(1, 0, 0), ar = c(0.6)))
 #'     } else {
-#'         Y[,i] <- -10 + p*(q+10)^2 + arima.sim(n = n, list(order = c(1, 0, 0), ar = c(0.6)))
+#'         X[,i] <- -10 + p*(q+10)^2 + arima.sim(n = T, list(order = c(1, 0, 0), ar = c(0.6)))
 #'     }
 #'     
 #' }
-#' plot.ts(Y)
+#' plot.ts(X)
 #' # Clustering with default rate of removal
 #' \dontrun{
-#'     QuadTrend <- sync.cluster(Y~poly(t,2))
+#'     QuadTrend <- sync.cluster(X~poly(t,2))
 #' }
 #' ## Sample output:
 #' ## $`Clusters`
 #' ## Lfinal
-#' ## 0 1 
-#' ## 2 2 
+#' ## 1 
+#' ## 4 
 #'     
 sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...) 
 {
-    
+    require(funtimes)
     # Storing the final list of clusters 
     Lfinal <- list() 
     clus_col.Idx <- list() # Storing the index of columns in cluster
@@ -160,8 +160,14 @@ sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...)
     L = rep(NaN,N)
     
     while (!is.null(ncol(Y))) {
-        #if (ncol(Y_star) == 0 || is.null(ncol(Y_star))) {break} #SL seems that this is the case of 1 TS left. Why break without assigning the last cluster?
-        # synchronism test on Ystar
+        #if (ncol(Y_star) == 0 || is.null(ncol(Y_star))) {break}
+        #SL seems that this is the case of 1 TS left. Why break without assigning the last cluster?
+        # This is required becasue if Y has only two time series left and suppose one of them got deleted
+        # becasue Y_star becomes a vector, then new Y_star will have only one time series left (because
+        # Y_star get updated by Y with one time series). So if there is only one time series then the loop 
+        # should stop because atleast two time series are required for the sync.test.
+        # synchronism test on Ystar. Colnames(Y) shows NULL so it is hard to find the time series
+        # which has to be clustered
         SyncResults <- do.call(sync.test, args = list(as.formula(paste("Y_star", "~", sh)), ...))
         # if we fail to reject the Null Hypothesis
         if (SyncResults$p.value >= alpha)
@@ -225,14 +231,17 @@ sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...)
                 Y <- Y[ , -j]
                 Y_star <- Y
                 N <- ncol(Y_star)
+                
             }
         }
         Y_star <<- Y_star
     }
-    Lfinal <- L[!L==0]
+    Lfinal <- L 
     clus_col.Idx <- sapply(1:max(unique(L[!is.nan(L)])), function(x) which(L == x)) 
     clus_col.NoBind <- which(L == 0)
-    print(list(Clusters=table(Lfinal)))
+    ## final cluster variable
+    print(paste("Number of Clusters obtained: ", max(Lfinal[!is.nan(Lfinal)]), sep = ""))
+    
     return(invisible(structure(list(Clusters = Lfinal, Column.Index = clus_col.Idx, Pval = sync.pval.Lst, 
                                     Statistics = sync.Teststat.Lst, Estimate = sync.stat.Est.Lst, ar.order = sync.ar_order.Lst,
                                     window_used = sync.window_used.Lst,
