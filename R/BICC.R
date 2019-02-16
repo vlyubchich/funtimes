@@ -1,9 +1,9 @@
 #' BIC-Based Spatio-Temporal Clustering
 #'
-#' Apply the algorithm of unsupervised spatio-temporal clustering TRUST 
+#' Apply the algorithm of unsupervised spatio-temporal clustering, TRUST 
 #' \insertCite{Ciampi_etal_2010}{funtimes}, with automatic selection of its 
 #' tuning parameters \code{Delta} and \code{Epsilon} based on Bayesian 
-#' information criterion (BIC).
+#' information criterion, BIC \insertCite{Schaeffer_etal_2016_trust}{funtimes}.
 #'
 #' @details This is the upper-level function for time series clustering. 
 #' It exploits the functions \code{\link{CWindowCluster}} and 
@@ -22,20 +22,20 @@
 #' 
 #' 
 #' @return A list with the following elements:
-#' \item{Delta.optimal}{`optimal' value for the clustering parameter \code{Delta}.}
-#' \item{Epsilon.optimal}{`optimal' value for the clustering parameter \code{Epsilon}.}
-#' \item{Clusters}{vector of length \code{ncol(X)} with cluster labels.}
+#' \item{delta.opt}{`optimal' value for the clustering parameter \code{Delta}.}
+#' \item{epsilon.opt}{`optimal' value for the clustering parameter \code{Epsilon}.}
+#' \item{clusters}{vector of length \code{ncol(X)} with cluster labels.}
 #' \item{IC}{values of the information criterion (BIC) for each considered 
 #' combination of \code{Delta} (rows) and \code{Epsilon} (columns).}
-#' \item{Delta.all}{vector of considered values for \code{Delta}.}
-#' \item{Epsilon.all}{vector of considered values for \code{Epsilon}.}
+#' \item{delta.all}{vector of considered values for \code{Delta}.}
+#' \item{epsilon.all}{vector of considered values for \code{Epsilon}.}
 #' 
 #' @references
 #' \insertAllCited{}
 #' 
 #' @seealso \code{\link{CSlideCluster}}, \code{\link{CWindowCluster}}, \code{\link{purity}}
 #' 
-#' @keywords cluster, ts, trend
+#' @keywords cluster ts trend
 #' 
 #' @author Ethan Schaeffer, Vyacheslav Lyubchich
 #' 
@@ -70,7 +70,7 @@
 #' #since they were all simulated the same way:
 #' classes <- rep(1, 10)
 #' # Use the information on the classes to calculate clustering purity:
-#' purity(classes, tmp$Clusters[1,])
+#' purity(classes, tmp$clusters[1,])
 #' 
 #' ##### Example 2
 #' # 2.1 Modify time series and update classes accordingly:
@@ -81,8 +81,8 @@
 #' 
 #' # 2.2 Re-apply clustering procedure and evaluate clustering purity:
 #' tmp2 <- BICC(X2, p = p, w = w, s = s)
-#' tmp2$Clusters
-#' purity(classes2, tmp2$Clusters[1,])
+#' tmp2$clusters
+#' purity(classes2, tmp2$clusters[1,])
 #' 
 BICC <- function(X, Alpha = NULL, Beta = NULL, Theta = 0.8, p, w, s) 
 {
@@ -113,6 +113,6 @@ BICC <- function(X, Alpha = NULL, Beta = NULL, Theta = 0.8, p, w, s)
                              Alpha = Alpha, Beta = Beta, Theta = Theta, 
                              p = p, w = w, s = s)
     dimnames(output) <- list(paste("Window", c(1:nrow(output)), sep="_"), colnames(X))
-    return(list(Delta.optimal = DELTA_opt, Epsilon.optimal = EPSILON_opt, 
-                Clusters = output, IC = IC, Delta.all = DELTA, Epsilon.all = EPS))
+    return(list(delta.opt = DELTA_opt, epsilon.opt = EPSILON_opt, 
+                clusters = output, IC = IC, delta.all = DELTA, epsilon.all = EPS))
 }

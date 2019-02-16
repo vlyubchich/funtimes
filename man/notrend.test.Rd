@@ -12,7 +12,8 @@ notrend.test(x, B = 1000, test = c("t", "MK", "WAVK"),
 \arguments{
 \item{x}{a vector containing a univariate time series. Missing values are not allowed.}
 
-\item{B}{number of bootstrap simulations to obtain empirical critical values.}
+\item{B}{number of bootstrap simulations to obtain empirical critical values. 
+Default is 1000.}
 
 \item{test}{trend test to implement: Student's t-test (\code{"t"}, default), 
 Mann-Kendall test (\code{"MK"}), or 
@@ -46,7 +47,7 @@ previous integer and greater than 2. \code{x} is the time series tested.}
 
 \item{Window}{length of the local window (factor), default is 
 \code{round(0.1*length(x))}. Used only if \code{test = "WAVK"}. 
-This argument is ignored if \code{factor.length = "adaptive.selection"}.}
+This argument is ignored if\cr \code{factor.length = "adaptive.selection"}.}
 
 \item{q}{scalar from 0 to 1 to define the set of possible windows when 
 \code{factor.length =} \code{"adaptive.selection"}. 
@@ -59,7 +60,7 @@ Used only if \code{test = "WAVK"}. Default is \code{c(8:11)}.
 This argument is ignored if \code{factor.length =} \code{"user.defined"}.}
 }
 \value{
-A list with class htest containing the following components:
+A list with class \code{"htest"} containing the following components:
 \item{method}{name of the method.}
 \item{data.name}{name of the data.}
 \item{statistic}{value of the test statistic.}
@@ -76,8 +77,8 @@ versus the alternative hypothesis of a linear trend (Student's t-test),
 or monotonic trend (Mann-Kendall test), or possibly non-monotonic trend (WAVK test).
 }
 \details{
-The current function tests the null hypothesis of no trend. 
-For general alternative shapes of the trend, use \code{\link{wavk.test}}. 
+This function tests the null hypothesis of no trend. 
+To set some other shape of trend as the null hypothesis, use \code{\link{wavk.test}}. 
 Note that \code{\link{wavk.test}} employs hybrid bootstrap, which is alternative 
 to the sieve bootstrap employed by the current function.
 }
@@ -92,7 +93,6 @@ tsTrend <- 1 + 2*(1:n/n)
 tsNoise <- arima.sim(n = n, list(order = c(2, 0, 0), ar = c(0.5, -0.1)))
 U <- tsTrend + tsNoise
 plot.ts(U)
-    
     
 #Use t-test
 notrend.test(U)
@@ -128,6 +128,6 @@ notrend.test(U, test = "WAVK", factor.length = "adaptive.selection")
 \author{
 Yulia R. Gel, Vyacheslav Lyubchich
 }
-\keyword{htest,}
+\keyword{htest}
 \keyword{trend}
-\keyword{ts,}
+\keyword{ts}

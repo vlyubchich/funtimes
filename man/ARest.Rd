@@ -34,7 +34,7 @@ the final \eqn{p=0}.
 Estimate parameters \eqn{\phi} of autoregressive time series model
 \deqn{X_t = \sum_{i=1}^p\phi_iX_{t-i} + e_t,} 
 by default using robust difference-based estimator and Bayesian information 
-criterion (BIC) to select the order \eqn{p}. This function is mainly employed 
+criterion (BIC) to select the order \eqn{p}. This function is employed 
 for time series filtering in functions \code{\link{sync.test}} 
 and \code{\link{wavk.test}}.
 }

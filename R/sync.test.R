@@ -1,6 +1,7 @@
 #' Time Series Trend Synchronism Test
 #' 
-#' Non-parametric test for synchronism of parametric trends in multiple time series. 
+#' Non-parametric test for synchronism of parametric trends in multiple time series
+#' \insertCite{Lyubchich_Gel_2016_synchronism}{funtimes}. 
 #' The method tests whether \eqn{N} observed time series exhibit the same trend 
 #' of some pre-specified smooth parametric form.
 #' 
@@ -17,17 +18,21 @@
 #' Values \code{T*q^j} are mapped to the largest previous integer, then only 
 #' those greater than 2 are used.
 #' 
+#' See more details in \insertCite{Lyubchich_Gel_2016_synchronism;textual}{funtimes} 
+#' and \insertCite{Lyubchich_2016_trends;textual}{funtimes}.
 #' 
-#' @param formula an object of class "formula", specifying the form of the common 
-#' parametric time trend to be tested in a \eqn{T} by \eqn{N} matrix of time series 
+#' 
+#' @param formula an object of class "\code{\link[stats]{formula}}", 
+#' specifying the form of the common parametric time trend to be tested 
+#' in a \eqn{T} by \eqn{N} matrix of time series 
 #' (time series in columns). Variable \eqn{t} should be used to specify the form of 
 #' the trend, where \eqn{t} is specified within the function as a regular sequence 
 #' on the interval (0,1]. See `Examples'.
 #' @param Window scalar or \eqn{N}-vector with lengths of the local windows (factors). 
 #' If only one value is set, the same \code{Window} is applied to each time series. 
-#' An \eqn{N}-vector specifies a particular window for each time series. 
-#' If no \code{Window} is specified, the automatic algorithm for optimal 
-#' window selection is performed as a default option (see `Details').
+#' An \eqn{N}-vector gives a specific window for each time series. 
+#' If \code{Window} is not specified, an automatic algorithm for optimal 
+#' window selection is applied as a default option (see `Details').
 #' @param q scalar from 0 to 1 to define the set of possible windows \code{T*q^j} 
 #' and to automatically select an optimal window for each time series. 
 #' Default is \eqn{3/4}. This argument is ignored if \code{Window} is set by user.
@@ -43,7 +48,7 @@
 #' @inheritParams ARest
 #' 
 #' 
-#' @return A list of class htest containing the following components:
+#' @return A list of class \code{"htest"} containing the following components:
 #' \item{method}{name of the method.}
 #' \item{data.name}{name of the data.}
 #' \item{statistic}{value of the test statistic.}
@@ -61,7 +66,7 @@
 #' @seealso \code{\link[stats]{ar}}, \code{\link{HVK}}, \code{\link{WAVK}}, 
 #' \code{\link{wavk.test}}
 #' 
-#' @keywords htest, ts, trend
+#' @keywords htest trend ts synchrony
 #' 
 #' @author Yulia R. Gel, Vyacheslav Lyubchich, Ethan Schaeffer, Xingyu Wang
 #' 

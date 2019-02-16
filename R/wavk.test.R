@@ -1,6 +1,10 @@
 #' WAVK Trend Test
 #' 
-#' Non-parametric test to detect (non-)monotonic parametric trends in time series.
+#' Non-parametric test to detect (non-)monotonic parametric trends in time series
+#' \insertCite{@based on @Lyubchich_etal_2013_wavk}{funtimes}.
+#' 
+#' @details See more details in \insertCite{Lyubchich_Gel_2016_synchronism;textual}{funtimes} 
+#' and \insertCite{Lyubchich_2016_trends;textual}{funtimes}.
 #' 
 #' 
 #' @param formula an object of class "\code{\link[stats]{formula}}", specifying the 
@@ -8,22 +12,23 @@
 #' to specify the form, where \eqn{t} is specified within the function as a regular 
 #' sequence on the interval (0,1]. See `Examples'.
 #' @param factor.length method to define the length of local windows (factors). 
-#' Default option \code{"user.defined"} allows to set only one value of the argument 
+#' Default option\cr \code{"user.defined"} allows to set only one value of the argument 
 #' \code{Window}. The option \code{"adaptive.selection"} sets \code{method = "boot"} 
 #' and employs heuristic \eqn{m}-out-of-\eqn{n} subsampling algorithm 
 #' \insertCite{Bickel_Sakov_2008}{funtimes} to select an optimal window from the set 
 #' of possible windows \code{length(x)*q^j} whose values are mapped to the largest 
-#' previous integer and greater than 2. \code{x} is the time series tested.
+#' previous integer and greater than 2. Vector \code{x} is the time series tested.
 #' @param Window length of the local window (factor), default is 
 #' \code{round(0.1*length(x))}, where \code{x} is the time series tested. 
-#' This argument is ignored if \code{factor.length = "adaptive.selection"}.
+#' This argument is ignored if\cr \code{factor.length = "adaptive.selection"}.
 #' @param q scalar from 0 to 1 to define the set of possible windows when 
 #' \code{factor.length =} \code{"adaptive.selection"}. Default is \eqn{3/4}. 
-#' This argument is ignored if \code{factor.length =} \code{"user.defined"}.
+#' This argument is ignored if\cr \code{factor.length =} \code{"user.defined"}.
 #' @param j numeric vector to define the set of possible windows when 
 #' \code{factor.length =} \code{"adaptive.selection"}. Default is \code{c(8:11)}. 
-#' This argument is ignored if \code{factor.length =} \code{"user.defined"}.
-#' @param B number of bootstrap simulations to obtain empirical critical values.
+#' This argument is ignored if\cr \code{factor.length = "user.defined"}.
+#' @param B number of bootstrap simulations to obtain empirical critical values. 
+#' Default is 1000.
 #' @param method method of obtaining critical values: from asymptotical (\code{"asympt"}) 
 #' or bootstrap (\code{"boot"}) distribution. 
 #' If \code{factor.length =} \code{"adaptive.selection"} the option \code{"boot"} is used.
@@ -32,7 +37,7 @@
 #' Default is \code{FALSE}.
 #' 
 #' 
-#' @return A list with class htest containing the following components:
+#' @return A list with class \code{"htest"} containing the following components:
 #' \item{method}{name of the method.}
 #' \item{data.name}{name of the data.}
 #' \item{statistic}{value of the test statistic.}
@@ -50,7 +55,7 @@
 #' @seealso \code{\link[stats]{ar}}, \code{\link{HVK}}, \code{\link{WAVK}}, 
 #' \code{\link{sync.test}}
 #' 
-#' @keywords htest, ts, trend
+#' @keywords htest ts trend
 #' 
 #' @author Yulia R. Gel, Vyacheslav Lyubchich, Ethan Schaeffer
 #' 

@@ -28,7 +28,7 @@
 #' @param theta connectivity parameter \eqn{\theta \in (0,1)}, which is to be used 
 #' only with \code{TRUST} method. Default value is 0.9.
 #' @param B number of random splits in calculating the 
-#' \code{Average Cluster Deviation (ACD)}. Default value is 500.
+#' Average Cluster Deviation (ACD). Default value is 500.
 #' @param lb,ub end points for a range of search for the optimal parameter.
 #' 
 #' 
@@ -46,7 +46,7 @@
 #' 
 #' @seealso \code{\link{BICC}}, \code{\link[dbscan]{dbscan}}
 #' 
-#' @keywords ts, trend
+#' @keywords ts trend
 #' 
 #' @author Xin Huang, Yulia R. Gel
 #' 

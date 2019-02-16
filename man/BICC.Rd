@@ -25,13 +25,13 @@ values are 1 (overlapping windows) or \code{w} (non-overlapping windows).}
 }
 \value{
 A list with the following elements:
-\item{Delta.optimal}{`optimal' value for the clustering parameter \code{Delta}.}
-\item{Epsilon.optimal}{`optimal' value for the clustering parameter \code{Epsilon}.}
-\item{Clusters}{vector of length \code{ncol(X)} with cluster labels.}
+\item{delta.opt}{`optimal' value for the clustering parameter \code{Delta}.}
+\item{epsilon.opt}{`optimal' value for the clustering parameter \code{Epsilon}.}
+\item{clusters}{vector of length \code{ncol(X)} with cluster labels.}
 \item{IC}{values of the information criterion (BIC) for each considered 
 combination of \code{Delta} (rows) and \code{Epsilon} (columns).}
-\item{Delta.all}{vector of considered values for \code{Delta}.}
-\item{Epsilon.all}{vector of considered values for \code{Epsilon}.}
+\item{delta.all}{vector of considered values for \code{Delta}.}
+\item{epsilon.all}{vector of considered values for \code{Epsilon}.}
 }
 \description{
 Apply the algorithm of unsupervised spatio-temporal clustering TRUST 
@@ -82,7 +82,7 @@ tmp <- BICC(X, p = p, w = w, s = s)
 #since they were all simulated the same way:
 classes <- rep(1, 10)
 # Use the information on the classes to calculate clustering purity:
-purity(classes, tmp$Clusters[1,])
+purity(classes, tmp$clusters[1,])
 
 ##### Example 2
 # 2.1 Modify time series and update classes accordingly:
@@ -93,8 +93,8 @@ classes2 <- rep(c(1, 2), each = N/2)
 
 # 2.2 Re-apply clustering procedure and evaluate clustering purity:
 tmp2 <- BICC(X2, p = p, w = w, s = s)
-tmp2$Clusters
-purity(classes2, tmp2$Clusters[1,])
+tmp2$clusters
+purity(classes2, tmp2$clusters[1,])
 
 }
 \references{
@@ -106,6 +106,6 @@ purity(classes2, tmp2$Clusters[1,])
 \author{
 Ethan Schaeffer, Vyacheslav Lyubchich
 }
-\keyword{cluster,}
+\keyword{cluster}
 \keyword{trend}
-\keyword{ts,}
+\keyword{ts}

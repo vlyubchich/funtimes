@@ -7,10 +7,7 @@
 q.tails(x0, x1, q = 0.99)
 }
 \arguments{
-\item{x0}{vectors of the same length (preferably). 
-Tail in \code{x1} is compared against the tail in \code{x0}.}
-
-\item{x1}{vectors of the same length (preferably). 
+\item{x0, x1}{vectors of the same length (preferably). 
 Tail in \code{x1} is compared against the tail in \code{x0}.}
 
 \item{q}{a quantile defining the right tail for both \code{x0} and \code{x1}. 

@@ -16,7 +16,7 @@ to specify the form, where \eqn{t} is specified within the function as a regular
 sequence on the interval (0,1]. See `Examples'.}
 
 \item{factor.length}{method to define the length of local windows (factors). 
-Default option \code{"user.defined"} allows to set only one value of the argument 
+Default option\cr \code{"user.defined"} allows to set only one value of the argument 
 \code{Window}. The option \code{"adaptive.selection"} sets \code{method = "boot"} 
 and employs heuristic \eqn{m}-out-of-\eqn{n} subsampling algorithm 
 \insertCite{Bickel_Sakov_2008}{funtimes} to select an optimal window from the set 
@@ -25,17 +25,18 @@ previous integer and greater than 2. \code{x} is the time series tested.}
 
 \item{Window}{length of the local window (factor), default is 
 \code{round(0.1*length(x))}, where \code{x} is the time series tested. 
-This argument is ignored if \code{factor.length = "adaptive.selection"}.}
+This argument is ignored if\cr \code{factor.length = "adaptive.selection"}.}
 
 \item{q}{scalar from 0 to 1 to define the set of possible windows when 
 \code{factor.length =} \code{"adaptive.selection"}. Default is \eqn{3/4}. 
-This argument is ignored if \code{factor.length =} \code{"user.defined"}.}
+This argument is ignored if\cr \code{factor.length =} \code{"user.defined"}.}
 
 \item{j}{numeric vector to define the set of possible windows when 
 \code{factor.length =} \code{"adaptive.selection"}. Default is \code{c(8:11)}. 
-This argument is ignored if \code{factor.length =} \code{"user.defined"}.}
+This argument is ignored if\cr \code{factor.length = "user.defined"}.}
 
-\item{B}{number of bootstrap simulations to obtain empirical critical values.}
+\item{B}{number of bootstrap simulations to obtain empirical critical values. 
+Default is 1000.}
 
 \item{method}{method of obtaining critical values: from asymptotical (\code{"asympt"}) 
 or bootstrap (\code{"boot"}) distribution. 
@@ -62,7 +63,7 @@ depending on whether \code{ar.order} is defined or not
 Default is \code{FALSE}.}
 }
 \value{
-A list with class htest containing the following components:
+A list with class \code{"htest"} containing the following components:
 \item{method}{name of the method.}
 \item{data.name}{name of the data.}
 \item{statistic}{value of the test statistic.}
@@ -75,7 +76,12 @@ if \code{factor.length =} \code{"adaptive.selection"},
 test results for all considered windows.}
 }
 \description{
-Non-parametric test to detect (non-)monotonic parametric trends in time series.
+Non-parametric test to detect (non-)monotonic parametric trends in time series
+\insertCite{@based on @Lyubchich_etal_2013_wavk}{funtimes}.
+}
+\details{
+See more details in \insertCite{Lyubchich_Gel_2016_synchronism;textual}{funtimes} 
+and \insertCite{Lyubchich_2016_trends;textual}{funtimes}.
 }
 \examples{
 # Fix seed for reproducible simulations:
@@ -147,6 +153,6 @@ wavk.test(U ~ 1, method = "asympt")
 \author{
 Yulia R. Gel, Vyacheslav Lyubchich, Ethan Schaeffer
 }
-\keyword{htest,}
+\keyword{htest}
 \keyword{trend}
-\keyword{ts,}
+\keyword{ts}

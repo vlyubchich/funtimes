@@ -1,20 +1,20 @@
 #' Slide-Level Time Series Clustering
 #' 
-#' This function clusters time series at a slide level, 
-#' based on the Algorithm 1 of \insertCite{Ciampi_etal_2010;textual}{funtimes}.
+#' Cluster time series at a slide level, 
+#' based on Algorithm 1 of \insertCite{Ciampi_etal_2010;textual}{funtimes}.
 #' 
 #' 
 #' @param X a matrix of time series observed within a slide (time series in columns).
 #' @param Alpha lower limit of the time series domain. Default is 
-#' \code{quantile(X)[2] - 1.5*(quantile(X)[4] - quantile(X)[2])}.
+#' \code{quantile(X)[2] -}\cr \code{1.5*(quantile(X)[4] - quantile(X)[2])}.
 #' @param Beta upper limit of the time series domain. 
-#' Default is \code{quantile(X)[2] + 1.5*(quantile(X)[4] - quantile(X)[2])}.
+#' Default is \code{quantile(X)[2] +}\cr \code{1.5*(quantile(X)[4] - quantile(X)[2])}.
 #' @param Delta closeness parameter, a real value in \eqn{[0,1]}. 
 #' Default is \code{0.1*(Beta - Alpha)}.
 #' @param Theta connectivity parameter, a real value in \eqn{[0,1]}. Default is 0.8.
 #' 
 #' 
-#' @return A vector of length \code{dim(X)[2]} with cluster labels.
+#' @return A vector of length \code{ncol(X)} with cluster labels.
 #' 
 #' @references
 #' \insertAllCited{}
@@ -22,7 +22,7 @@
 #' @seealso \code{\link{CSlideCluster}}, \code{\link{CWindowCluster}}, 
 #' and \code{\link{BICC}}
 #' 
-#' @keywords cluster, ts, trend
+#' @keywords cluster ts trend
 #' 
 #' @author Vyacheslav Lyubchich
 #' 
