@@ -29,19 +29,17 @@ number of bootstrap replications (\code{B}).}
 }
 \value{
 A list with the elements: #SL: need to make the output more user-friendly. Where are the clustering results (cluster assignments or so-called cluster labels)? #SL: Also, please, use similar notations to other functions.
-<<<<<<< HEAD
+
 \item{clusters}{number of clusters obtained.}
 \item{column_Index}{index of columns of time series (based on the main matrix) in each cluster.}
 \item{estimate}{parametric trend estimates of clusters obtained.}
 \item{pval}{\code{p}-value of the \code{sync.test}.}
 \item{statistics}{value of \code{sync.test} test statistics.}
-=======
 \item{Clusters}{number of clusters obtained.}
 \item{Column.Index}{index of columns of time series (based on the main matrix) in each cluster.}
 \item{Estimate}{parametric trend estimates of clusters obtained.}
 \item{Pval}{\code{p}-value of the \code{sync.test}.}
 \item{Statistics}{value of \code{sync.test} test statistics.}
->>>>>>> be40c39db2a7ec48361bb04739fc11d2c29b6e56
 \item{ar.order}{AR filter order.}
 \item{window_used}{window used for the \code{sync.test} test.}
 \item{all_considered_Windows}{different windows considered in the \code{sync.test}.}
@@ -91,12 +89,10 @@ T = 50
 N = 7
 X = matrix(NA, nrow = T, ncol = N)
 for ( i in 1:N){
-=======
 n = 50
 nc = 7
 Y = matrix(NA, nrow = n, ncol = nc)
 for ( i in 1:nc){
->>>>>>> be40c39db2a7ec48361bb04739fc11d2c29b6e56
     if (i < 5){
         X[,i] <-  arima.sim(n = T, list(order = c(1, 0, 0), ar = c(0.6)))
     } else {
