@@ -10,7 +10,7 @@ sync.cluster(formula, rate = 1, alpha = 0.05, ...)
 \item{formula}{an object of class "\code{\link[stats]{formula}}", 
 specifying the type of common trend 
 for clustering the time series in a \eqn{T} by \eqn{N} matrix of time series 
-(time series in columns). It is passed to \code{\link{sync.test}}. 
+(time series in columns) which is passed to \code{\link{sync.test}}. 
 Variable \eqn{t} should be used to specify the form 
 of the trend, where \eqn{t} is specified within the function automatically as a 
 regular sequence of length \eqn{T} on the interval (0,1]. See `Examples'.}
@@ -28,22 +28,23 @@ time series to be removed.}
 number of bootstrap replications (\code{B}).}
 }
 \value{
-A list with the elements: #SL: need to make the output more user-friendly. Where are the clustering results (cluster assignments or so-called cluster labels)? #SL: Also, please, use similar notations to other functions.
-
-\item{clusters}{number of clusters obtained.}
-\item{column_Index}{index of columns of time series (based on the main matrix) in each cluster.}
-\item{estimate}{parametric trend estimates of clusters obtained.}
-\item{pval}{\code{p}-value of the \code{sync.test}.}
-\item{statistics}{value of \code{sync.test} test statistics.}
-\item{Clusters}{number of clusters obtained.}
-\item{Column.Index}{index of columns of time series (based on the main matrix) in each cluster.}
-\item{Estimate}{parametric trend estimates of clusters obtained.}
-\item{Pval}{\code{p}-value of the \code{sync.test}.}
-\item{Statistics}{value of \code{sync.test} test statistics.}
-\item{ar.order}{AR filter order.}
-\item{window_used}{window used for the \code{sync.test} test.}
-\item{all_considered_Windows}{different windows considered in the \code{sync.test}.}
-\item{WAVK_obs}{WAVK test statistics for each cluster obtained from \code{sync.test}.}
+A list with the elements:
+ #SL: need to make the output more user-friendly. Where are the clustering results (cluster assignments or so-called cluster labels)? #SL: Also, please, use similar notations to other functions.
+\item{clusters}{total number of clusters obtained.}
+\item{cluster_label}{cluster labels of each time series (each label is the cluster number of 
+time series). A label zero represents the time series which does not have a common trend with
+other time series. Labels other than zero are the clusters obtained.}
+\item{column_index}{stores index of columns of time series in the main matrix corresponding to each cluster. This can be used for
+plotting the time series of clustered time series, for example.}
+\item{estimate}{parametric trend estimates obtained for each cluster.}
+\item{pval}{\code{p}-value of \code{sync.test} for each cluster.}
+\item{statistics}{value of \code{sync.test} test statistics for each cluster.}
+\item{ar_order}{AR filter order used in \code{sync.test} for each cluster.}
+\item{window_used}{window used in the \code{sync.test} test for each cluster.}
+\item{all_considered_Windows}{different windows considered in \code{sync.test} for each cluster.}
+\item{WAVK_obs}{WAVK test statistics for each cluster obtained from \code{sync.test} for each cluster.}
+In case of more than one cluster, each output will be in 
+the same sequence as of unique cluster labels except zero.
 }
 \description{
 Cluster time series with a common parametric trend using the 
@@ -56,7 +57,7 @@ a pre-specified common parametric trend until there are no time series left.
 Starting with the given \eqn{N} time series, the \code{\link{sync.test}} function 
 is used to test for a common trend. If null hypothesis of common trend is not 
 rejected by \code{\link{sync.test}}, the time series are grouped together 
-(i.e., assigned to a cluster). Othewise, the time series with the largest 
+(i.e., assigned to a cluster). Otherwise, the time series with the largest 
 contribution to the test statistics are temporarily removed (the number of time 
 series to remove depends on the \code{rate} of removal) and \code{\link{sync.test}} 
 is applied again. The contribution to the test statistic is assessed by the
@@ -77,68 +78,56 @@ plot.ts(X)
     LinTrend <- sync.cluster(X ~ t) 
 }    
 ## Sample Output:
-## $`Clusters`
-## Lfinal
-## 1 
-## 2 
+## "Number of Clusters obtained: 1"
+## "Cluster Labels"
+## 1 1 0 0
 
-## simulating seven auroregressive time series 
-## Three have linear trend added and four have no  trend
-<<<<<<< HEAD
-T = 50
-N = 7
+## plotting the time series of the cluster obtained
+idx = LinTrend$column_index
+plot.ts(X[,idx])
+
+## simulating seven autoregressive time series 
+## Four time series have linear trend added 
+set.seed(123)
+T = 30
+N = 10
 X = matrix(NA, nrow = T, ncol = N)
-for ( i in 1:N){
-n = 50
-nc = 7
-Y = matrix(NA, nrow = n, ncol = nc)
-for ( i in 1:nc){
-    if (i < 5){
-        X[,i] <-  arima.sim(n = T, list(order = c(1, 0, 0), ar = c(0.6)))
-    } else {
-        X[,i] <- -10 + 0.5 * (1:T) + arima.sim(n = T, list(order = c(1, 0, 0), ar = c(0.6)))
-    }
-}
-
+X[,1:5] <-  sapply(1:5, function(x) arima.sim(n = T + 100, list(order = c(1, 0, 0), ar = c(0.6)))[-c(1:100)])
+X[,6:N] <- sapply(6:N, function(x) -10 + 0.5 * (1:T) + arima.sim(n = T + 100, list(order = c(1, 0, 0), ar = c(0.6)))[-c(1:100)])
 plot.ts(X)
-## Clustering with rate of removal = 5 and window = 15
+
+## Clustering with rate of removal = 5, and window = 15
 \dontrun{
-    LinTrendR5W15 <- sync.cluster(X~t, rate = 5, Window = 15) 
+    LinTrendR5W15 <- sync.cluster(X~t, rate = 2, Window = 15) 
 }    
 ## Sample output:
-# $`Clusters`
-# Lfinal
-# 1 
-# 2 
-
+## "Number of Clusters obtained: 2"
+## "Cluster Labels"
+##   2 1 1 2 1 1 1 1 1 1
 
 ## simulating five autoregressive time series to test for quadratic trend
 ## One has no trend, while rest of the series have quadratic trend
+set.seed(123)
 T = 30
 N = 5
 X = matrix(NA, nrow = T, ncol = N)
 p <- 0.5
 q <- 1:T
 
-for ( i in 1:N){
-    if (i < 2){
-        X[,i] <- arima.sim(n = T, list(order = c(1, 0, 0), ar = c(0.6)))
-    } else {
-        X[,i] <- -10 + p*(q+10)^2 + arima.sim(n = T, list(order = c(1, 0, 0), ar = c(0.6)))
-    }
-    
-}
+X[,1:2] <-  sapply(1:2, function(x) arima.sim(n = T + 100, list(order = c(1, 0, 0), ar = c(0.6)))[-c(1:100)])
+X[,3:N] <- sapply(3:N, function(x) -10 + p*(q+10)^2 +arima.sim(n = T + 100, list(order = c(1, 0, 0), ar = c(0.6)))[-c(1:100)])
+  
 plot.ts(X)
 # Clustering with default rate of removal
 \dontrun{
     QuadTrend <- sync.cluster(X~poly(t,2))
 }
 ## Sample output:
-## $`Clusters`
-## Lfinal
-## 1 
-## 4 
-    
+## "Number of Clusters obtained: 1"
+## "Cluster Labels"
+## 1 1 0 1 1  
+
+
 }
 \references{
 \insertAllCited{}

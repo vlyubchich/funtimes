@@ -9,7 +9,7 @@
 #' Starting with the given \eqn{N} time series, the \code{\link{sync.test}} function 
 #' is used to test for a common trend. If null hypothesis of common trend is not 
 #' rejected by \code{\link{sync.test}}, the time series are grouped together 
-#' (i.e., assigned to a cluster). Othewise, the time series with the largest 
+#' (i.e., assigned to a cluster). Otherwise, the time series with the largest 
 #' contribution to the test statistics are temporarily removed (the number of time 
 #' series to remove depends on the \code{rate} of removal) and \code{\link{sync.test}} 
 #' is applied again. The contribution to the test statistic is assessed by the
@@ -19,7 +19,7 @@
 #' @param formula an object of class "\code{\link[stats]{formula}}", 
 #' specifying the type of common trend 
 #' for clustering the time series in a \eqn{T} by \eqn{N} matrix of time series 
-#' (time series in columns). It is passed to \code{\link{sync.test}}. 
+#' (time series in columns) which is passed to \code{\link{sync.test}}. 
 #' Variable \eqn{t} should be used to specify the form 
 #' of the trend, where \eqn{t} is specified within the function automatically as a 
 #' regular sequence of length \eqn{T} on the interval (0,1]. See `Examples'.
@@ -34,16 +34,24 @@
 #' number of bootstrap replications (\code{B}).
 #' 
 #' 
-#' @return A list with the elements: #SL: need to make the output more user-friendly. Where are the clustering results (cluster assignments or so-called cluster labels)? #SL: Also, please, use similar notations to other functions.
-#' \item{Clusters}{number of clusters obtained.}
-#' \item{Column.Index}{index of columns of time series (based on the main matrix) in each cluster.}
-#' \item{Estimate}{parametric trend estimates of clusters obtained.}
-#' \item{Pval}{\code{p}-value of the \code{sync.test}.}
-#' \item{Statistics}{value of \code{sync.test} test statistics.}
-#' \item{ar.order}{AR filter order.}
-#' \item{window_used}{window used for the \code{sync.test} test.}
-#' \item{all_considered_Windows}{different windows considered in the \code{sync.test}.}
-#' \item{WAVK_obs}{WAVK test statistics for each cluster obtained from \code{sync.test}.}
+#' @return A list with the elements:
+#'  #SL: need to make the output more user-friendly. Where are the clustering results (cluster assignments or so-called cluster labels)? #SL: Also, please, use similar notations to other functions.
+#' \item{clusters}{total number of clusters obtained.}
+#' \item{cluster_label}{cluster labels of each time series (each label is the cluster number of 
+#' time series). A label zero represents the time series which does not have a common trend with
+#' other time series. Labels other than zero are the clusters obtained.}
+#' \item{column_index}{stores index of columns of time series in the main matrix corresponding to each cluster. This can be used for
+#' plotting the time series of clustered time series, for example.}
+#' \item{estimate}{parametric trend estimates obtained for each cluster.}
+#' \item{pval}{\code{p}-value of \code{sync.test} for each cluster.}
+#' \item{statistics}{value of \code{sync.test} test statistics for each cluster.}
+#' \item{ar_order}{AR filter order used in \code{sync.test} for each cluster.}
+#' \item{window_used}{window used in the \code{sync.test} test for each cluster.}
+#' \item{all_considered_Windows}{different windows considered in \code{sync.test} for each cluster.}
+#' \item{WAVK_obs}{WAVK test statistics for each cluster obtained from \code{sync.test} for each cluster.}
+#' In case of more than one cluster, each output will be in 
+#' the same sequence as of unique cluster labels except zero.
+#' 
 #' 
 #' @references
 #' \insertAllCited{}
@@ -68,69 +76,60 @@
 #'     LinTrend <- sync.cluster(X ~ t) 
 #' }    
 #' ## Sample Output:
-#' ## $`Clusters`
-#' ## Lfinal
-#' ## 1 
-#' ## 2 
+#' ## "Number of Clusters obtained: 1"
+#' ## "Cluster Labels"
+#' ## 1 1 0 0
 #' 
-#' ## simulating seven auroregressive time series 
-#' ## Three have linear trend added and four have no  trend
-#' T = 50
-#' N = 7
+#' ## plotting the time series of the cluster obtained
+#' idx = LinTrend$column_index
+#' plot.ts(X[,idx])
+#' 
+#' ## simulating seven autoregressive time series 
+#' ## Four time series have linear trend added 
+#' set.seed(123)
+#' T = 30
+#' N = 10
 #' X = matrix(NA, nrow = T, ncol = N)
-#' for ( i in 1:N){
-#'     if (i < 5){
-#'         X[,i] <-  arima.sim(n = T, list(order = c(1, 0, 0), ar = c(0.6)))
-#'     } else {
-#'         X[,i] <- -10 + 0.5 * (1:T) + arima.sim(n = T, list(order = c(1, 0, 0), ar = c(0.6)))
-#'     }
-#' }
-#' 
+#' X[,1:5] <-  sapply(1:5, function(x) arima.sim(n = T + 100, list(order = c(1, 0, 0), ar = c(0.6)))[-c(1:100)])
+#' X[,6:N] <- sapply(6:N, function(x) -10 + 0.5 * (1:T) + arima.sim(n = T + 100, list(order = c(1, 0, 0), ar = c(0.6)))[-c(1:100)])
+
 #' plot.ts(X)
-#' ## Clustering with rate of removal = 5 and window = 15
+#' 
+#' ## Clustering with rate of removal = 5, and window = 15
 #' \dontrun{
-#'     LinTrendR5W15 <- sync.cluster(X~t, rate = 5, Window = 15) 
+#'     LinTrendR5W15 <- sync.cluster(X~t, rate = 2, Window = 15) 
 #' }    
 #' ## Sample output:
-#' # $`Clusters`
-#' # Lfinal
-#' # 1 
-#' # 2 
-#' 
+#' ## "Number of Clusters obtained: 2"
+#' ## "Cluster Labels"
+#' ##   2 1 1 2 1 1 1 1 1 1
 #' 
 #' ## simulating five autoregressive time series to test for quadratic trend
 #' ## One has no trend, while rest of the series have quadratic trend
+#' set.seed(123)
 #' T = 30
 #' N = 5
 #' X = matrix(NA, nrow = T, ncol = N)
 #' p <- 0.5
 #' q <- 1:T
 #' 
-#' for ( i in 1:N){
-#'     if (i < 2){
-#'         X[,i] <- arima.sim(n = T, list(order = c(1, 0, 0), ar = c(0.6)))
-#'     } else {
-#'         X[,i] <- -10 + p*(q+10)^2 + arima.sim(n = T, list(order = c(1, 0, 0), ar = c(0.6)))
-#'     }
-#'     
-#' }
+#' X[,1:2] <-  sapply(1:2, function(x) arima.sim(n = T + 100, list(order = c(1, 0, 0), ar = c(0.6)))[-c(1:100)])
+#' X[,3:N] <- sapply(3:N, function(x) -10 + p*(q+10)^2 +arima.sim(n = T + 100, list(order = c(1, 0, 0), ar = c(0.6)))[-c(1:100)])
+#'   
 #' plot.ts(X)
 #' # Clustering with default rate of removal
 #' \dontrun{
 #'     QuadTrend <- sync.cluster(X~poly(t,2))
 #' }
 #' ## Sample output:
-#' ## $`Clusters`
-#' ## Lfinal
-#' ## 1 
-#' ## 4 
-#'     
+#' ## "Number of Clusters obtained: 1"
+#' ## "Cluster Labels"
+#' ## 1 1 0 1 1  
+#' 
+#' 
 sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...) 
 {
-<<<<<<< HEAD
     require(funtimes)
-=======
->>>>>>> be40c39db2a7ec48361bb04739fc11d2c29b6e56
     # Storing the final list of clusters 
     Lfinal <- list() 
     clus_col.Idx <- list() # Storing the index of columns in cluster
@@ -152,11 +151,11 @@ sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...)
     # assigning column names
     N <- ncol(Y)
     colnames(Y) <- 1:N
+    
     # initializing variables according to the algorithm
     Y_star <<- Y
-    # number of columns in a matrix
-    #N <- ncol(Y_star)
-    # number of rows in a matrix
+    
+    # number of rows in a matix
     nrows <- nrow(Y_star)
     # index for clusters
     K = 1
@@ -164,14 +163,12 @@ sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...)
     L = rep(NaN,N)
     
     while (!is.null(ncol(Y))) {
-        #if (ncol(Y_star) == 0 || is.null(ncol(Y_star))) {break}
-        #SL seems that this is the case of 1 TS left. Why break without assigning the last cluster?
-        # This is required becasue if Y has only two time series left and suppose one of them got deleted
-        # becasue Y_star becomes a vector, then new Y_star will have only one time series left (because
-        # Y_star get updated by Y with one time series). So if there is only one time series then the loop 
-        # should stop because atleast two time series are required for the sync.test.
-        # synchronism test on Ystar. Colnames(Y) shows NULL so it is hard to find the time series
-        # which has to be clustered
+        
+        ## removing time series with certain rate may lead to empty matrix for few cases
+        ## checking it first
+        if (length(Y_star) == 0 ) {break}
+        
+        # testing sync.test() in the input matrix
         SyncResults <- do.call(sync.test, args = list(as.formula(paste("Y_star", "~", sh)), ...))
         # if we fail to reject the Null Hypothesis
         if (SyncResults$p.value >= alpha)
@@ -186,7 +183,8 @@ sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...)
             # updating Y star
             Y_star <- Y
             N <- ncol(Y_star)
-            # storing the clusters and their results
+            # storing the estimates of parametric trend in clustered time series 
+            # along with other test statistics from sync.test()
             sync.stat.Est.Lst[[K]] = SyncResults$estimate$common_trend_estimates
             sync.pval.Lst[[K]] = SyncResults$p.value
             sync.Teststat.Lst[[K]] = SyncResults$statistic
@@ -205,22 +203,28 @@ sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...)
             } else {
                 nRM <- round(rate*length(WAVKResults))
             } 
-            #SL: This will work with a big sample in the beginning of the iterations. What if user set rate=5, and you have only 3 TS left? What if user set rate=0.1 and with 2 TS left round(rate*length(WAVKResults)) is 0 (i.e., the algorithm is stuck becase cannot remove anything)? Need to put a condition that at least 1 TS shall be removed.
+           
+            # if the rate of removal becomes greater than the number of columns or becomes zero in the testing data
+            # then rate becomes equal to 1.
+            # atleast 1 time series should be removed 
+            if (nRM > ncol(Y_star) || nRM == 0){
+                nRM <- 1 
+            }
+            #SL: This will work with a big sample in the beginning of the iterations.
+            #What if user set rate=5, and you have only 3 TS left?
+            #What if user set rate=0.1 and with 2 TS left round(rate*length(WAVKResults)) 
+            #is 0 (i.e., the algorithm is stuck becase cannot remove anything)? 
+            #Need to put a condition that at least 1 TS shall be removed.
             # if rate is higher than the time series left in the matrix
             # if rate becomes zero and algorithm runs infinitely
-            if (nRM > ncol(Y_star) || nRM == 0){
-                nRM <- 1 # atleast one time series shoud be deleted
-            }
+       
             #SL: I think this will work faster than the if() clause above: nRM <- max(1, nRM)
             
             
             # removing the time series as per the rate
-            #if (rate == 1) {  #SL: This IF can be avoided For example, can sort WAVK in decreasing order, then just select/remove first nRM ones
-            #    Y_star <- Y_star[, !(WAVKResults == max(WAVKResults))]
-            #} else {
             WAVKtmp.rmv <- WAVKtmp$ix[(length(WAVKtmp$ix)-nRM+1):length(WAVKtmp$ix)]
             Y_star <- Y_star[, -WAVKtmp.rmv]
-            #}
+    
         }
         if (is.vector(Y_star)) {
             if (is.null(ncol(Y))) {
@@ -230,7 +234,7 @@ sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...)
                 for ( idx.j in 1:length(colnames(Y))){if (length(which(Y[,idx.j] == Y_star) == TRUE) == nrows){j = idx.j}}
                 # Extracting the correct column name from the original Y
                 clm.nm <- colnames(Y)
-                # finding the index of that time series because we need to update the vector L
+                # finding the index of that time series because we need to update the vector L (cluster label)
                 j1 = as.numeric(clm.nm[j])
                 # updating the L with correct index of time series
                 L[j1] = 0 # zero denotes that time series is not joined by any other series
@@ -241,16 +245,23 @@ sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...)
                 
             }
         }
+      
         Y_star <<- Y_star
+        
     }
     Lfinal <- L 
-    clus_col.Idx <- sapply(1:max(unique(L[!is.nan(L)])), function(x) which(L == x)) 
-    clus_col.NoBind <- which(L == 0)
+    ## The very last time series in the loop will be left out without being alloted to cluster
+    Lfinal[is.nan(Lfinal)] = 0
+    clus_col.Idx <- sapply(1:max(unique(Lfinal)), function(x) which(Lfinal == x)) 
     ## final cluster variable
-    print(paste("Number of Clusters obtained: ", max(Lfinal[!is.nan(Lfinal)]), sep = ""))
+    print(paste("Number of Clusters obtained: ", max(Lfinal), sep = ""))
+    ## Cluster assginment
+    print("Cluster Labels")
+    print(Lfinal)
     
-    return(invisible(structure(list(Clusters = Lfinal, Column.Index = clus_col.Idx, Pval = sync.pval.Lst, 
-                                    Statistics = sync.Teststat.Lst, Estimate = sync.stat.Est.Lst, ar.order = sync.ar_order.Lst,
+    return(invisible(structure(list(Clusters = max(Lfinal), cluster_label = Lfinal, column_index = clus_col.Idx, 
+                                    estimate = sync.stat.Est.Lst, pval = sync.pval.Lst, 
+                                    statistics = sync.Teststat.Lst,  ar_order = sync.ar_order.Lst,
                                     window_used = sync.window_used.Lst,
                                     all_considered_windows = sync.all_consideredWindow.Lst, WAVK_obs = sync.wavk_obs.Lst))))
     # removing Y_star 
