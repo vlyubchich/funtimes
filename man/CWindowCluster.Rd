@@ -24,7 +24,7 @@ passed to \code{\link{CSlideCluster}}.}
 \item{w}{number of slides in each window.}
 
 \item{s}{step to shift a window, calculated in number of slides. The recommended 
-values are 1 (overlapping windows) or \code{w} (non-overlapping windows).}
+values are 1 (overlapping windows) or equal to \code{w} (non-overlapping windows).}
 
 \item{Epsilon}{a real value in \eqn{[0,1]} used to identify each pair of time series 
 that are clustered together over at least \code{w*Epsilon} slides within a window;  
@@ -35,8 +35,8 @@ A vector (if \code{X} contains only one window) or matrix with cluster
 labels for each time series (columns) and window (rows).
 }
 \description{
-This function clusters time series at a window level, 
-based on the Algorithm 2 of \insertCite{Ciampi_etal_2010;textual}{funtimes}.
+Cluster time series at a window level, 
+based on Algorithm 2 of \insertCite{Ciampi_etal_2010;textual}{funtimes}.
 }
 \details{
 This is the upper-level function for time series clustering. It exploits 

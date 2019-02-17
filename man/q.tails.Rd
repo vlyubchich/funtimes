@@ -16,11 +16,11 @@ Values above the  thresholds \code{quantile(x0, probs = q)} and
 }
 \value{
 A list with two elements:
-\item{d}{the quantile step.}
+\item{d}{the step in probabilities for defining the quantiles.}
 \item{Pk}{vector of differences of the intervals' centers.}
 }
 \description{
-This function compares right tails of two sample distributions using 
+Compare right tails of two sample distributions using 
 a quantile-based approach (QBA); 
 see \insertCite{Soliman_etal_2014_insurance;textual}{funtimes},
 \insertCite{Soliman_etal_2015_insurance;textual}{funtimes}, 

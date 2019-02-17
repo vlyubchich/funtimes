@@ -21,7 +21,7 @@ Default option\cr \code{"user.defined"} allows to set only one value of the argu
 and employs heuristic \eqn{m}-out-of-\eqn{n} subsampling algorithm 
 \insertCite{Bickel_Sakov_2008}{funtimes} to select an optimal window from the set 
 of possible windows \code{length(x)*q^j} whose values are mapped to the largest 
-previous integer and greater than 2. \code{x} is the time series tested.}
+previous integer and greater than 2. Vector \code{x} is the time series tested.}
 
 \item{Window}{length of the local window (factor), default is 
 \code{round(0.1*length(x))}, where \code{x} is the time series tested. 

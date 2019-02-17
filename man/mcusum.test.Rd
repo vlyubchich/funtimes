@@ -39,7 +39,7 @@ and \code{B} (the number of bootstrap replications).}
 }
 \description{
 Apply change point test by \insertCite{Horvath_etal_2017;textual}{funtimes} 
-for detecting at most \eqn{m} changes in regression coefficients, where
+for detecting at-most-\eqn{m} changes in regression coefficients, where
 test statistic is a modified cumulative sum (CUSUM), and 
 critical values are obtained with sieve bootstrap.
 }
@@ -52,6 +52,7 @@ and order \eqn{p} is selected based on \code{ar.order} and \code{BIC} settings
 are simulated under the null hypothesis of no change points.
 The distribution of test statistics \eqn{M_T} computed on each of those 
 bootstrapped series is used to obtain bootstrap-based \eqn{p}-values for the test. 
+
 The test statistic corresponds to the maximal value of the modified CUSUM over
 all combinations of hypothesized change points specified in \code{k}. The change 
 points that correspond to that maximum are reported in \code{estimate$khat},

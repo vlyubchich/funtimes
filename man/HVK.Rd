@@ -18,7 +18,7 @@ HVK(X, m1 = NULL, m2 = NULL, ar.order = 1)
 Vector of length \code{ar.order} with estimated autoregression coefficients.
 }
 \description{
-Estimates coefficients in non-parametric autoregression using the difference-based 
+Estimate coefficients in non-parametric autoregression using the difference-based 
 approach by \insertCite{Hall_VanKeilegom_2003;textual}{funtimes}.
 }
 \details{
@@ -27,7 +27,7 @@ using formula (2.6) by \insertCite{Hall_VanKeilegom_2003;textual}{funtimes}:
 \deqn{\hat{\gamma}(0)=\frac{1}{m_2-m_1+1}\sum_{m=m_1}^{m_2}
 \frac{1}{2(n-m)}\sum_{i=m+1}^{n}\{(D_mX)_i\}^2,}
 \deqn{\hat{\gamma}(j)=\hat{\gamma}(0)-\frac{1}{2(n-j)}\sum_{i=j+1}^n\{(D_jX)_i\}^2,}
-where \eqn{n}=\code{length(X)} is sample size, \eqn{D_j} is a difference operator 
+where \eqn{n} = \code{length(X)} is sample size, \eqn{D_j} is a difference operator 
 such that \eqn{(D_jX)_i=X_i-X_{i-j}}. Then, Yule--Walker method is used to 
 derive autoregression coefficients.
 }

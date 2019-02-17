@@ -21,7 +21,7 @@ passed to \code{\link{CSlideCluster}}.}
 \item{w}{number of slides in each window.}
 
 \item{s}{step to shift a window, calculated in number of slides. The recommended 
-values are 1 (overlapping windows) or \code{w} (non-overlapping windows).}
+values are 1 (overlapping windows) or equal to \code{w} (non-overlapping windows).}
 }
 \value{
 A list with the following elements:
@@ -34,10 +34,10 @@ combination of \code{Delta} (rows) and \code{Epsilon} (columns).}
 \item{epsilon.all}{vector of considered values for \code{Epsilon}.}
 }
 \description{
-Apply the algorithm of unsupervised spatio-temporal clustering TRUST 
+Apply the algorithm of unsupervised spatio-temporal clustering, TRUST 
 \insertCite{Ciampi_etal_2010}{funtimes}, with automatic selection of its 
 tuning parameters \code{Delta} and \code{Epsilon} based on Bayesian 
-information criterion (BIC).
+information criterion, BIC \insertCite{Schaeffer_etal_2016_trust}{funtimes}.
 }
 \details{
 This is the upper-level function for time series clustering. 

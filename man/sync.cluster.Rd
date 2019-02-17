@@ -29,22 +29,32 @@ number of bootstrap replications (\code{B}).}
 }
 \value{
 A list with the elements:
- #SL: need to make the output more user-friendly. Where are the clustering results (cluster assignments or so-called cluster labels)? #SL: Also, please, use similar notations to other functions.
-\item{clusters}{total number of clusters obtained.}
-\item{cluster_label}{cluster labels of each time series (each label is the cluster number of 
-time series). A label zero represents the time series which does not have a common trend with
-other time series. Labels other than zero are the clusters obtained.}
-\item{column_index}{stores index of columns of time series in the main matrix corresponding to each cluster. This can be used for
-plotting the time series of clustered time series, for example.}
-\item{estimate}{parametric trend estimates obtained for each cluster.}
-\item{pval}{\code{p}-value of \code{sync.test} for each cluster.}
-\item{statistics}{value of \code{sync.test} test statistics for each cluster.}
-\item{ar_order}{AR filter order used in \code{sync.test} for each cluster.}
-\item{window_used}{window used in the \code{sync.test} test for each cluster.}
-\item{all_considered_Windows}{different windows considered in \code{sync.test} for each cluster.}
-\item{WAVK_obs}{WAVK test statistics for each cluster obtained from \code{sync.test} for each cluster.}
-In case of more than one cluster, each output will be in 
-the same sequence as of unique cluster labels except zero.
+\item{cluster}{an integer vector indicating the cluster to which each time series is 
+allocated. A label \code{'0'} is assigned to time series which do not have a common trend 
+with other time series (that is, all time series labeled with \code{'0'} are separate 
+one-element clusters).}
+\item{elements}{a list with names of the time series in each cluster.}
+
+The further outputs combine results of \code{\link{sync.test}} for each cluster with
+at least two elements (that is, single-element clusters labeled with 
+\code{'0'} are excluded):
+\item{estimate}{a list with common parametric trend estimates obtained by 
+\code{\link{sync.test}} for each cluster. 
+The length of this list is \code{max(cluster)}.}
+\item{pval}{a list of \eqn{p}-values of \code{\link{sync.test}} for each cluster.
+The length of this list is \code{max(cluster)}.}
+\item{statistic}{a list with values of \code{\link{sync.test}} test statistic for 
+each cluster. The length of this list is \code{max(cluster)}.}
+\item{ar_order}{a list of AR filter orders used in \code{\link{sync.test}} for each 
+time series. The results are grouped by cluster in the list of length \code{max(cluster)}.}
+\item{window_used}{a list of local windows used in \code{\link{sync.test}} for each 
+time series. The results are grouped by cluster in the list of length \code{max(cluster)}.}
+\item{all_considered_windows}{a list of all windows considered in 
+\code{\link{sync.test}} and corresponding test results, for each cluster. 
+The length of this list is \code{max(cluster)}.}
+\item{WAVK_obs}{a list of WAVK test statistics obtained in \code{\link{sync.test}} 
+for each time series. 
+The results are grouped by cluster in the list of length \code{max(cluster)}.}
 }
 \description{
 Cluster time series with a common parametric trend using the 
@@ -64,73 +74,59 @@ is applied again. The contribution to the test statistic is assessed by the
 WAVK test statistic calculated for each time series.
 }
 \examples{
-## Simulate four autoregressive time series, 
-## three having a linear trend and one without a trend:
+\dontrun{
+## Simulate 4 autoregressive time series, 
+## 3 having a linear trend and 1 without a trend:
 set.seed(123)
-T = 30
-N = 4
-X = sapply(1:N, function(x) arima.sim(n = T + 100, list(order = c(1, 0, 0), ar = c(0.6)))[-c(1:100)])
+T = 100 #length of time series
+N = 4 #number of time series
+X = sapply(1:N, function(x) arima.sim(n = T, 
+           list(order = c(1, 0, 0), ar = c(0.6))))
 X[,1] <- 5 * (1:T)/T + X[,1]
 plot.ts(X)
 
-# Finding clusters with default parameters
-\dontrun{
-    LinTrend <- sync.cluster(X ~ t) 
-}    
+# Finding clusters with common linear trends:
+LinTrend <- sync.cluster(X ~ t) 
+  
 ## Sample Output:
-## "Number of Clusters obtained: 1"
-## "Cluster Labels"
-## 1 1 0 0
+##[1] "Cluster labels:"
+##[1] 0 1 1 1
+##[1] "Number of single-element clusters (labeled with '0'): 1"
 
 ## plotting the time series of the cluster obtained
-idx = LinTrend$column_index
-plot.ts(X[,idx])
-
-## simulating seven autoregressive time series 
-## Four time series have linear trend added 
-set.seed(123)
-T = 30
-N = 10
-X = matrix(NA, nrow = T, ncol = N)
-X[,1:5] <-  sapply(1:5, function(x) arima.sim(n = T + 100, list(order = c(1, 0, 0), ar = c(0.6)))[-c(1:100)])
-X[,6:N] <- sapply(6:N, function(x) -10 + 0.5 * (1:T) + arima.sim(n = T + 100, list(order = c(1, 0, 0), ar = c(0.6)))[-c(1:100)])
-plot.ts(X)
-
-## Clustering with rate of removal = 5, and window = 15
-\dontrun{
-    LinTrendR5W15 <- sync.cluster(X~t, rate = 2, Window = 15) 
-}    
-## Sample output:
-## "Number of Clusters obtained: 2"
-## "Cluster Labels"
-##   2 1 1 2 1 1 1 1 1 1
-
-## simulating five autoregressive time series to test for quadratic trend
-## One has no trend, while rest of the series have quadratic trend
-set.seed(123)
-T = 30
-N = 5
-X = matrix(NA, nrow = T, ncol = N)
-p <- 0.5
-q <- 1:T
-
-X[,1:2] <-  sapply(1:2, function(x) arima.sim(n = T + 100, list(order = c(1, 0, 0), ar = c(0.6)))[-c(1:100)])
-X[,3:N] <- sapply(3:N, function(x) -10 + p*(q+10)^2 +arima.sim(n = T + 100, list(order = c(1, 0, 0), ar = c(0.6)))[-c(1:100)])
-  
-plot.ts(X)
-# Clustering with default rate of removal
-\dontrun{
-    QuadTrend <- sync.cluster(X~poly(t,2))
+for(i in 1:max(LinTrend$cluster)) {
+    plot.ts(X[, LinTrend$cluster == i], 
+            main = paste("Cluster", i))
 }
-## Sample output:
-## "Number of Clusters obtained: 1"
-## "Cluster Labels"
-## 1 1 0 1 1  
 
+
+## Simulating 7 autoregressive time series, 
+## where first 4 time series have a linear trend added 
+set.seed(234)
+T = 100 #length of time series
+a <- sapply(1:4, function(x) -10 + 0.1 * (1:T) + 
+            arima.sim(n = T, list(order = c(1, 0, 0), ar = c(0.6))))
+b <- sapply(1:3, function(x) arima.sim(n = T, 
+            list(order = c(1, 0, 0), ar = c(0.6))))
+Y <- cbind(a, b)
+plot.ts(Y)
+
+## Clustering based on linear trend with rate of removal = 2 
+# and confidence level for the synchronism test 90\%
+LinTrend7 <- sync.cluster(Y ~ t, rate = 2, alpha = 0.1, B = 99)
+   
+## Sample output:
+##[1] "Cluster labels:"
+##[1] 1 1 1 0 2 0 2
+##[1] "Number of single-element clusters (labeled with '0'): 2"
+}
 
 }
 \references{
 \insertAllCited{}
+}
+\seealso{
+\code{\link{BICC}}, \code{\link{DR}}, \code{\link{sync.test}}
 }
 \author{
 Srishti Vishwakarma, Vyacheslav Lyubchich

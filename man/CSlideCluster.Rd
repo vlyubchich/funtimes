@@ -25,8 +25,8 @@ Default is \code{0.1*(Beta - Alpha)}.}
 A vector of length \code{ncol(X)} with cluster labels.
 }
 \description{
-This function clusters time series at a slide level, 
-based on the Algorithm 1 of \insertCite{Ciampi_etal_2010;textual}{funtimes}.
+Cluster time series at a slide level, 
+based on Algorithm 1 of \insertCite{Ciampi_etal_2010;textual}{funtimes}.
 }
 \examples{
 set.seed(123)

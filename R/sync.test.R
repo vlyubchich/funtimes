@@ -169,7 +169,7 @@ sync.test <- function(formula, B = 1000, Window = NULL, q = NULL, j = NULL,
     splt <- strsplit(frml, "~")[[1]]
     DNAME <- splt[1]
     sh <- splt[2]
-    X <- eval(parse(text = DNAME))
+    X <- eval(parse(text = DNAME), parent.frame())
     n <- nrow(X)
     K <- ncol(X)
     t <- c(1:n)/n

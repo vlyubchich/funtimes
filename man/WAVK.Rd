@@ -44,7 +44,7 @@ is used to estimate \eqn{\sigma^2}{sigma^2}.}
 asymptotic \eqn{N(0,1)} distribution.}
 }
 \description{
-Computes statistic for testing the parametric form of a regression function, 
+Statistic for testing the parametric form of a regression function, 
 suggested by \insertCite{Wang_etal_2008;textual}{funtimes}.
 }
 \examples{

@@ -17,10 +17,10 @@ Tail in \code{x1} is compared against the tail in \code{x0}.}
 A list with two elements:
 \item{Nk}{vector that tells how many more \code{x1}-values compared with 
 \code{x0}-values there are within each interval.}
-\item{Ck}{vector of intervals' centers.}
+\item{Ck}{vector of the intervals' centers.}
 }
 \description{
-This function compares right tails of two sample distributions using 
+Compare right tails of two sample distributions using 
 an interval-based approach (IBA); 
 see \insertCite{Chu_etal_2015_insurance;textual}{funtimes}
 and \insertCite{Lyubchich_Gel_2017_insurance;textual}{funtimes}.
