@@ -41,7 +41,7 @@
 #' one-element clusters).}
 #' \item{elements}{a list with names of the time series in each cluster.}
 #' 
-#' The further outputs combine results of \code{\link{sync.test}} for each cluster with
+#' The further elements combine results of \code{\link{sync.test}} for each cluster with
 #' at least two elements (that is, single-element clusters labeled with 
 #' \code{'0'} are excluded):
 #' \item{estimate}{a list with common parametric trend estimates obtained by 

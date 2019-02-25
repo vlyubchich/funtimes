@@ -23,7 +23,7 @@
 #' @param e vector of regression residuals (a stationary time series). 
 #' @param k an integer vector or scalar with hypothesized change point location(s) to 
 #' test. The length of this vector is treated as \eqn{m}, that is, the number of change 
-#' points being confirmed as statistially significant (from those 
+#' points being confirmed as statistically significant (from those 
 #' specified in \code{k}) would be \eqn{\le m}.
 #' @inheritParams wavk.test
 #' @param ... additional arguments passed to \code{\link{ARest}}
