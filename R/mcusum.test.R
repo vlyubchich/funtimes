@@ -26,6 +26,12 @@
 #' points being confirmed as statistically significant (from those 
 #' specified in \code{k}) would be \eqn{\le m}.
 #' @inheritParams wavk.test
+#' @param ksm logical value indicating whether a kernel smoothing to innovations in sieve 
+#' bootstrap shall be applied (default is \code{FALSE}, that is, the original estimated 
+#' innovations are bootstrapped, without the smoothing).
+#' @param ksm.arg used only if \code{ksm = TRUE}. A list of arguments for kernel smoothing
+#' to be passed to \code{\link[stats]{density}} function. Default settings specify the 
+#' use of Gaussian kernel and the \code{"sj"} rule to choose the bandwidth.
 #' @param ... additional arguments passed to \code{\link{ARest}}
 #' (for example, \code{ar.method}).
 #'
@@ -59,14 +65,18 @@
 #' T <- 100 #length of time series
 #' X <- rnorm(T, mean = 1, sd = 1)
 #' E <- rnorm(T, mean = 0, sd = 1)
-#' SizeOfChange <- 1.5
+#' SizeOfChange <- 1
 #' TimeOfChange <- 50
 #' Y <- c(1 * X[1:TimeOfChange] + E[1:TimeOfChange], 
 #'       (1 + SizeOfChange)*X[(TimeOfChange+1):T] + E[(TimeOfChange+1):T])
 #' ehat <- lm(Y ~ X)$resid
 #' mcusum.test(ehat, k = c(30, 50, 70))
 #' 
-mcusum.test <- function(e, k, B = 1000, ...)
+#' #Same, but with bootstrapped innovations obtained from a kernel smoothed distribution:
+#' mcusum.test(ehat, k = c(30, 50, 70), ksm = TRUE)
+#' 
+mcusum.test <- function(e, k, B = 1000, ksm = FALSE, 
+                        ksm.arg = list(kernel = "gaussian", bw = "sj"), ...)
 {
     DNAME <- deparse(substitute(e))
     T <- length(e)
@@ -77,10 +87,21 @@ mcusum.test <- function(e, k, B = 1000, ...)
         e <-  as.vector(embed(e, length(phi) + 1L) %*% c(1, -phi))
         e <- e - mean(e)
     }
-    MTboot <- sapply(1:B, function(b) 
-        MTfun(arima.sim(T, model = list(order = c(length(phi), 0, 0), ar = phi), 
-                        innov = sample(e, size = T, replace = TRUE)), k = k)$MT
-    )
+    if (ksm) { #use e from a smoothed distribution of e
+        ksm.arg$x <- e #append x to the arguments of the density function
+        bw <- do.call(stats::density, ksm.arg) #estimate bandwidth
+        bw <- bw$bw
+        MTboot <- sapply(1:B, function(b) 
+            MTfun(arima.sim(T, model = list(order = c(length(phi), 0, 0), ar = phi), 
+                            innov = rnorm(T, mean = sample(e, size = T, replace = TRUE), sd = bw)), 
+                  k = k)$MT
+        )
+    } else { #use bootstrapped e
+        MTboot <- sapply(1:B, function(b) 
+            MTfun(arima.sim(T, model = list(order = c(length(phi), 0, 0), ar = phi), 
+                            innov = sample(e, size = T, replace = TRUE)), k = k)$MT
+        )
+    }
     STATISTIC <- MTobs$MT
     names(STATISTIC) <- "M_T"
     PARAMETER <- length(MTobs$k)
