@@ -1,4 +1,13 @@
-oldrel
 .Rproj.user
 .Rhistory
+.Renviron
 .RData
+
+# produced vignettes
+vignettes/*.html
+vignettes/*.pdf
+vignettes/*.R
+vignettes/plots/figures
+
+# old releases
+oldrel

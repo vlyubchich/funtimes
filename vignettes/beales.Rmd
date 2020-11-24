@@ -1,0 +1,136 @@
+---
+title: "Beale's estimator and sample size calculation"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+bibliography: vignrefs.bib
+vignette: >
+  %\VignetteIndexEntry{Beale's estimator and sample size calculation}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+  
+```{r, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(funtimes)
+```
+
+# Introduction
+
+The R package `funtimes` contains the function `beales` that can be used to implement Beale's [@Beale_1962] ratio estimator for estimating total value. The function also calculates recommended sample size for desired confidence level and absolute or relative error.
+
+The Beale's estimator is often used in ecology to compute total pollutant load, $\widehat{Y}$, given a sample of the loads $y_i$ and corresponding river flow or discharges, $x_i$ ($i = 1,\ldots,n$):
+$$
+\widehat{Y}
+=X\frac{\bar{y}}{\bar{x}}\frac{\left( 1+ \theta\frac{s_{xy}}{\bar{x}\bar{y}}\right)}{\left( 1+\theta\frac{s^2_x}{\bar{x}^2} \right)},
+$$
+where $\theta=n^{-1} - N^{-1}$, $s_{xy}=(n-1)^{-1}\sum_{i=1}^n(x_i-\bar{x})(y_i-\bar{y})$, and $s^2_{x}=(n-1)^{-1}\sum_{i=1}^n(x_i-\bar{x})^2$. 
+Total flow, $X=\sum_{i=1}^Nx_i$, is assumed to be known. If the data set for flow contains only  $n'$ observations ($n\leqslant n'< N$), we use an estimate $\widehat{X}=\frac{N}{n'}\sum_{i=1}^{n'}x_i$ following formula (2.8) in @Thompson_2012.
+
+Help file for the function can be opened from R with:
+```{r eval = FALSE}
+?beales
+```
+
+
+The function uses the following groups of arguments as its inputs.
+
+* **Main inputs:** 
+  + `x` and `y` (both are required) for discharge and corresponding load measurements; 
+  + `level` defines the confidence level (optional; if not specified, `level = 0.95` is used, i.e., 95%); 
+  + population size `N` (optional, see details in the [section](#sec:dm) below).
+* **Output format:** 
+  + `verbose` (optional) is a logical value (`TRUE` or `FALSE`) defining whether text output should be shown. If not specified, its value is set to `TRUE` to show the text outputs.
+* **Sample size calculation:** (both arguments are optional, see details in the [section on sample size](#sec:samsize))
+  + `p` relative error, or 
+  + `d` margin of error.
+
+# General case, when all discharge data are known
+
+The ideal case is when all discharge data are know, and only some measurements of loads are missing.
+
+The inputs should be organized in vectors of same length. Consider a toy example where ten measurements cover the whole period of interest (i.e., the population size `N = 10`):
+```{r}
+discharge <- c(60, 50, 90, 100, 80, 90, 100, 90, 80, 70)
+loads <- c(33, 22, 44, 48, NA, 44, 49, NA, NA, 36)
+```
+`NA`s stand for missing values.
+
+To estimate the total load for this period, use:
+```{r}
+B10 <- beales(x = discharge, y = loads)
+```
+By default (the setting `verbose = TRUE`), the function shows text output. All estimates have been saved in the object `B10` and can be extracted from there. For example, see the list of elements saved in `B10`, then extract the standard error of the load estimate, and population size:
+```{r}
+ls(B10)
+B10$se
+B10$N
+```
+
+If a different level of confidence (default is 95%) is needed, set it using the argument `level`:
+```{r}
+B11 <- beales(x = discharge, y = loads, level = 0.9)
+```
+
+To suppress the text outputs, use `verbose = FALSE`:
+```{r}
+B12 <- beales(x = discharge, y = loads, level = 0.9, verbose = FALSE)
+```
+
+
+
+# Common case, when some discharge data are missing {#sec:dm}
+
+It is common that some *discharge data are missing*. The function fills-in the missing discharge measurements with average estimates automatically. For example, now the first discharge value is missing:
+```{r}
+discharge2 <- c(NA, 50, 90, 100, 80, 90, 100, 90, 80, 70)
+loads2 <- c(33, 22, 44, 48, NA, 44, 49, NA, NA, 36)
+```
+
+The `NA` in discharge will be replaced by an average value of the non-missing measurements, and the first pair of discharge and load (average discharge and the corresponding load of `r loads2[1]`) will be still used in estimating covariance and other quantities. Simply use the function in the same way as above:
+```{r}
+B20 <- beales(x = discharge2, y = loads2)
+```
+
+In another case, *both discharge and load data might be missing*. If they are not represented at all in the data vectors (e.g., by `NA`s), a simple trick is to set the population size, `N`, which is one of the arguments in the function. For example, if the data above are ten monthly measurements, and an estimate for the whole year (12 months) is required, set `N = 12`:
+```{r}
+B21 <- beales(x = discharge2, y = loads2, N = 12)
+```
+which is equivalent to adding two missing values to each vector, like this:
+```{r}
+discharge22 <- c(discharge2, NA, NA)
+loads22 <- c(loads2, NA, NA)
+B22 <- beales(x = discharge22, y = loads22)
+```
+
+
+# Sample size calculation {#sec:samsize}
+
+The other two arguments of the function, `p` and `d`, allow the user to set the desired relative error or margin of error, respectively, for sample size calculations. (If both `p` and `d` are defined, the calculations will run for `p`.) The estimated sample size, $\hat{n}$, is added to the output list as the element `nhat`, and an additional sentence is printed out at the output.
+
+For example, using our simulated data for 10 months out of 12, estimate the sample size needed to estimate the total yearly load with the relative error up to 5%:
+```{r}
+B30 <- beales(x = discharge2, y = loads2, N = 12, p = 0.05)
+```
+
+What if increase the confidence of such interval:
+```{r}
+B31 <- beales(x = discharge2, y = loads2, N = 12, p = 0.05, level = 0.99)
+```
+
+Similarly, when the margin of error is set:
+```{r}
+B32 <- beales(x = discharge2, y = loads2, N = 12, d = 15)
+```
+
+# Notes
+
+1. The function will not run if the inputs `x` and `y` are of different lengths.
+2. The reported sample size `n` is the number of non-missing values in `y` (missing values in `x` are replaced with an average, $\bar{x}$, automatically).
+3. The function will not run if the argument `N` is set such that `N < length(x)` (more discharge samples than possible in a given period) or if `N <= n` (sample size is bigger than or equals the population size). In the case when `N = n`, no estimation is needed, because the total load can be calculated just by summing up all individual loads.
+4. The form of the Beale's estimator assumes `n > 1` (for estimating the variances and covariance), and $\bar{x}\neq 0$ and $\bar{y}\neq 0$.
+
+# References
