@@ -2,7 +2,7 @@
 #' 
 #' A combination of time series trend tests for testing the null hypothesis of no trend, 
 #' versus the alternative hypothesis of a linear trend (Student's t-test), 
-#' or monotonic trend (Mann-Kendall test), or more general, 
+#' or monotonic trend (Mann--Kendall test), or more general, 
 #' possibly non-monotonic trend (WAVK test).
 #' 
 #' @details This function tests the null hypothesis of no trend 
@@ -154,14 +154,14 @@ notrend.test <- function(x, B = 1000, test = c("t", "MK", "WAVK"),
     if (length(pheta) > 0) {
         names(pheta) <- paste(rep("phi_", length(pheta)), c(1:length(pheta)), sep = "")
         tmp <- filter(x, pheta, sides = 1)
-        Z <- x[(length(pheta)+1):n] - tmp[length(pheta):(n-1)]
-        for (i in 1:B){
+        Z <- x[(length(pheta) + 1):n] - tmp[length(pheta):(n - 1)]
+        for (i in 1:B) {
             e <- sample(Z, size = n, replace = TRUE)
             Y[ ,i] <- arima.sim(list(order = c(length(pheta), 0, 0), ar = pheta), n = n, innov = e)
         }
     } else {
         Z <- x
-        for (i in 1:B){
+        for (i in 1:B) {
             Y[ ,i] <- sample(Z, size = n, replace = TRUE)
         }
     }
@@ -169,7 +169,7 @@ notrend.test <- function(x, B = 1000, test = c("t", "MK", "WAVK"),
     ESTIMATE <- list(length(pheta), pheta)
     names(ESTIMATE) <- c("AR_order", "AR_coefficients")
     #If Student's t-test is used
-    if(test == "t"){
+    if (test == "t") {
         METHOD <- "Sieve-bootstrap Student's t-test for a linear trend"
         ALTERNATIVE <- "linear trend."
         STATISTIC <- summary(lm(x ~ t))$coefficients["t", "t value"]
@@ -177,7 +177,7 @@ notrend.test <- function(x, B = 1000, test = c("t", "MK", "WAVK"),
         boot.stat <- sapply(1:dim(Y)[2], function(i) summary(lm(Y[,i] ~ t))$coefficients["t", "t value"])
     }
     #If Mann-Kendall's test is used
-    if(test == "MK"){
+    if (test == "MK") {
         METHOD <- "Sieve-bootstrap Mann-Kendall's trend test"
         ALTERNATIVE <- "monotonic trend."
         STATISTIC <- MannKendall(x)$tau
@@ -185,19 +185,19 @@ notrend.test <- function(x, B = 1000, test = c("t", "MK", "WAVK"),
         boot.stat <- sapply(1:dim(Y)[2], function(i) MannKendall(Y[,i])$tau)
     }
     #If WAVK test is used
-    if(test == "WAVK"){
+    if (test == "WAVK") {
         METHOD <- "Sieve-bootstrap WAVK trend test"
         ALTERNATIVE <- "(non-)monotonic trend."
         if (length(kn) < 3) {
             kn_opt <- kn[1]
             boot.stat <- sapply(1:dim(Y)[2], function(j) WAVK(Y[,j], kn_opt)$Tns)
         } else {
-            s <- array(data=NA, c(length(kn), B))
-            for (i in 1:length(kn)){
+            s <- array(data = NA, c(length(kn), B))
+            for (i in 1:length(kn)) {
                 s[i,] <- sapply(1:dim(Y)[2], function(j) WAVK(Y[,j], kn[i])$Tns)
             }
             s <- t(apply(s, 1, sort))
-            distance <- sapply(1:(length(kn)-1), function(x) dist(s[x:(x+1),]))
+            distance <- sapply(1:(length(kn) - 1), function(x) dist(s[x:(x + 1),]))
             argmin <- which.min(distance)
             kn_opt <- kn[argmin]
             boot.stat <- s[argmin,]
@@ -208,7 +208,7 @@ notrend.test <- function(x, B = 1000, test = c("t", "MK", "WAVK"),
         names(PARAMETER) <- "moving window"
     }
     P.VALUE <- mean(abs(boot.stat) >= abs(STATISTIC))
-    if(test == "WAVK"){
+    if (test == "WAVK") {
         structure(list(method = METHOD, data.name = DNAME, statistic = STATISTIC, p.value = P.VALUE, 
                        alternative = ALTERNATIVE, estimate = ESTIMATE, parameter = PARAMETER), class = "htest") 
     } else {

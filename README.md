@@ -2,6 +2,7 @@
 
 * Mark deprecated functions as defunct.
 * Combine functions for tail comparison into one.
+* Replace BIC argument in AR estimation with penalty, to easily switch to AIC or another penalty.
 
 # Upcoming version
 
@@ -9,7 +10,7 @@
 * Add vignettes for Beale's estimator and trend tests.
 * Add a package overview section in the documentation.
 * Improve computational efficiency of `purity` function, based on Brian Simmons's suggestions from 2019-06-12.
-* Format R code.
+* Format R code according to R style diagnostics (such as whitespaces).
 
 
 # CRAN version 6.1 and below

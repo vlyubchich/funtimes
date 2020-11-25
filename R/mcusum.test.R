@@ -83,7 +83,7 @@ mcusum.test <- function(e, k, B = 1000, ksm = FALSE,
     e <- e - mean(e)
     phi <- ARest(e, ...)
     MTobs <- MTfun(e, k = k)
-    if(length(phi) > 0) {
+    if (length(phi) > 0) {
         e <-  as.vector(embed(e, length(phi) + 1L) %*% c(1, -phi))
         e <- e - mean(e)
     }
@@ -96,7 +96,7 @@ mcusum.test <- function(e, k, B = 1000, ksm = FALSE,
                             innov = rnorm(T, mean = sample(e, size = T, replace = TRUE), sd = bw)), 
                   k = k)$MT
         )
-    } else { #use bootstrapped e
+    } else {#use bootstrapped e
         MTboot <- sapply(1:B, function(b) 
             MTfun(arima.sim(T, model = list(order = c(length(phi), 0, 0), ar = phi), 
                             innov = sample(e, size = T, replace = TRUE)), k = k)$MT

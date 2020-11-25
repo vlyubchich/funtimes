@@ -93,15 +93,15 @@ BICC <- function(X, Alpha = NULL, Beta = NULL, Theta = 0.8, p, w, s)
     DELTA <- seq(IQRx/50, IQRx/2, IQRx/10)
     EPS <- seq(1.0/w, 1.0, 1.0/w)
     IC <- array(NA, dim = c(length(DELTA), length(EPS)))
-    for (i in 1:(length(DELTA))){ 
-        for(j in 1:length(EPS)){
+    for (i in 1:(length(DELTA))) { 
+        for (j in 1:length(EPS)) {
             outputTMP <- CWindowCluster(X, Delta = DELTA[i], Epsilon = EPS[j], 
                                         Alpha = Alpha, Beta = Beta, Theta = Theta, 
                                         p = p, w = w, s = s)
             k <- max(outputTMP) 
             Res <- sapply(1:k, function(v) as.matrix(X[,v == outputTMP]) - 
                               rowMeans(as.matrix(X[,v == outputTMP])))
-            VarRes <- var(as.vector(unlist(Res)))*(n*N-1)/(n*N) #biased variance estimate
+            VarRes <- var(as.vector(unlist(Res)))*(n*N - 1)/(n*N) #biased variance estimate
             IC[i,j] <- N*log(VarRes) + k*log(N) #BIC
         }
     }
@@ -112,7 +112,7 @@ BICC <- function(X, Alpha = NULL, Beta = NULL, Theta = 0.8, p, w, s)
     output <- CWindowCluster(X, Delta = DELTA_opt, Epsilon = EPSILON_opt, 
                              Alpha = Alpha, Beta = Beta, Theta = Theta, 
                              p = p, w = w, s = s)
-    dimnames(output) <- list(paste("Window", c(1:nrow(output)), sep="_"), colnames(X))
+    dimnames(output) <- list(paste("Window", c(1:nrow(output)), sep = "_"), colnames(X))
     return(list(delta.opt = DELTA_opt, epsilon.opt = EPSILON_opt, 
                 clusters = output, IC = IC, delta.all = DELTA, epsilon.all = EPS))
 }

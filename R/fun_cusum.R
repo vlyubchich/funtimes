@@ -12,8 +12,8 @@ Mfun <- function(e, k) {
     mm <- (sum(e[(k[m] + 1):T]) - sume*(T - k[m])/T) / sqrt(T - k[m])
     mi <- numeric()
     if (m > 1) {
-        for(i in 2:m) {
-            mtmp <- (sum(e[(k[i-1] + 1):k[i]]) - sume*(k[i] - k[i-1])/T) / sqrt(T)
+        for (i in 2:m) {
+            mi[i - 1] <- (sum(e[(k[i - 1] + 1):k[i]]) - sume*(k[i] - k[i - 1])/T) / sqrt(T)
         }
     }
     sum(abs(c(m1, mi, mm)))
@@ -24,11 +24,11 @@ MTfun <- function(e, m, k = NULL) {
     if (is.null(k)) { #explore all combinations of at-most-m change points
         T <- length(e)
         M <- K <- as.list(rep(NA, m))
-        for(i in 1:m) {
+        for (i in 1:m) {
             K[[i]] <- combn(T - 1, i)
             M[[i]] <- sapply(1:ncol(K[[i]]), function(x) Mfun(e, K[[i]][,x]))
         }
-    } else { #explore only the pre-defined k's
+    } else {#explore only the pre-defined k's
         k <- unique(sort(k))
         m <- length(k)
         M <- K <- as.list(rep(NA, m))
@@ -36,7 +36,7 @@ MTfun <- function(e, m, k = NULL) {
             K[[1]] <- k
             M[[1]] <- Mfun(e, k)
         } else {
-            for(i in 1:m) {
+            for (i in 1:m) {
                 K[[i]] <- combn(k, i)
                 M[[i]] <- sapply(1:ncol(K[[i]]), function(x) Mfun(e, K[[i]][,x]))
             }

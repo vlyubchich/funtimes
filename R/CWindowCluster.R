@@ -84,10 +84,10 @@ CWindowCluster <- function(X, Alpha = NULL, Beta = NULL, Delta = NULL, Theta = 0
     Clusters <- array(NA, dim = c(w, N, nWindows))
     ClustersWithinWindow <- array(NA, dim = c(nWindows, N))
     #Separate data into windows
-    for (nw in 1:nWindows){
+    for (nw in 1:nWindows) {
         #Apply CSlideCluster to each slide withing the window
-        for (sl in 1:w){
-            Clusters[sl,,nw] <- CSlideCluster(X[c(((nw-1)*w*p+1+(sl-1)*p):((nw-1)*w*p+(sl)*p)),], 
+        for (sl in 1:w) {
+            Clusters[sl,,nw] <- CSlideCluster(X[c(((nw - 1)*w*p + 1 + (sl - 1)*p):((nw - 1)*w*p + (sl)*p)),], 
                                               Alpha = Alpha, Beta = Beta, Delta = Delta, Theta = Theta)
         }
         #Apply clusterization to CSlideCluster within window
@@ -97,10 +97,10 @@ CWindowCluster <- function(X, Alpha = NULL, Beta = NULL, Delta = NULL, Theta = 0
         currentTS <- currentCluster <- 1
         TSclusters[currentTS] <- currentCluster
         Unclassified <- is.na(TSclusters)
-        while(any(Unclassified)){
+        while (any(Unclassified)) {
             Include <- CExpandWindowCluster(E[Unclassified, currentTS], 
                                             E[Unclassified, Unclassified])
-            #Assign cluster number to the time series that were just groupped
+            #Assign cluster number to the time series that were just grouped
             TSclusters[Unclassified][Include] <- currentCluster
             #Next cluster number will be:
             currentCluster <- currentCluster + 1

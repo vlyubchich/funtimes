@@ -95,61 +95,63 @@
 #' samp_Ind <- sample(12,replace=F)
 #' time_points <- 30
 #' X <- matrix(0,nrow=time_points,ncol = 12)
-#' cluster1 <- sapply(1:4,function(x) arima.sim(list(order=c(1,0,0),ar=c(0.2)),
-#'                                              n=time_points,mean=0,sd=1))
-#' cluster2 <- sapply(1:4,function(x) arima.sim(list(order=c(2,0,0),ar=c(0.1,-0.2)),
-#'                                              n=time_points,mean=2,sd=1))
-#' cluster3 <- sapply(1:4,function(x) arima.sim(list(order=c(1,0,1),ar=c(0.3),ma=c(0.1)),
-#'                                              n=time_points,mean=6,sd=1))
+#' cluster1 <- sapply(1:4,function(x) arima.sim(list(order = c(1, 0, 0), ar = c(0.2)),
+#'                                              n = time_points, mean = 0, sd = 1))
+#' cluster2 <- sapply(1:4,function(x) arima.sim(list(order = c(2 ,0, 0), ar = c(0.1, -0.2)),
+#'                                              n = time_points, mean = 2, sd = 1))
+#' cluster3 <- sapply(1:4,function(x) arima.sim(list(order = c(1, 0, 1), ar = c(0.3), ma = c(0.1)),
+#'                                              n = time_points, mean = 6, sd = 1))
 #' 
-#' X[,samp_Ind[1:4]] <- t(round(cluster1,4))
-#' X[,samp_Ind[5:8]] <- t(round(cluster2,4))
-#' X[,samp_Ind[9:12]] <- t(round(cluster3,4))
+#' X[,samp_Ind[1:4]] <- t(round(cluster1, 4))
+#' X[,samp_Ind[5:8]] <- t(round(cluster2, 4))
+#' X[,samp_Ind[9:12]] <- t(round(cluster3, 4))
 #' 
 #' 
 #' # create ground truth label of the synthetic data
-#' ground_truth_label = matrix(1,nrow=12,ncol=1) 
+#' ground_truth_label = matrix(1, nrow = 12, ncol = 1) 
 #' for(k in 1:3){
-#'     ground_truth_label[samp_Ind[(4*k-4+1):(4*k)]] = k
+#'     ground_truth_label[samp_Ind[(4*k - 4 + 1):(4*k)]] = k
 #' }
 #' 
 #' # perform DR procedure to select optimal delta for TRUST
 #' # and save it in variable delta_opt
-#' delta_opt <- DR(X,method="TRUST")$P_opt 
+#' delta_opt <- DR(X, method = "TRUST")$P_opt 
 #' 
 #' # apply TRUST with the optimal delta on the synthetic data 
 #' # and save the clustering result in variable res
-#' res <- CSlideCluster(X,Delta=delta_opt ,Theta=0.9)  
+#' res <- CSlideCluster(X, Delta = delta_opt, Theta = 0.9)  
 #' 
 #' # calculate NMI to compare the clustering result with the ground truth label
 #' clue::cl_agreement(as.cl_partition(as.numeric(ground_truth_label)),
-#'                    as.cl_partition(as.numeric(res)),method = "NMI")
+#'                    as.cl_partition(as.numeric(res)), method = "NMI")
 #' 
 #' # visualize the clustering result and compare it with the ground truth result
 #' # visualization of the clustering result obtained by TRUST
-#' plot.zoo(X, type = "l",plot.type = "single",col = res, xlab = "Time Index", ylab ="")
+#' plot.zoo(X, type = "l", plot.type = "single", col = res, xlab = "Time index", ylab = "")
 #' # visualization of the ground truth result 
-#' plot.zoo(X, type = "l",plot.type = "single",col = ground_truth_label,
-#'          xlab = "Time Index", ylab ="")
+#' plot.zoo(X, type = "l", plot.type = "single", col = ground_truth_label,
+#'          xlab = "Time index", ylab = "")
 #' }
 #' 
 DR <- function(X, method, minPts = 3, theta = 0.9, B = 500, lb = -30, ub = 10)
 {
-    control_para <- sapply(seq(lb,ub,by=0.5),function(x) 1.1^x)
+    control_para <- sapply(seq(lb, ub, by = 0.5), function(x) 1.1^x)
     Nnodes <- floor(ncol(X)/2)
     # define local minimum selection function
-    para_opt <- function(M){
+    para_opt <- function(M) {
         acd <- M[,2]
         max <- max(acd)
         max_idx <- which(acd == max)
         max_idx <- max_idx[length(max_idx)]
-        if (max == 0) return("All ACDs are 0. This may be caused by the range of controlling parameters is either too small or too large.")
-        else if(max_idx > (length(acd)-6)) return("Max ACD is found near the upper bound of controlling parameters, there is no room to check the local minimum. You might need increase the upper bound of controlling parameters.")
-        else{
-            for (i in (max_idx+3):(length(acd)-3)){
-                if(acd[i-1] >= acd[i] & acd[i] < acd[i+1]){
-                    if(acd[i-2] >= acd[i] & acd[i] < acd[i+2]){
-                        if(acd[i-3] >= acd[i] & acd[i] < acd[i+3]) return(M[i,1])
+        if (max == 0) {
+            return("All ACDs are 0. This may be caused by the range of controlling parameters is either too small or too large.")
+        } else if (max_idx > (length(acd) - 6)) {
+            return("Max ACD is found near the upper bound of controlling parameters, there is no room to check the local minimum. You might need increase the upper bound of controlling parameters.")
+        } else {
+            for (i in (max_idx + 3):(length(acd) - 3)) {
+                if (acd[i - 1] >= acd[i] & acd[i] < acd[i + 1]) {
+                    if (acd[i - 2] >= acd[i] & acd[i] < acd[i + 2]) {
+                        if (acd[i - 3] >= acd[i] & acd[i] < acd[i + 3]) return(M[i, 1])
                     }
                 }
             }
@@ -160,50 +162,46 @@ DR <- function(X, method, minPts = 3, theta = 0.9, B = 500, lb = -30, ub = 10)
     cat(sprintf("Total # of controlling parameter: %d \n",length(control_para)))
     cat(sprintf("The # of controlling parameters has been processed: \n"))
     
-    if(method == "DBSCAN"){
-        if (missing(minPts)) stop("missing parameter minPts for DBSCAN")
-        else{
-            
-            ACD <- lapply(1:length(control_para),function(x){
+    if (method == "DBSCAN") {
+        if (missing(minPts)) {
+            stop("Missing parameter minPts for DBSCAN")
+        } else {
+            ACD <- lapply(1:length(control_para), function(x) {
                 Buffer <- c()
-                for(i in 1:B){
-                    Sindex<-sample(1:ncol(X),Nnodes, replace = FALSE)
+                for (i in 1:B) {
+                    Sindex <- sample(1:ncol(X), Nnodes, replace = FALSE)
                     sub_data_1 <- X[,Sindex]
-                    cl_1 <- max(dbscan::dbscan(t(sub_data_1),eps=control_para[x], minPts=minPts)$cluster)
-                    
+                    cl_1 <- max(dbscan::dbscan(t(sub_data_1), eps = control_para[x], minPts = minPts)$cluster)
                     sub_data_2 <- X[,-Sindex]
-                    cl_2 <- max(dbscan::dbscan(t(sub_data_2),eps=control_para[x], minPts=minPts)$cluster)
-                    Buffer <- c(Buffer,abs(cl_1-cl_2))
+                    cl_2 <- max(dbscan::dbscan(t(sub_data_2), eps = control_para[x], minPts = minPts)$cluster)
+                    Buffer <- c(Buffer,abs(cl_1 - cl_2))
                 }
                 print(x)
-                return(list(control_para[x],mean(Buffer)))
+                return(list(control_para[x], mean(Buffer)))
             })
         }
-        
-    }else if(method == "TRUST"){
-        
-        ACD <- lapply(1:length(control_para),function(x){
+    } else if (method == "TRUST") {
+        ACD <- lapply(1:length(control_para), function(x){
             Buffer <- c()
-            for(i in 1:B){
-                
-                Sindex<-sample(1:ncol(X),Nnodes,replace=F)
+            for (i in 1:B) {
+                Sindex <- sample(1:ncol(X), Nnodes, replace = FALSE)
                 sub_data_1 <- X[,Sindex]
-                cl_1 <- max(CSlideCluster(sub_data_1,Delta=control_para[x],Theta=theta))
-                
+                cl_1 <- max(CSlideCluster(sub_data_1, Delta = control_para[x], Theta = theta))
                 sub_data_2 <- X[,-Sindex]
-                cl_2 <- max(CSlideCluster(sub_data_2,Delta=control_para[x],Theta=theta))
-                
-                Buffer <- c(Buffer,abs(cl_1-cl_2))
+                cl_2 <- max(CSlideCluster(sub_data_2, Delta = control_para[x], Theta = theta))
+                Buffer <- c(Buffer, abs(cl_1 - cl_2))
             }
             print(x)
-            return(list(control_para[x],mean(Buffer)))
+            return(list(control_para[x], mean(Buffer)))
         })
-    }else stop ("Missing method")
+    } else {
+        stop("Missing method")
+    }
     
-    ACD_matrix <- apply(do.call('rbind',ACD),2,as.numeric)
-    colnames(ACD_matrix) <- c("Controlling Parameter","ACD")
+    ACD_matrix <- apply(do.call('rbind', ACD), 2, as.numeric)
+    colnames(ACD_matrix) <- c("Controlling Parameter", "ACD")
     p_opt <- para_opt(ACD_matrix)
     out <- list(p_opt, ACD_matrix)
-    names(out) <- c("P_opt","ACD_matrix")
+    names(out) <- c("P_opt", "ACD_matrix")
     return(out)
 }
