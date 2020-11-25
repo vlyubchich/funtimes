@@ -3,9 +3,9 @@ crad <- function(X, Nbin, StepSize = 1, Rcov = FALSE){
   #require(rPython)
   #require(robustbase)
 
-  if(Rcov){
+  if (Rcov) {
     cov = robustbase::covMcd(X)$cov
-  }else{
+  } else {
     cov = cov(X)
   }
 

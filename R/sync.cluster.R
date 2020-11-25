@@ -167,7 +167,7 @@ sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...)
             sync.all_considered_windows[[K]] = SyncResults$estimate$all_considered_windows
             sync.wavk_obs[[K]] = SyncResults$estimate$wavk_obs
             K = K + 1
-        } else { #the H0 of trend synchronism is rejected
+        } else {#the H0 of trend synchronism is rejected
             # Extracting local factor statistics
             WAVKResults <- abs(SyncResults$estimate$wavk_obs)
             # Sorting the WAVK result
@@ -179,7 +179,7 @@ sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...)
             }
             # Make sure at least 1 time series should be removed, but less than 
             # the number of time series remaining in Ystar
-            if (nRM >= ncol(Ystar) || nRM == 0){
+            if (nRM >= ncol(Ystar) || nRM == 0) {
                 nRM <- 1 
             }
             # Removing the time series as per the rate

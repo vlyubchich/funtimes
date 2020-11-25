@@ -41,7 +41,7 @@
 #' 
 i.tails <- function(x0, x1, d = NULL)
 {
-    if(is.null(d)) d <- quantile(x0, probs = 0.99)
+    if (is.null(d)) d <- quantile(x0, probs = 0.99)
     n <- sum(x0 >= d)
     #Sturges' formula
     k <- ceiling(log2(n) + 1)

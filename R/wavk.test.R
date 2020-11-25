@@ -127,7 +127,8 @@ wavk.test <- function(formula, factor.length = c("user.defined", "adaptive.selec
     frml <- deparse(substitute(formula))
     splt <- strsplit(frml, "~")[[1]]
     DNAME <- splt[1]
-    x <- eval(parse(text = DNAME))
+    x <- lm(formula = as.formula(paste0(DNAME, "~ 1"), env = parent.frame(n = 4)), 
+            method = "model.frame")[,1]
     if (is.null(Window)) {
         Window = round(0.1*length(x))
     }
@@ -182,24 +183,24 @@ wavk.test <- function(formula, factor.length = c("user.defined", "adaptive.selec
     if (is.null(ar.order)) {
         ar.order <- floor(10*log10(n))
     }
-    mod <- lm(as.formula(frml))
+    mod <- lm(as.formula(as.formula(paste0("x ~ ", splt[2]))))
     TrendCoeff <- mod$coefficients
     TS <- as.vector(mod$residuals)
-    ALTERNATIVE <- paste("trend is not of the form ", frml, ".", sep="")
-    pheta <- ARest(TS, ar.order=ar.order, ar.method=ar.method, BIC=BIC)
-    if (length(pheta)>0) {
-        names(pheta) <- paste(rep("phi_", length(pheta)), c(1:length(pheta)), sep="")
-        tmp <- filter(x, pheta, sides=1)
-        tmp2 <- filter(mod$fitted.values, pheta, sides=1)
-        Z <- (x[(length(pheta)+1):n] - tmp[length(pheta):(n-1)]) - 
-            (mod$fitted.values[(length(pheta)+1):n] - tmp2[length(pheta):(n-1)])
+    ALTERNATIVE <- paste("trend is not of the form ", frml, ".", sep = "")
+    pheta <- ARest(TS, ar.order = ar.order, ar.method = ar.method, BIC = BIC)
+    if (length(pheta) > 0) {
+        names(pheta) <- paste(rep("phi_", length(pheta)), c(1:length(pheta)), sep = "")
+        tmp <- filter(x, pheta, sides = 1)
+        tmp2 <- filter(mod$fitted.values, pheta, sides = 1)
+        Z <- (x[(length(pheta) + 1):n] - tmp[length(pheta):(n - 1)]) - 
+            (mod$fitted.values[(length(pheta) + 1):n] - tmp2[length(pheta):(n - 1)])
     } else {
         Z <- TS
     }
     ESTIMATE <- list(TrendCoeff, length(pheta), pheta)
     names(ESTIMATE) <- c("trend_coefficients", "AR_order", "AR_coefficients")
     Z <- Z - mean(Z)
-    sigma <- sqrt(sum(diff(Z)^2)/(2*(length(Z)-1)))
+    sigma <- sqrt(sum(diff(Z)^2)/(2*(length(Z) - 1)))
     if (method == "asympt") {
         METHOD <- "Trend test by Wang, Akritas, and Van Keilegom (asymptotic p-values)"
         for (i in 1:length(kn)) {
@@ -212,16 +213,16 @@ wavk.test <- function(formula, factor.length = c("user.defined", "adaptive.selec
         names(PARAMETER) <- "user-defined window"
     } else {
         METHOD <- "Trend test by Wang, Akritas, and Van Keilegom (bootstrap p-values)"
-        boot <- array(data=rnorm(n*B), c(n,B)) * sigma
-        s <- array(data=NA, c(length(kn), B))
+        boot <- array(data = rnorm(n*B), c(n,B)) * sigma
+        s <- array(data = NA, c(length(kn), B))
         for (i in 1:length(kn)) {
             s[i,] <- apply(boot, 2, function(x) WAVK(x, kn[i])$Tns)
-            result[i,1] <- WAVK(Z, kn[i])$Tns
+            result[i, 1] <- WAVK(Z, kn[i])$Tns
             crit <- sum(result[i,1] < s[i,])/B
             if (crit < 0.5) {
-                result[i,2] <- 2*crit
+                result[i, 2] <- 2*crit
             } else {
-                result[i,2] <- 2*(1-crit)
+                result[i, 2] <- 2*(1 - crit)
             }
         }
         if (length(kn) < 3) {
@@ -231,7 +232,7 @@ wavk.test <- function(formula, factor.length = c("user.defined", "adaptive.selec
             names(PARAMETER) <- "user-defined window"
         } else {
             s <- t(apply(s, 1, sort))
-            distance <- sapply(1:(length(kn)-1), function(x) dist(s[x:(x+1),]))
+            distance <- sapply(1:(length(kn) - 1), function(x) dist(s[x:(x + 1),]))
             kn_opt <- kn[which.min(distance)]
             res[1,] <- result[which.min(distance),]
             STATISTIC <- res[1,1]

@@ -92,30 +92,30 @@ purity <- function(classes, clusters)
   nClusters <- length(unique(clusters))
   ClassLabels <- ClusterLabels <- ClusterSize <- numeric()
   tmp <- table(classes, clusters)
-  for(i in 1:min(dim(tmp))){
+  for (i in 1:min(dim(tmp))) {
     ind <- which(tmp == max(tmp), arr.ind = TRUE)
-    if(nrow(ind) > 1){ #several equal max values
-      if(any(dim(tmp) < 2)) {
+    if (nrow(ind) > 1) { #several equal max values
+      if (any(dim(tmp) < 2)) {
         ind <- ind[1,]
-      }else{
+      } else {
         #for each class with equal max, run and select the second max and choose minimum of that
         ind <- ind[which.min(sapply(1:nrow(ind), function(j) 
-            sort(tmp[,ind[j,2]], decreasing = TRUE)[2])), ]
+          sort(tmp[,ind[j,2]], decreasing = TRUE)[2])), ]
       }
     }
     ClassLabels[i] <- rownames(tmp)[ind[1]]
     ClusterLabels[i] <- colnames(tmp)[ind[2]]
     ClusterSize[i] <- max(tmp)
-    tmp <- tmp[-which(rownames(tmp)==ClassLabels[i]), -which(colnames(tmp) == ClusterLabels[i])]
+    tmp <- tmp[-which(rownames(tmp) == ClassLabels[i]), -which(colnames(tmp) == ClusterLabels[i])]
     #If converged to only one column (cluster), tmp should be a column-vector:
-    if(is.null(dim(tmp))){
-      if(nClusters < nClasses){ 
+    if (is.null(dim(tmp))) {
+      if (nClusters < nClasses) { 
         tmp <- as.matrix(tmp)
         colnames(tmp) <- unique(clusters)[!is.element(unique(clusters), ClusterLabels)]
-      }else{ #tmp should be a row-vector
+      } else {#tmp should be a row-vector
         tmp <- t(as.matrix(tmp))
         rownames(tmp) <- unique(classes)[!is.element(unique(classes), ClassLabels)]
-        if(length(tmp) == 1) colnames(tmp) <- unique(clusters)[!is.element(unique(clusters), ClusterLabels)]
+        if (length(tmp) == 1) colnames(tmp) <- unique(clusters)[!is.element(unique(clusters), ClusterLabels)]
       }
     }
   }
