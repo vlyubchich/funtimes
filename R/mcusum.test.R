@@ -68,7 +68,7 @@
 #' SizeOfChange <- 1
 #' TimeOfChange <- 50
 #' Y <- c(1 * X[1:TimeOfChange] + E[1:TimeOfChange], 
-#'       (1 + SizeOfChange)*X[(TimeOfChange+1):T] + E[(TimeOfChange+1):T])
+#'       (1 + SizeOfChange)*X[(TimeOfChange + 1):T] + E[(TimeOfChange + 1):T])
 #' ehat <- lm(Y ~ X)$resid
 #' mcusum.test(ehat, k = c(30, 50, 70))
 #' 

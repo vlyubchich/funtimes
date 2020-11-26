@@ -10,7 +10,7 @@
 #' @param formula an object of class "\code{\link[stats]{formula}}", specifying the 
 #' form of the parametric time trend to be tested. Variable \eqn{t} should be used 
 #' to specify the form, where \eqn{t} is specified within the function as a regular 
-#' sequence on the interval (0,1]. See `Examples'.
+#' sequence on the interval (0,1]. See \code{Examples}.
 #' @param factor.length method to define the length of local windows (factors). 
 #' Default option\cr \code{"user.defined"} allows to set only one value of the argument 
 #' \code{Window}. The option \code{"adaptive.selection"} sets \code{method = "boot"} 

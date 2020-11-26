@@ -22,8 +22,8 @@
 #' 
 #' 
 #' @return A list with the following elements:
-#' \item{delta.opt}{`optimal' value for the clustering parameter \code{Delta}.}
-#' \item{epsilon.opt}{`optimal' value for the clustering parameter \code{Epsilon}.}
+#' \item{delta.opt}{optimal value for the clustering parameter \code{Delta}.}
+#' \item{epsilon.opt}{optimal value for the clustering parameter \code{Epsilon}.}
 #' \item{clusters}{vector of length \code{ncol(X)} with cluster labels.}
 #' \item{IC}{values of the information criterion (BIC) for each considered 
 #' combination of \code{Delta} (rows) and \code{Epsilon} (columns).}

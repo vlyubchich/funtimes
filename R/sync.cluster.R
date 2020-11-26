@@ -22,7 +22,7 @@
 #' (time series in columns) which is passed to \code{\link{sync.test}}. 
 #' Variable \eqn{t} should be used to specify the form 
 #' of the trend, where \eqn{t} is specified within the function automatically as a 
-#' regular sequence of length \eqn{T} on the interval (0,1]. See `Examples'.
+#' regular sequence of length \eqn{T} on the interval (0,1]. See \code{Examples}.
 #' @param rate rate of removal of time series. Default is 1 (i.e., if hypothesis 
 #' of synchronism is rejected one time series is removed at a time to re-test the 
 #' remaining time series). Integer values above 1 are treated as number of time 

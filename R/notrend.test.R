@@ -15,7 +15,7 @@
 #' @inheritParams ARest
 #' @inheritParams wavk.test
 #' @param test trend test to implement: Student's t-test (\code{"t"}, default), 
-#' Mann-Kendall test (\code{"MK"}), or 
+#' Mann--Kendall test (\code{"MK"}), or 
 #' WAVK test (\code{"WAVK"}, see \code{\link{WAVK}}).
 #' @param factor.length method to define the length of local windows (factors). 
 #' Used only if \code{test = "WAVK"}. Default option \code{"user.defined"} allows 
@@ -75,7 +75,7 @@
 #' #Use t-test
 #' notrend.test(U)
 #'     
-#' #Use Mann-Kendall test and Yule-Walker estimates of the AR parameters
+#' #Use Mann--Kendall test and Yule-Walker estimates of the AR parameters
 #' notrend.test(U, test = "MK", ar.method = "yw")
 #'     
 #' #Use WAVK test for the H0 of no trend, with m-out-of-n selection of the local window:
@@ -176,12 +176,12 @@ notrend.test <- function(x, B = 1000, test = c("t", "MK", "WAVK"),
         names(STATISTIC) <- "Student's t value"
         boot.stat <- sapply(1:dim(Y)[2], function(i) summary(lm(Y[,i] ~ t))$coefficients["t", "t value"])
     }
-    #If Mann-Kendall's test is used
+    #If Mann--Kendall's test is used
     if (test == "MK") {
-        METHOD <- "Sieve-bootstrap Mann-Kendall's trend test"
+        METHOD <- "Sieve-bootstrap Mann--Kendall's trend test"
         ALTERNATIVE <- "monotonic trend."
         STATISTIC <- MannKendall(x)$tau
-        names(STATISTIC) <- "Mann-Kendall's tau"
+        names(STATISTIC) <- "Mann--Kendall's tau"
         boot.stat <- sapply(1:dim(Y)[2], function(i) MannKendall(Y[,i])$tau)
     }
     #If WAVK test is used
