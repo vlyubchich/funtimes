@@ -124,7 +124,11 @@ notrend_test <- function(x, B = 1000, test = c("t", "MK", "WAVK"),
     if (!is.vector(j) | !is.numeric(j)) {
         stop("j is not a numeric vector.")
     }
-    kn <- ifelse(factor.length == "user.defined", Window[1], n*q^j)
+    if (factor.length == "user.defined") {
+        kn <- Window[1]
+    } else {
+        kn <- n*q^j
+    }
     kn <- unique(sort(floor(kn)))
     kn <- kn[kn > 2 & kn < n]
     if (length(kn) == 0) {

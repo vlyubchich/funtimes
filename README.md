@@ -3,7 +3,7 @@
 * Mark deprecated functions as defunct. <!-- https://devguide.ropensci.org/evolution.html  -->
 * Combine functions for tail comparison into one, without dots.
 * Replace BIC argument in AR estimation with penalty, to easily switch to AIC or another penalty.
-* Improve computational efficiency of `purity` function, based on Brian Simmons's suggestions from 2019-06-12.
+
 
 # Upcoming version
 
@@ -11,7 +11,7 @@
 * Add vignettes for Beale's estimator and trend tests.
 * Add a package overview section in the documentation.
 * Format R code according to R style diagnostics (such as whitespaces).
-
+* Improve computational efficiency of `purity` function, inspired by Brian Simmons's suggestions from 2019-06-12 about handling zero-cases when all clusters have been found.
 
 # CRAN version 6.1 and below
 

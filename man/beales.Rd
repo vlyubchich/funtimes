@@ -74,6 +74,9 @@ beales(discharge, loads, level = 0.9, d = 30)
 \references{
 \insertAllCited{}
 }
+\seealso{
+\code{vignette("beales", package = "funtimes")}
+}
 \author{
 Vyacheslav Lyubchich
 }
