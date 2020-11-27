@@ -105,7 +105,7 @@ notrend.test <- function(x, B = 1000, test = c("t", "MK", "WAVK"),
                          factor.length = c("user.defined", "adaptive.selection"), 
                          Window = NULL, q = 3/4, j = c(8:11))
 {
-    .Deprecated("notrend_test", msg = "notrend.test is deprecated and will be removed soon. Use notrend_test instead.")
+    .Deprecated("notrend_test", msg = "notrend.test is deprecated and will be removed. Use notrend_test instead.")
     ### Perform various checks.
     DNAME <- deparse(substitute(x))  
     if (NCOL(x) > 1 | !is.numeric(x)) {

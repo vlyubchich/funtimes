@@ -84,7 +84,7 @@ NULL
 mcusum.test <- function(e, k, B = 1000, ksm = FALSE, 
                         ksm.arg = list(kernel = "gaussian", bw = "sj"), ...)
 {
-    .Deprecated("mcusum_test", msg = "mcusum.test is deprecated and will be removed soon. Use mcusum_test instead.")
+    .Deprecated("mcusum_test", msg = "mcusum.test is deprecated and will be removed. Use mcusum_test instead.")
     DNAME <- deparse(substitute(e))
     T <- length(e)
     e <- e - mean(e)

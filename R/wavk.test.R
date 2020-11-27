@@ -128,7 +128,7 @@ wavk.test <- function(formula, factor.length = c("user.defined", "adaptive.selec
                       Window = NULL, q = 3/4, j = c(8:11), B = 1000, method = c("boot", "asympt"), 
                       ar.order = NULL, ar.method = "HVK", BIC = TRUE, out = FALSE)
 {
-    .Deprecated("wavk.test", msg = "wavk.test is deprecated and will be removed soon. Use wavk_test instead.")
+    .Deprecated("wavk.test", msg = "wavk.test is deprecated and will be removed. Use wavk_test instead.")
     ### Perform various checks.
     frml <- deparse(substitute(formula))
     splt <- strsplit(frml, "~")[[1]]

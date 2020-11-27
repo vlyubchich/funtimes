@@ -170,7 +170,7 @@ NULL
 sync.test <- function(formula, B = 1000, Window = NULL, q = NULL, j = NULL, 
                       ar.order = NULL, ar.method = "HVK", BIC = TRUE)
 {
-    .Deprecated("sync_test", msg = "sync_test is deprecated and will be removed soon. Use sync_test instead.")
+    .Deprecated("sync_test", msg = "sync_test is deprecated and will be removed. Use sync_test instead.")
     frml <- deparse(substitute(formula))
     splt <- strsplit(frml, "~")[[1]]
     DNAME <- splt[1]

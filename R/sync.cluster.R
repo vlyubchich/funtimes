@@ -127,7 +127,7 @@ NULL
 #' 
 sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...) 
 {
-    .Deprecated("sync_cluster", msg = "sync.cluster is deprecated and will be removed soon. Use sync_cluster instead.")
+    .Deprecated("sync_cluster", msg = "sync.cluster is deprecated and will be removed. Use sync_cluster instead.")
     ## separating formula to find the time series
     frml <- deparse(substitute(formula))
     splt <- strsplit(frml, "~")[[1]]
