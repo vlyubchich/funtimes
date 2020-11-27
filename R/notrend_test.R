@@ -7,13 +7,13 @@
 #' 
 #' @details This function tests the null hypothesis of no trend 
 #' versus different alternatives.
-#' To set some other shape of trend as the null hypothesis, use \code{\link{wavk.test}}. 
-#' Note that \code{\link{wavk.test}} employs hybrid bootstrap, which is alternative 
+#' To set some other shape of trend as the null hypothesis, use \code{\link{wavk_test}}. 
+#' Note that \code{\link{wavk_test}} employs hybrid bootstrap, which is alternative 
 #' to the sieve bootstrap employed by the current function.
 #' 
 #' 
 #' @inheritParams ARest
-#' @inheritParams wavk.test
+#' @inheritParams wavk_test
 #' @param test trend test to implement: Student's t-test (\code{"t"}, default), 
 #' Mann--Kendall test (\code{"MK"}), or 
 #' WAVK test (\code{"WAVK"}, see \code{\link{WAVK}}).
@@ -53,14 +53,9 @@
 #' \insertAllCited{}
 #' 
 #' @seealso \code{\link[stats]{ar}}, \code{\link{HVK}}, \code{\link{WAVK}}, 
-#' \code{\link{wavk.test}}
+#' \code{\link{wavk_test}}
 #' 
-#' @keywords internal
-NULL
-
-#' @rdname funtimes-deprecated
-#' @section \code{notrend.test}:
-#' For \code{notrend.test}, use \code{\link{notrend_test}}.
+#' @keywords htest ts trend
 #' 
 #' @author Yulia R. Gel, Vyacheslav Lyubchich
 #' 
@@ -78,13 +73,13 @@ NULL
 #' plot.ts(U)
 #'     
 #' #Use t-test
-#' notrend.test(U)
+#' notrend_test(U)
 #'     
 #' #Use Mann--Kendall test and Yule-Walker estimates of the AR parameters
-#' notrend.test(U, test = "MK", ar.method = "yw")
+#' notrend_test(U, test = "MK", ar.method = "yw")
 #'     
 #' #Use WAVK test for the H0 of no trend, with m-out-of-n selection of the local window:
-#' notrend.test(U, test = "WAVK", factor.length = "adaptive.selection")
+#' notrend_test(U, test = "WAVK", factor.length = "adaptive.selection")
 #' # Sample output:
 #' ##	Sieve-bootstrap WAVK trend test
 #' ##
@@ -100,12 +95,11 @@ NULL
 #' ##0.4041848 
 #' }
 #' 
-notrend.test <- function(x, B = 1000, test = c("t", "MK", "WAVK"), 
+notrend_test <- function(x, B = 1000, test = c("t", "MK", "WAVK"), 
                          ar.method = "HVK", ar.order = NULL, BIC = TRUE, 
                          factor.length = c("user.defined", "adaptive.selection"), 
                          Window = NULL, q = 3/4, j = c(8:11))
 {
-    .Deprecated("notrend_test", msg = "notrend.test is deprecated and will be removed soon. Use notrend_test instead.")
     ### Perform various checks.
     DNAME <- deparse(substitute(x))  
     if (NCOL(x) > 1 | !is.numeric(x)) {

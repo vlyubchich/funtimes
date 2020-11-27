@@ -4,19 +4,18 @@
 \alias{CSlideCluster}
 \title{Slide-Level Time Series Clustering}
 \usage{
-CSlideCluster(X, Alpha = NULL, Beta = NULL, Delta = NULL,
-  Theta = 0.8)
+CSlideCluster(X, Alpha = NULL, Beta = NULL, Delta = NULL, Theta = 0.8)
 }
 \arguments{
 \item{X}{a matrix of time series observed within a slide (time series in columns).}
 
-\item{Alpha}{lower limit of the time series domain. Default is 
+\item{Alpha}{lower limit of the time series domain. Default is
 \code{quantile(X)[2] -}\cr \code{1.5*(quantile(X)[4] - quantile(X)[2])}.}
 
-\item{Beta}{upper limit of the time series domain. 
+\item{Beta}{upper limit of the time series domain.
 Default is \code{quantile(X)[2] +}\cr \code{1.5*(quantile(X)[4] - quantile(X)[2])}.}
 
-\item{Delta}{closeness parameter, a real value in \eqn{[0,1]}. 
+\item{Delta}{closeness parameter, a real value in \eqn{[0,1]}.
 Default is \code{0.1*(Beta - Alpha)}.}
 
 \item{Theta}{connectivity parameter, a real value in \eqn{[0,1]}. Default is 0.8.}
@@ -25,7 +24,7 @@ Default is \code{0.1*(Beta - Alpha)}.}
 A vector of length \code{ncol(X)} with cluster labels.
 }
 \description{
-Cluster time series at a slide level, 
+Cluster time series at a slide level,
 based on Algorithm 1 of \insertCite{Ciampi_etal_2010;textual}{funtimes}.
 }
 \examples{
@@ -38,7 +37,7 @@ CSlideCluster(X)
 \insertAllCited{}
 }
 \seealso{
-\code{\link{CSlideCluster}}, \code{\link{CWindowCluster}}, 
+\code{\link{CSlideCluster}}, \code{\link{CWindowCluster}},
 and \code{\link{BICC}}
 }
 \author{

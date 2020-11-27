@@ -9,7 +9,7 @@ BICC(X, Alpha = NULL, Beta = NULL, Theta = 0.8, p, w, s)
 \arguments{
 \item{X}{a matrix of time series observed within a slide (time series in columns).}
 
-\item{Alpha}{lower limit of the time series domain, 
+\item{Alpha}{lower limit of the time series domain,
 passed to \code{\link{CSlideCluster}}.}
 
 \item{Beta}{upper limit of the time series domain, passed to \code{\link{CSlideCluster}}.}
@@ -20,36 +20,36 @@ passed to \code{\link{CSlideCluster}}.}
 
 \item{w}{number of slides in each window.}
 
-\item{s}{step to shift a window, calculated in number of slides. The recommended 
+\item{s}{step to shift a window, calculated in number of slides. The recommended
 values are 1 (overlapping windows) or equal to \code{w} (non-overlapping windows).}
 }
 \value{
 A list with the following elements:
-\item{delta.opt}{`optimal' value for the clustering parameter \code{Delta}.}
-\item{epsilon.opt}{`optimal' value for the clustering parameter \code{Epsilon}.}
+\item{delta.opt}{optimal value for the clustering parameter \code{Delta}.}
+\item{epsilon.opt}{optimal value for the clustering parameter \code{Epsilon}.}
 \item{clusters}{vector of length \code{ncol(X)} with cluster labels.}
-\item{IC}{values of the information criterion (BIC) for each considered 
+\item{IC}{values of the information criterion (BIC) for each considered
 combination of \code{Delta} (rows) and \code{Epsilon} (columns).}
 \item{delta.all}{vector of considered values for \code{Delta}.}
 \item{epsilon.all}{vector of considered values for \code{Epsilon}.}
 }
 \description{
-Apply the algorithm of unsupervised spatio-temporal clustering, TRUST 
-\insertCite{Ciampi_etal_2010}{funtimes}, with automatic selection of its 
-tuning parameters \code{Delta} and \code{Epsilon} based on Bayesian 
+Apply the algorithm of unsupervised spatio-temporal clustering, TRUST
+\insertCite{Ciampi_etal_2010}{funtimes}, with automatic selection of its
+tuning parameters \code{Delta} and \code{Epsilon} based on Bayesian
 information criterion, BIC \insertCite{Schaeffer_etal_2016_trust}{funtimes}.
 }
 \details{
-This is the upper-level function for time series clustering. 
-It exploits the functions \code{\link{CWindowCluster}} and 
-\code{\link{CSlideCluster}} to cluster time series based on closeness and 
-homogeneity measures. Clustering is performed multiple times with a range 
-of equidistant values for the parameters \code{Delta} and \code{Epsilon}, 
-then optimal parameters \code{Delta} and \code{Epsilon} along with the 
-corresponding clustering results are shown 
+This is the upper-level function for time series clustering.
+It exploits the functions \code{\link{CWindowCluster}} and
+\code{\link{CSlideCluster}} to cluster time series based on closeness and
+homogeneity measures. Clustering is performed multiple times with a range
+of equidistant values for the parameters \code{Delta} and \code{Epsilon},
+then optimal parameters \code{Delta} and \code{Epsilon} along with the
+corresponding clustering results are shown
 \insertCite{@see @Schaeffer_etal_2016_trust, for more details}{funtimes}.
 
-The total length of time series (number of levels, i.e., \code{nrow(X)}) 
+The total length of time series (number of levels, i.e., \code{nrow(X)})
 should be divisible by \code{p}.
 }
 \examples{

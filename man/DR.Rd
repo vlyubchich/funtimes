@@ -4,55 +4,54 @@
 \alias{DR}
 \title{Downhill Riding (DR) Procedure}
 \usage{
-DR(X, method, minPts = 3, theta = 0.9, B = 500, lb = -30,
-  ub = 10)
+DR(X, method, minPts = 3, theta = 0.9, B = 500, lb = -30, ub = 10)
 }
 \arguments{
-\item{X}{a \eqn{n\times k} matrix where columns are \eqn{k} objects to be clustered, 
+\item{X}{a \eqn{n\times k} matrix where columns are \eqn{k} objects to be clustered,
 and each object contains n observations (objects could be a set of time series).}
 
-\item{method}{the clustering method to be used -- currently either 
-\dQuote{TRUST} \insertCite{Ciampi_etal_2010}{funtimes} 
-or \dQuote{DBSCAN} \insertCite{Ester_etal_1996}{funtimes}. If method is \code{DBSCAN}, 
-then set \code{MinPts} and optimal \eqn{\epsilon} is selected using DR. 
-If method is \code{TRUST}, then set \code{theta} and optimal \eqn{\delta} 
+\item{method}{the clustering method to be used -- currently either
+\dQuote{TRUST} \insertCite{Ciampi_etal_2010}{funtimes}
+or \dQuote{DBSCAN} \insertCite{Ester_etal_1996}{funtimes}. If method is \code{DBSCAN},
+then set \code{MinPts} and optimal \eqn{\epsilon} is selected using DR.
+If method is \code{TRUST}, then set \code{theta} and optimal \eqn{\delta}
 is selected using DR.}
 
-\item{minPts}{the minimum number of samples in an \eqn{\epsilon}-neighborhood of 
-a point to be considered as a core point. The \code{minPts} is to be used only 
+\item{minPts}{the minimum number of samples in an \eqn{\epsilon}-neighborhood of
+a point to be considered as a core point. The \code{minPts} is to be used only
 with \code{DBSCAN} method. Default value is 3.}
 
-\item{theta}{connectivity parameter \eqn{\theta \in (0,1)}, which is to be used 
+\item{theta}{connectivity parameter \eqn{\theta \in (0,1)}, which is to be used
 only with \code{TRUST} method. Default value is 0.9.}
 
-\item{B}{number of random splits in calculating the 
+\item{B}{number of random splits in calculating the
 Average Cluster Deviation (ACD). Default value is 500.}
 
 \item{lb, ub}{end points for a range of search for the optimal parameter.}
 }
 \value{
 A list containing the following components:
-\item{P_opt}{the value of optimal parameter. If method is \code{DBSCAN}, then 
-\code{P_opt} is optimal \eqn{\epsilon}. If method is \code{TRUST}, 
+\item{P_opt}{the value of optimal parameter. If method is \code{DBSCAN}, then
+\code{P_opt} is optimal \eqn{\epsilon}. If method is \code{TRUST},
 then \code{P_opt} is optimal \eqn{\delta}.}
-\item{ACD_matrix}{a matrix that returns \code{ACD} for different values of a 
+\item{ACD_matrix}{a matrix that returns \code{ACD} for different values of a
 tuning parameter.
-If method is \code{DBSCAN}, then the tuning parameter is \eqn{\epsilon}. 
+If method is \code{DBSCAN}, then the tuning parameter is \eqn{\epsilon}.
 If method is \code{TRUST}, then the tuning parameter is \eqn{\delta}.}
 }
 \description{
-Downhill riding procedure for selecting optimal tuning parameters in clustering 
+Downhill riding procedure for selecting optimal tuning parameters in clustering
 algorithms, using an (in)stability probe.
 }
 \details{
-Parameters \code{lb,ub} are end points for a range of search for the 
-optimal parameter. The parameter candidates are calculated in a way such that 
-\eqn{P:=  1.1^x , x \in {lb,lb+0.5,lb+1.0,...,ub}}. 
-Although the default range of search is sufficiently wide, in some cases 
+Parameters \code{lb,ub} are end points for a range of search for the
+optimal parameter. The parameter candidates are calculated in a way such that
+\eqn{P:=  1.1^x , x \in {lb,lb+0.5,lb+1.0,...,ub}}.
+Although the default range of search is sufficiently wide, in some cases
 \code{lb,ub} can be further extended if a warning message is given.
 
-For more discussion on properties of the considered clustering algorithms and the 
-DR procedure see \insertCite{Huang_etal_2016;textual}{funtimes} 
+For more discussion on properties of the considered clustering algorithms and the
+DR procedure see \insertCite{Huang_etal_2016;textual}{funtimes}
 and \insertCite{Huang_etal_2018_riding;textual}{funtimes}.
 }
 \examples{
@@ -99,42 +98,42 @@ set.seed(114)
 samp_Ind <- sample(12,replace=F)
 time_points <- 30
 X <- matrix(0,nrow=time_points,ncol = 12)
-cluster1 <- sapply(1:4,function(x) arima.sim(list(order=c(1,0,0),ar=c(0.2)),
-                                             n=time_points,mean=0,sd=1))
-cluster2 <- sapply(1:4,function(x) arima.sim(list(order=c(2,0,0),ar=c(0.1,-0.2)),
-                                             n=time_points,mean=2,sd=1))
-cluster3 <- sapply(1:4,function(x) arima.sim(list(order=c(1,0,1),ar=c(0.3),ma=c(0.1)),
-                                             n=time_points,mean=6,sd=1))
+cluster1 <- sapply(1:4,function(x) arima.sim(list(order = c(1, 0, 0), ar = c(0.2)),
+                                             n = time_points, mean = 0, sd = 1))
+cluster2 <- sapply(1:4,function(x) arima.sim(list(order = c(2 ,0, 0), ar = c(0.1, -0.2)),
+                                             n = time_points, mean = 2, sd = 1))
+cluster3 <- sapply(1:4,function(x) arima.sim(list(order = c(1, 0, 1), ar = c(0.3), ma = c(0.1)),
+                                             n = time_points, mean = 6, sd = 1))
 
-X[,samp_Ind[1:4]] <- t(round(cluster1,4))
-X[,samp_Ind[5:8]] <- t(round(cluster2,4))
-X[,samp_Ind[9:12]] <- t(round(cluster3,4))
+X[,samp_Ind[1:4]] <- t(round(cluster1, 4))
+X[,samp_Ind[5:8]] <- t(round(cluster2, 4))
+X[,samp_Ind[9:12]] <- t(round(cluster3, 4))
 
 
 # create ground truth label of the synthetic data
-ground_truth_label = matrix(1,nrow=12,ncol=1) 
+ground_truth_label = matrix(1, nrow = 12, ncol = 1) 
 for(k in 1:3){
-    ground_truth_label[samp_Ind[(4*k-4+1):(4*k)]] = k
+    ground_truth_label[samp_Ind[(4*k - 4 + 1):(4*k)]] = k
 }
 
 # perform DR procedure to select optimal delta for TRUST
 # and save it in variable delta_opt
-delta_opt <- DR(X,method="TRUST")$P_opt 
+delta_opt <- DR(X, method = "TRUST")$P_opt 
 
 # apply TRUST with the optimal delta on the synthetic data 
 # and save the clustering result in variable res
-res <- CSlideCluster(X,Delta=delta_opt ,Theta=0.9)  
+res <- CSlideCluster(X, Delta = delta_opt, Theta = 0.9)  
 
 # calculate NMI to compare the clustering result with the ground truth label
 clue::cl_agreement(as.cl_partition(as.numeric(ground_truth_label)),
-                   as.cl_partition(as.numeric(res)),method = "NMI")
+                   as.cl_partition(as.numeric(res)), method = "NMI")
 
 # visualize the clustering result and compare it with the ground truth result
 # visualization of the clustering result obtained by TRUST
-plot.zoo(X, type = "l",plot.type = "single",col = res, xlab = "Time Index", ylab ="")
+plot.zoo(X, type = "l", plot.type = "single", col = res, xlab = "Time index", ylab = "")
 # visualization of the ground truth result 
-plot.zoo(X, type = "l",plot.type = "single",col = ground_truth_label,
-         xlab = "Time Index", ylab ="")
+plot.zoo(X, type = "l", plot.type = "single", col = ground_truth_label,
+         xlab = "Time index", ylab = "")
 }
 
 }

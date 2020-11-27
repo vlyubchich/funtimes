@@ -43,7 +43,7 @@
 #' @references
 #' \insertAllCited{}
 #' 
-#' @seealso \code{\link{wavk.test}}
+#' @seealso \code{\link{wavk_test}}
 #' 
 #' @keywords ts trend
 #' 

@@ -4,8 +4,8 @@
 #' \deqn{X_t = \sum_{i=1}^p\phi_iX_{t-i} + e_t,} 
 #' by default using robust difference-based estimator and Bayesian information 
 #' criterion (BIC) to select the order \eqn{p}. This function is employed 
-#' for time series filtering in functions \code{\link{sync.test}} 
-#' and \code{\link{wavk.test}}.
+#' for time series filtering in functions \code{\link{sync_test}} 
+#' and \code{\link{wavk_test}}.
 #' 
 #' @details The same formula for BIC is used consistently for all methods:
 #' \deqn{BIC=n\ln(\hat{\sigma}^2) + k\ln(n),} 
@@ -36,7 +36,7 @@
 #' \insertAllCited{}
 #' 
 #' @seealso \code{\link[stats]{ar}}, \code{\link{HVK}}, 
-#' \code{\link{sync.test}}, \code{\link{wavk.test}}
+#' \code{\link{sync_test}}, \code{\link{wavk_test}}
 #' 
 #' @keywords ts
 #' 

@@ -116,7 +116,7 @@ For example, using our simulated data for 10 months out of 12, estimate the samp
 B30 <- beales(x = discharge2, y = loads2, N = 12, p = 0.05)
 ```
 
-What if increase the confidence of such interval:
+What if increase the confidence of such interval (notice the differences in the last line of the output):
 ```{r}
 B31 <- beales(x = discharge2, y = loads2, N = 12, p = 0.05, level = 0.99)
 ```

@@ -53,14 +53,9 @@
 #' \insertAllCited{}
 #' 
 #' @seealso \code{\link[stats]{ar}}, \code{\link{HVK}}, \code{\link{WAVK}}, 
-#' \code{\link{sync.test}}
+#' \code{\link{sync_test}}
 #' 
-#' @keywords internal
-NULL
-
-#' @rdname funtimes-deprecated
-#' @section \code{wavk.test}:
-#' For \code{wavk.test}, use \code{\link{wavk_test}}.
+#' @keywords htest ts trend
 #' 
 #' @author Yulia R. Gel, Vyacheslav Lyubchich, Ethan Schaeffer
 #' 
@@ -78,7 +73,7 @@ NULL
 #' 
 #' #Test H0 of a linear trend, with m-out-of-n selection of the local window:
 #' \dontrun{
-#'     wavk.test(U ~ t, factor.length = "adaptive.selection")}
+#'     wavk_test(U ~ t, factor.length = "adaptive.selection")}
 #' # Sample output:
 #' ##	Trend test by Wang, Akritas, and Van Keilegom (bootstrap p-values)
 #' ##
@@ -89,7 +84,7 @@ NULL
 #' #Test H0 of a quadratic trend, with m-out-of-n selection of the local window 
 #' #and output of all results:
 #' \dontrun{
-#'     wavk.test(U ~ poly(t, 2), factor.length = "adaptive.selection", out = TRUE)}
+#'     wavk_test(U ~ poly(t, 2), factor.length = "adaptive.selection", out = TRUE)}
 #' # Sample output:
 #' ##	Trend test by Wang, Akritas, and Van Keilegom (bootstrap p-values)
 #' ##
@@ -116,7 +111,7 @@ NULL
 #' ##     10    -1.02982929   0.360
 #' 
 #' # Test H0 of no trend (constant trend) using asymptotic distribution of statistic.
-#' wavk.test(U ~ 1, method = "asympt")
+#' wavk_test(U ~ 1, method = "asympt")
 #' # Sample output:
 #' ##	Trend test by Wang, Akritas, and Van Keilegom (asymptotic p-values)
 #' ##
@@ -124,11 +119,10 @@ NULL
 #' ##WAVK test statistic = 25.999, user-defined window = 10, p-value < 2.2e-16
 #' ##alternative hypothesis: trend is not of the form U ~ 1.
 #' 
-wavk.test <- function(formula, factor.length = c("user.defined", "adaptive.selection"), 
+wavk_test <- function(formula, factor.length = c("user.defined", "adaptive.selection"), 
                       Window = NULL, q = 3/4, j = c(8:11), B = 1000, method = c("boot", "asympt"), 
                       ar.order = NULL, ar.method = "HVK", BIC = TRUE, out = FALSE)
 {
-    .Deprecated("wavk.test", msg = "wavk.test is deprecated and will be removed soon. Use wavk_test instead.")
     ### Perform various checks.
     frml <- deparse(substitute(formula))
     splt <- strsplit(frml, "~")[[1]]

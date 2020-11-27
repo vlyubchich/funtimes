@@ -26,7 +26,7 @@
 #' test. The length of this vector is treated as \eqn{m}, that is, the number of change 
 #' points being confirmed as statistically significant (from those 
 #' specified in \code{k}) would be \eqn{\le m}.
-#' @inheritParams wavk.test
+#' @inheritParams wavk_test
 #' @param ksm logical value indicating whether a kernel smoothing to innovations in sieve 
 #' bootstrap shall be applied (default is \code{FALSE}, that is, the original estimated 
 #' innovations are bootstrapped, without the smoothing).
@@ -56,12 +56,7 @@
 #' @references
 #' \insertAllCited{}
 #' 
-#' @keywords internal
-NULL
-
-#' @rdname funtimes-deprecated
-#' @section \code{mcusum.test}:
-#' For \code{mcusum.test}, use \code{\link{mcusum_test}}.
+#' @keywords changepoint htest ts
 #' 
 #' @author Vyacheslav Lyubchich
 #' 
@@ -76,15 +71,14 @@ NULL
 #' Y <- c(1 * X[1:TimeOfChange] + E[1:TimeOfChange], 
 #'       (1 + SizeOfChange)*X[(TimeOfChange + 1):T] + E[(TimeOfChange + 1):T])
 #' ehat <- lm(Y ~ X)$resid
-#' mcusum.test(ehat, k = c(30, 50, 70))
+#' mcusum_test(ehat, k = c(30, 50, 70))
 #' 
 #' #Same, but with bootstrapped innovations obtained from a kernel smoothed distribution:
-#' mcusum.test(ehat, k = c(30, 50, 70), ksm = TRUE)
+#' mcusum_test(ehat, k = c(30, 50, 70), ksm = TRUE)
 #' 
-mcusum.test <- function(e, k, B = 1000, ksm = FALSE, 
+mcusum_test <- function(e, k, B = 1000, ksm = FALSE, 
                         ksm.arg = list(kernel = "gaussian", bw = "sj"), ...)
 {
-    .Deprecated("mcusum_test", msg = "mcusum.test is deprecated and will be removed soon. Use mcusum_test instead.")
     DNAME <- deparse(substitute(e))
     T <- length(e)
     e <- e - mean(e)

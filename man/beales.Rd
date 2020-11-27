@@ -4,19 +4,18 @@
 \alias{beales}
 \title{Beale's Estimator and Sample Size}
 \usage{
-beales(x, y, level = 0.95, N = NULL, p = NULL, d = NULL,
-  verbose = TRUE)
+beales(x, y, level = 0.95, N = NULL, p = NULL, d = NULL, verbose = TRUE)
 }
 \arguments{
-\item{x}{a numeric vector with quantities of interest, such as river discharge 
+\item{x}{a numeric vector with quantities of interest, such as river discharge
 per month. Missing values (\code{NA}) are allowed.}
 
-\item{y}{a numeric vector with quantities of interest for which the total shall 
-be estimated, such as total nutrient loads per month. 
-Missing values (\code{NA}) are allowed. 
+\item{y}{a numeric vector with quantities of interest for which the total shall
+be estimated, such as total nutrient loads per month.
+Missing values (\code{NA}) are allowed.
 Lengths of \code{x} and \code{y} mush be the same.}
 
-\item{level}{confidence level, from 0 to 1. 
+\item{level}{confidence level, from 0 to 1.
 Default is \code{0.95}, that is, 95\% confidence.}
 
 \item{N}{population size for which the estimate of the total \code{y} required.
@@ -37,21 +36,21 @@ in words. Default is set to \code{TRUE} to give such output.}
 A list with the following components:
 \item{estimate}{Beale's estimate of the population total for the variable \code{y}.}
 \item{se}{standard error of the estimate.}
-\item{CI}{a vector of length 2 with a confidence interval (lower and upper value) 
+\item{CI}{a vector of length 2 with a confidence interval (lower and upper value)
 for the estimate.}
 \item{level}{confidence level for the interval.}
 \item{N}{population size.}
 \item{n}{the actual sample size.}
-\item{p}{the relative error used for sample size calculations. 
+\item{p}{the relative error used for sample size calculations.
 Reported only if \code{p} was specified in the input.}
 \item{d}{the margin of error used for sample size calculations.
 Reported only if \code{d} was specified and \code{p} was not specified in the input.}
-\item{nhat}{estimated sample size for the given \code{level} and error 
+\item{nhat}{estimated sample size for the given \code{level} and error
 (\code{p} or \code{d}).}
 }
 \description{
-Beale's ratio estimator \insertCite{Beale_1962}{funtimes} 
-for estimating population total and  
+Beale's ratio estimator \insertCite{Beale_1962}{funtimes}
+for estimating population total and
 confidence intervals, with an option of calculating sample size for a required
 relative error (\code{p}) or margin of error (\code{d}).
 }

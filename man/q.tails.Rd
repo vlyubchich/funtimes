@@ -7,11 +7,11 @@
 q.tails(x0, x1, q = 0.99)
 }
 \arguments{
-\item{x0, x1}{vectors of the same length (preferably). 
+\item{x0, x1}{vectors of the same length (preferably).
 Tail in \code{x1} is compared against the tail in \code{x0}.}
 
-\item{q}{a quantile defining the right tail for both \code{x0} and \code{x1}. 
-Values above the  thresholds \code{quantile(x0, probs = q)} and 
+\item{q}{a quantile defining the right tail for both \code{x0} and \code{x1}.
+Values above the  thresholds \code{quantile(x0, probs = q)} and
 \code{quantile(x1, probs = q)} are considered as the respective right tails.}
 }
 \value{
@@ -20,17 +20,17 @@ A list with two elements:
 \item{Pk}{vector of differences of the intervals' centers.}
 }
 \description{
-Compare right tails of two sample distributions using 
-a quantile-based approach (QBA); 
+Compare right tails of two sample distributions using
+a quantile-based approach (QBA);
 see \insertCite{Soliman_etal_2014_insurance;textual}{funtimes},
-\insertCite{Soliman_etal_2015_insurance;textual}{funtimes}, 
+\insertCite{Soliman_etal_2015_insurance;textual}{funtimes},
 and \insertCite{Lyubchich_Gel_2017_insurance;textual}{funtimes}.
 }
 \details{
-Sturges' formula is used to calculate number of intervals (\eqn{k}) 
-to split the upper \eqn{100(1 - q)}\% portion of \code{x0} and \code{x1} 
-(the right tails). Then, each tail is divided into equally-filled intervals 
-with a quantile step \eqn{d=(1 - q)/k}. \code{Pk} reports the difference between 
+Sturges' formula is used to calculate number of intervals (\eqn{k})
+to split the upper \eqn{100(1 - q)}\\% portion of \code{x0} and \code{x1}
+(the right tails). Then, each tail is divided into equally-filled intervals
+with a quantile step \eqn{d=(1 - q)/k}. \code{Pk} reports the difference between
 corresponding intervals' centers obtained from \code{x0} and \code{x1}.
 }
 \examples{

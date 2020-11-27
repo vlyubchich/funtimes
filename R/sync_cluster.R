@@ -1,17 +1,17 @@
 #' Time Series Clustering based on Trend Synchronism
 #' 
 #' Cluster time series with a common parametric trend using the 
-#' \code{\link{sync.test}} function 
+#' \code{\link{sync_test}} function 
 #' \insertCite{Lyubchich_Gel_2016_synchronism,Ghahari_etal_2017_MBDCE}{funtimes}.
 #' 
-#' @details The \code{sync.cluster} function recursively clusters time series having 
+#' @details The \code{sync_cluster} function recursively clusters time series having 
 #' a pre-specified common parametric trend until there are no time series left. 
-#' Starting with the given \eqn{N} time series, the \code{\link{sync.test}} function 
+#' Starting with the given \eqn{N} time series, the \code{\link{sync_test}} function 
 #' is used to test for a common trend. If null hypothesis of common trend is not 
-#' rejected by \code{\link{sync.test}}, the time series are grouped together 
+#' rejected by \code{\link{sync_test}}, the time series are grouped together 
 #' (i.e., assigned to a cluster). Otherwise, the time series with the largest 
 #' contribution to the test statistics are temporarily removed (the number of time 
-#' series to remove depends on the \code{rate} of removal) and \code{\link{sync.test}} 
+#' series to remove depends on the \code{rate} of removal) and \code{\link{sync_test}} 
 #' is applied again. The contribution to the test statistic is assessed by the
 #' WAVK test statistic calculated for each time series.
 #' 
@@ -19,7 +19,7 @@
 #' @param formula an object of class "\code{\link[stats]{formula}}", 
 #' specifying the type of common trend 
 #' for clustering the time series in a \eqn{T} by \eqn{N} matrix of time series 
-#' (time series in columns) which is passed to \code{\link{sync.test}}. 
+#' (time series in columns) which is passed to \code{\link{sync_test}}. 
 #' Variable \eqn{t} should be used to specify the form 
 #' of the trend, where \eqn{t} is specified within the function automatically as a 
 #' regular sequence of length \eqn{T} on the interval (0,1]. See \code{Examples}.
@@ -29,8 +29,8 @@
 #' series to be removed. Values from 0 to 1 are treated as a fraction of 
 #' time series to be removed.
 #' @param alpha significance level for testing hypothesis of a common trend 
-#' (using \code{\link{sync.test}}) of the parametric form specified in \code{formula}.
-#' @param ... arguments to be passed to \code{\link{sync.test}}, for example, 
+#' (using \code{\link{sync_test}}) of the parametric form specified in \code{formula}.
+#' @param ... arguments to be passed to \code{\link{sync_test}}, for example, 
 #' number of bootstrap replications (\code{B}).
 #' 
 #' 
@@ -41,38 +41,33 @@
 #' one-element clusters).}
 #' \item{elements}{a list with names of the time series in each cluster.}
 #' 
-#' The further elements combine results of \code{\link{sync.test}} for each cluster with
+#' The further elements combine results of \code{\link{sync_test}} for each cluster with
 #' at least two elements (that is, single-element clusters labeled with 
 #' \code{'0'} are excluded):
 #' \item{estimate}{a list with common parametric trend estimates obtained by 
-#' \code{\link{sync.test}} for each cluster. 
+#' \code{\link{sync_test}} for each cluster. 
 #' The length of this list is \code{max(cluster)}.}
-#' \item{pval}{a list of \eqn{p}-values of \code{\link{sync.test}} for each cluster.
+#' \item{pval}{a list of \eqn{p}-values of \code{\link{sync_test}} for each cluster.
 #' The length of this list is \code{max(cluster)}.}
-#' \item{statistic}{a list with values of \code{\link{sync.test}} test statistic for 
+#' \item{statistic}{a list with values of \code{\link{sync_test}} test statistic for 
 #' each cluster. The length of this list is \code{max(cluster)}.}
-#' \item{ar_order}{a list of AR filter orders used in \code{\link{sync.test}} for each 
+#' \item{ar_order}{a list of AR filter orders used in \code{\link{sync_test}} for each 
 #' time series. The results are grouped by cluster in the list of length \code{max(cluster)}.}
-#' \item{window_used}{a list of local windows used in \code{\link{sync.test}} for each 
+#' \item{window_used}{a list of local windows used in \code{\link{sync_test}} for each 
 #' time series. The results are grouped by cluster in the list of length \code{max(cluster)}.}
 #' \item{all_considered_windows}{a list of all windows considered in 
-#' \code{\link{sync.test}} and corresponding test results, for each cluster. 
+#' \code{\link{sync_test}} and corresponding test results, for each cluster. 
 #' The length of this list is \code{max(cluster)}.}
-#' \item{WAVK_obs}{a list of WAVK test statistics obtained in \code{\link{sync.test}} 
+#' \item{WAVK_obs}{a list of WAVK test statistics obtained in \code{\link{sync_test}} 
 #' for each time series. 
 #' The results are grouped by cluster in the list of length \code{max(cluster)}.}
 #' 
 #' @references
 #' \insertAllCited{}
 #' 
-#' @seealso \code{\link{BICC}}, \code{\link{DR}}, \code{\link{sync.test}}
+#' @seealso \code{\link{BICC}}, \code{\link{DR}}, \code{\link{sync_test}}
 #' 
-#' @keywords internal
-NULL
-
-#' @rdname funtimes-deprecated
-#' @section \code{sync.cluster}:
-#' For \code{sync.cluster}, use \code{\link{sync_cluster}}.
+#' @keywords cluster trend synchrony
 #' 
 #' @author Srishti Vishwakarma, Vyacheslav Lyubchich
 #' 
@@ -90,7 +85,7 @@ NULL
 #' plot.ts(X)
 #' 
 #' # Finding clusters with common linear trends:
-#' LinTrend <- sync.cluster(X ~ t) 
+#' LinTrend <- sync_cluster(X ~ t) 
 #'   
 #' ## Sample Output:
 #' ##[1] "Cluster labels:"
@@ -117,7 +112,7 @@ NULL
 #' 
 #' ## Clustering based on linear trend with rate of removal = 2 
 #' # and confidence level for the synchronism test 90%
-#' LinTrend7 <- sync.cluster(Y ~ t, rate = 2, alpha = 0.1, B = 99)
+#' LinTrend7 <- sync_cluster(Y ~ t, rate = 2, alpha = 0.1, B = 99)
 #'    
 #' ## Sample output:
 #' ##[1] "Cluster labels:"
@@ -125,9 +120,8 @@ NULL
 #' ##[1] "Number of single-element clusters (labeled with '0'): 2"
 #' }
 #' 
-sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...) 
+sync_cluster <- function(formula, rate = 1, alpha = 0.05, ...) 
 {
-    .Deprecated("sync_cluster", msg = "sync.cluster is deprecated and will be removed soon. Use sync_cluster instead.")
     ## separating formula to find the time series
     frml <- deparse(substitute(formula))
     splt <- strsplit(frml, "~")[[1]]
@@ -140,7 +134,7 @@ sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...)
     colnames(Y) <- 1:N 
     # Storing the final cluster labels
     cluster <- rep(NA, N)
-    # Storing outputs of sync.test for each cluster
+    # Storing outputs of sync_test for each cluster
     sync.common_trend_estimates <- 
         sync.p.value <- 
         sync.statistic <- 
@@ -153,8 +147,8 @@ sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...)
     # index for clusters
     K = 1
     while (sum(is.na(cluster)) > 1) { #while 2 or more time series are unclustered
-        # testing sync.test() in the input matrix
-        SyncResults <- do.call(sync.test, args = list(as.formula(paste("Ystar", "~", sh)), ...))
+        # testing sync_test() in the input matrix
+        SyncResults <- do.call(sync_test, args = list(as.formula(paste("Ystar", "~", sh)), ...))
         # if we fail to reject the H0 of synchronism
         if (SyncResults$p.value >= alpha)
         {
@@ -164,7 +158,7 @@ sync.cluster <- function(formula, rate = 1, alpha = 0.05, ...)
             cluster[j] <- K
             Ystar <- Y[, is.na(cluster)]
             Ystar_names <- colnames(Ystar)
-            # Storing the output of sync.test()
+            # Storing the output of sync_test()
             sync.common_trend_estimates[[K]] = SyncResults$estimate$common_trend_estimates
             sync.p.value[[K]] = SyncResults$p.value
             sync.statistic[[K]] = SyncResults$statistic

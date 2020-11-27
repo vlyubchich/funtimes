@@ -9,38 +9,38 @@ ARest(x, ar.order = NULL, ar.method = "HVK", BIC = TRUE)
 \arguments{
 \item{x}{a vector containing a univariate time series. Missing values are not allowed.}
 
-\item{ar.order}{order of autoregressive model when \code{BIC = FALSE}, or 
-the maximal order for BIC-based filtering. Default is 
+\item{ar.order}{order of autoregressive model when \code{BIC = FALSE}, or
+the maximal order for BIC-based filtering. Default is
 \code{round(10*log10(length(x)))}, where \code{x} is the time series.}
 
-\item{ar.method}{method of estimating autoregression coefficients. 
-Default \code{"HVK"} delivers robust difference-based estimates by 
-\insertCite{Hall_VanKeilegom_2003;textual}{funtimes}. Alternatively, 
-options of \command{ar} function can be used, such as \code{"burg"}, 
+\item{ar.method}{method of estimating autoregression coefficients.
+Default \code{"HVK"} delivers robust difference-based estimates by
+\insertCite{Hall_VanKeilegom_2003;textual}{funtimes}. Alternatively,
+options of \command{ar} function can be used, such as \code{"burg"},
 \code{"ols"}, \code{"mle"}, and \code{"yw"}.}
 
-\item{BIC}{logical value indicates whether the order of autoregressive 
-filter should be selected by Bayesian information criterion (BIC). 
-If \code{TRUE} (default), models of orders \eqn{p=} 0,1,...,\code{ar.order} 
-or \eqn{p=} 0,1,...,\code{round(10*log10(length(x)))} are considered, 
-depending on whether \code{ar.order} is defined or not 
+\item{BIC}{logical value indicates whether the order of autoregressive
+filter should be selected by Bayesian information criterion (BIC).
+If \code{TRUE} (default), models of orders \eqn{p=} 0,1,...,\code{ar.order}
+or \eqn{p=} 0,1,...,\code{round(10*log10(length(x)))} are considered,
+depending on whether \code{ar.order} is defined or not
 (\code{x} is the time series).}
 }
 \value{
-A vector of estimated AR coefficients. Returns \code{numeric(0)} if 
+A vector of estimated AR coefficients. Returns \code{numeric(0)} if
 the final \eqn{p=0}.
 }
 \description{
 Estimate parameters \eqn{\phi} of autoregressive time series model
-\deqn{X_t = \sum_{i=1}^p\phi_iX_{t-i} + e_t,} 
-by default using robust difference-based estimator and Bayesian information 
-criterion (BIC) to select the order \eqn{p}. This function is employed 
-for time series filtering in functions \code{\link{sync.test}} 
-and \code{\link{wavk.test}}.
+\deqn{X_t = \sum_{i=1}^p\phi_iX_{t-i} + e_t,}
+by default using robust difference-based estimator and Bayesian information
+criterion (BIC) to select the order \eqn{p}. This function is employed
+for time series filtering in functions \code{\link{sync_test}}
+and \code{\link{wavk_test}}.
 }
 \details{
 The same formula for BIC is used consistently for all methods:
-\deqn{BIC=n\ln(\hat{\sigma}^2) + k\ln(n),} 
+\deqn{BIC=n\ln(\hat{\sigma}^2) + k\ln(n),}
 where \eqn{n} = \code{length(x)}, \eqn{k=p+1}.
 }
 \examples{
@@ -62,8 +62,8 @@ ARest(Y, ar.method = "burg") #Burg
 \insertAllCited{}
 }
 \seealso{
-\code{\link[stats]{ar}}, \code{\link{HVK}}, 
-\code{\link{sync.test}}, \code{\link{wavk.test}}
+\code{\link[stats]{ar}}, \code{\link{HVK}},
+\code{\link{sync_test}}, \code{\link{wavk_test}}
 }
 \author{
 Vyacheslav Lyubchich

@@ -44,7 +44,7 @@
 #' The \code{ar.order} can be a scalar or \eqn{N}-vector. If scalar, the same 
 #' \code{ar.order} is applied to each time series. An \eqn{N}-vector specifies 
 #' a separate \code{ar.order} for each time series.
-#' @inheritParams wavk.test
+#' @inheritParams wavk_test
 #' @inheritParams ARest
 #' 
 #' 
@@ -64,14 +64,9 @@
 #' \insertAllCited{}
 #' 
 #' @seealso \code{\link[stats]{ar}}, \code{\link{HVK}}, \code{\link{WAVK}}, 
-#' \code{\link{wavk.test}}
+#' \code{\link{wavk_test}}
 #' 
-#' @keywords internal
-NULL
-
-#' @rdname funtimes-deprecated
-#' @section \code{sync.test}:
-#' For \code{sync.test}, use \code{\link{sync_test}}.
+#' @keywords htest trend ts synchrony
 #' 
 #' @author Yulia R. Gel, Vyacheslav Lyubchich, Ethan Schaeffer, Xingyu Wang
 #' 
@@ -92,7 +87,7 @@ NULL
 #' 
 #' #Test H0 of a common linear trend:
 #' \dontrun{
-#'     sync.test(Y ~ t, B = 500)
+#'     sync_test(Y ~ t, B = 500)
 #' }
 #' # Sample output:
 #' ##	Non-parametric test for synchronism of parametric trends
@@ -129,7 +124,7 @@ NULL
 #' Y2 <- cbind(Y, y3)
 #' plot.ts(Y2)
 #' \dontrun{
-#'     sync.test(Y2 ~ t, B = 500)}
+#'     sync_test(Y2 ~ t, B = 500)}
 #' # Sample output:
 #' ##	Non-parametric test for synchronism of parametric trends
 #' ##
@@ -162,15 +157,14 @@ NULL
 #' 
 #' #Other hypothesized trend forms can be specified, for example:
 #' \dontrun{
-#'     sync.test(Y ~ 1) #constant trend
-#'     sync.test(Y ~ poly(t, 2)) #quadratic trend
-#'     sync.test(Y ~ poly(t, 3)) #cubic trend
+#'     sync_test(Y ~ 1) #constant trend
+#'     sync_test(Y ~ poly(t, 2)) #quadratic trend
+#'     sync_test(Y ~ poly(t, 3)) #cubic trend
 #' }
 #' 
-sync.test <- function(formula, B = 1000, Window = NULL, q = NULL, j = NULL, 
+sync_test <- function(formula, B = 1000, Window = NULL, q = NULL, j = NULL, 
                       ar.order = NULL, ar.method = "HVK", BIC = TRUE)
 {
-    .Deprecated("sync_test", msg = "sync_test is deprecated and will be removed soon. Use sync_test instead.")
     frml <- deparse(substitute(formula))
     splt <- strsplit(frml, "~")[[1]]
     DNAME <- splt[1]

@@ -4,13 +4,22 @@
 \alias{CWindowCluster}
 \title{Window-Level Time Series Clustering}
 \usage{
-CWindowCluster(X, Alpha = NULL, Beta = NULL, Delta = NULL,
-  Theta = 0.8, p, w, s, Epsilon = 1)
+CWindowCluster(
+  X,
+  Alpha = NULL,
+  Beta = NULL,
+  Delta = NULL,
+  Theta = 0.8,
+  p,
+  w,
+  s,
+  Epsilon = 1
+)
 }
 \arguments{
 \item{X}{a matrix of time series observed within a slide (time series in columns).}
 
-\item{Alpha}{lower limit of the time series domain, 
+\item{Alpha}{lower limit of the time series domain,
 passed to \code{\link{CSlideCluster}}.}
 
 \item{Beta}{upper limit of the time series domain, passed to \code{\link{CSlideCluster}}.}
@@ -23,28 +32,28 @@ passed to \code{\link{CSlideCluster}}.}
 
 \item{w}{number of slides in each window.}
 
-\item{s}{step to shift a window, calculated in number of slides. The recommended 
+\item{s}{step to shift a window, calculated in number of slides. The recommended
 values are 1 (overlapping windows) or equal to \code{w} (non-overlapping windows).}
 
-\item{Epsilon}{a real value in \eqn{[0,1]} used to identify each pair of time series 
-that are clustered together over at least \code{w*Epsilon} slides within a window;  
+\item{Epsilon}{a real value in \eqn{[0,1]} used to identify each pair of time series
+that are clustered together over at least \code{w*Epsilon} slides within a window;
 see Definition 7 by \insertCite{Ciampi_etal_2010;textual}{funtimes}. Default is 1.}
 }
 \value{
-A vector (if \code{X} contains only one window) or matrix with cluster 
+A vector (if \code{X} contains only one window) or matrix with cluster
 labels for each time series (columns) and window (rows).
 }
 \description{
-Cluster time series at a window level, 
+Cluster time series at a window level,
 based on Algorithm 2 of \insertCite{Ciampi_etal_2010;textual}{funtimes}.
 }
 \details{
-This is the upper-level function for time series clustering. It exploits 
-the function \code{\link{CSlideCluster}} to cluster time series within each slide 
-based on closeness and homogeneity measures. Then, it uses slide-level cluster 
+This is the upper-level function for time series clustering. It exploits
+the function \code{\link{CSlideCluster}} to cluster time series within each slide
+based on closeness and homogeneity measures. Then, it uses slide-level cluster
 assignments to cluster time series within each window.
 
-The total length of time series (number of levels, i.e., \code{nrow(X)}) 
+The total length of time series (number of levels, i.e., \code{nrow(X)})
 should be divisible by \code{p}.
 }
 \examples{
@@ -86,7 +95,7 @@ ts.plot(X[c(1:(p*w)) + s*p, tmp[2,] != 1], ylim = c(-4, 4),
 \insertAllCited{}
 }
 \seealso{
-\code{\link{CSlideCluster}}, \code{\link{CWindowCluster}}, 
+\code{\link{CSlideCluster}}, \code{\link{CWindowCluster}},
 and \code{\link{BICC}}
 }
 \author{

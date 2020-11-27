@@ -9,7 +9,7 @@
 #' and bootstrapped version of WAVK test for possibly non-monotonic trends \insertCite{Lyubchich_etal_2013_wavk}{funtimes}. 
 #' The WAVK test is further applied in testing synchronism of trends \insertCite{Lyubchich_Gel_2016_synchronism}{funtimes}; 
 #' see an implementation to climate data in \insertCite{Lyubchich_2016_trends;textual}{funtimes}. 
-#' With iterative testing, WAVK test is also applied for identifying clusters of 
+#' With iterative testing, the synchronism test is also applied for identifying clusters of 
 #' multiple time series \insertCite{Ghahari_etal_2017_MBDCE}{funtimes}.
 #' 
 #' Additional clustering methods are implemented using functions \code{BICC} \insertCite{Schaeffer_etal_2016_trust}{funtimes}
@@ -23,6 +23,8 @@
 #' Nonparametric comparison of tails of distributions is implemented using small bins defined based on
 #' quantiles \insertCite{Soliman_etal_2015_insurance}{funtimes} 
 #' or intervals in the units in which the data are recorded \insertCite{Lyubchich_Gel_2017_insurance}{funtimes}.
+#' 
+#' For a list of deprecated functions, use \code{?'funtimes-deprecated'}
 #' 
 #' @references
 #' \insertAllCited{}
