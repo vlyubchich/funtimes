@@ -1,0 +1,165 @@
+---
+title: "Tests for trends in time series"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+bibliography: vignrefs.bib
+vignette: >
+  %\VignetteIndexEntry{Tests for trends in time series}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+
+```{r, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#")
+library(funtimes)
+devtools::load_all(".") #remove this line
+```
+
+# Introduction
+
+The majority of studies focus on detection of linear or monotonic trends, using  
+
+* classical t-test (for linear trends) or
+* rank-based Mann--Kendall test (for monotonic trends)  
+
+typically under the assumption of uncorrelated data.
+
+There exist two main problems:
+
+* dependence effect, that is, the issue of inflating significance due to dependent observations when the test is developed for independent data (always check assumptions of the testing method!), and
+* change points or regime shifts that affect the linear or monotonic trend hypothesis. For example, when testing the null hypothesis ($H_0$) of no trend against the alternative hypothesis ($H_1$) of linear trend, using t-test, it is easier to reject $H_0$ and accept $H_1$ in case A below, than in case B, and especially hard to reject $H_0$ in case C. Case C reminds us that a test with proper alternative hypothesis should be chosen, and that non-rejection of $H_0$ does not mean it is true.
+
+These problems can be addressed by using tests for **non-monotonic trends** assuming that **observations can be autocorrelated**.
+
+```{r}
+set.seed(777)
+n <- 100
+Time <- c(1:n)
+X0 <- arima.sim(list(order = c(1, 0, 0), ar = 0.5), n = n, n.start = 100, sd = 0.5)
+X1 <- 2*Time/n + X0
+X2 <- 2*(Time/n)^0.5 + X0
+X3 <- 0.5*(Time - n/2)/n - 6*((Time - n/2)/n)^2 + X0
+X <- as.data.frame(cbind(X0, X1, X2, X3))
+```
+
+
+```{r, echo = FALSE, fig.width = 7, dpi = 96}
+library(ggplot2)
+library(patchwork)
+p1 <- ggplot(X, aes(x = Time, y = X1)) + geom_line() + theme_minimal()
+p2 <- ggplot(X, aes(x = Time, y = X2)) + geom_line() + theme_minimal()
+p3 <- ggplot(X, aes(x = Time, y = X3)) + geom_line() + theme_minimal()
+
+p1 + p2 + p3 + 
+  plot_annotation(
+    title = 'Time series simulated for different alternative hypotheses',
+    tag_levels = 'A'
+  )
+```
+
+The time series above were simulated:  
+A) `X1` with linear trend,  
+B) `X2` with square root -- nonlinear monotonic -- trend, and   
+C) `X3` with quadratic -- nonlinear non-monotonic -- trend,  
+with stationary autocorrelated innovations `X0`: $X0_t = 0.5X0_{t-1} + e_t$, where $e_t \sim N(0, 0.5^2)$.
+
+```{r, echo = FALSE}
+ggplot(X, aes(x = Time, y = X0)) + geom_line() + theme_minimal()
+```
+
+Let's test these time series using the functions from package `funtimes`, using significance level 0.05.
+
+
+# Testing for presence of a trend
+
+Function `notrend_test` tests the null hypothesis of no trend against different alternatives defined by the corresponding tests.
+
+## Linear trend
+
+Consider the following pair of hypotheses  
+$H_0$: no trend  
+$H_1$: linear trend  
+that can be tested specifically using t-test.
+
+Assuming the time series may be autocorrelated (which is the usual case with observational data), we apply sieve-bootstrap version of the **t-test**, by adapting the approach of @Noguchi_etal_2011:
+```{r}
+notrend_test(X0)
+```
+The large $p$-value correctly indicates that there is not enough evidence to reject the hypothesis of no trend in `X0` in favor of the alternative hypothesis of a linear trend. 
+
+For the other time series, $p$-values are reported below:
+```{r}
+apply(X[,-1], 2, function(x) notrend_test(x)$p.value)
+```
+indicating that the null hypothesis of no trend could be rejected and hypothesis of a linear trend could be accepted for `X1` and `X2`. While `X3` has a trend (based on the way it was simulated and the time series plot above), the alternative hypothesis of a linear trend does not fit in this case.
+
+
+## Monotonic trend
+
+Since a linear trend is also a monotonic trend, we may expect seeing similar results when testing the following pair of hypotheses  
+$H_0$: no trend  
+$H_1$: monotonic trend  
+using Mann--Kendall test.
+
+Apply **Mann--Kendall test**, also with the sieve-bootstrap enhancement for potentially autocorrelated data; $p$-values are shown below:
+```{r}
+apply(X, 2, function(x) notrend_test(x, test = "MK")$p.value)
+```
+indicating that the null hypothesis of no trend could be rejected and hypothesis of a monotonic trend could be accepted for `X1` and `X2`. For `X0` and `X3`, the null hypothesis could not be rejected, because `X0` does not have a trend, and `X3` has a trend that does not match the alternative hypothesis.
+
+
+## Any trend
+
+If the interest is in testing for any, potentially non-monotonic trend, consider testing the following pair of hypotheses  
+$H_0$: no trend  
+$H_1$: any trend  
+using local regression-based WAVK test [@Wang_etal_2008].
+
+Apply **WAVK test**, also with the sieve-bootstrap enhancement for potentially autocorrelated data:
+```{r}
+apply(X, 2, function(x) notrend_test(x, test = "WAVK", 
+                                     factor.length = "adaptive.selection")$p.value)
+```
+The results indicate that WAVK test was correct in non-rejecting the null hypothesis for `X0`, and correctly rejected it for the time series with trends `X1`, `X2`, and `X3`.
+
+@Lyubchich_etal_2013_wavk originally implemented *hybrid* bootstrap to this test statistic, available from the `wavk_test` function described in the next section.
+
+
+# Testing a specific parametric form of trend
+
+Function `wavk_test` is developed for the following goodness-of-fit question [@Lyubchich_etal_2013_wavk]:  
+$H_0$: trend is of form $f(\theta,t)$  
+$H_1$: trend is not of form $f(\theta,t)$   
+where $f$ belongs to a known family of smooth parametric functions, and $\theta$ are its parameters. 
+
+**Note** Considering $f(\theta,t)$ being some polynomial function, non-rejection of the null hypothesis means that function $f(\theta,t)$ or its simpler form (lower-order polynomial) is sufficient for describing the trend in the tested time series. 
+
+For example, the case of $f(\theta,t) \equiv 0$ corresponds to testing for no trend (in other words, for a constant trend), and the following code differs only in the type of bootstrap used, sieve bootstrap in `notrend_test` (the statistic is calculated on original time series and simulated autoregressive series) and hybrid bootstrap in `wavk_test` (the statistic is calculated on time series after the trend $f(\theta,t)$ and autoregressive dependence are removed and on simulated independent normal series):
+```{r}
+notrend_test(X0, test = "WAVK", factor.length = "adaptive.selection")
+wavk_test(X0 ~ 0, factor.length = "adaptive.selection")
+```
+
+To test a linear trend $f(\theta,t) = \theta_0 + \theta_1 t$, use
+```{r}
+wavk_test(X0 ~ t, factor.length = "adaptive.selection")
+```
+Note that the time sequence `t` is specified automatically within the function.
+
+For the other time series, $p$-values are shown below:
+```{r}
+sapply(names(X[,-1]), function(x) wavk_test(eval(parse(text = x)) ~ t)$p.value)
+```
+
+The function `poly` could also be used, for example, test quadratic trend $f(\theta,t) = \theta_0 + \theta_1 t + \theta_2 t^2$
+```{r}
+wavk_test(X3 ~ poly(t, 2), factor.length = "adaptive.selection")
+```
+
+
+# References
