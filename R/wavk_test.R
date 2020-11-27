@@ -53,7 +53,7 @@
 #' \insertAllCited{}
 #' 
 #' @seealso \code{\link[stats]{ar}}, \code{\link{HVK}}, \code{\link{WAVK}}, 
-#' \code{\link{sync_test}}
+#' \code{\link{sync_test}}, \code{vignette("trendtests", package = "funtimes")}
 #' 
 #' @keywords htest ts trend
 #' 

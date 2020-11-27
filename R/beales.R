@@ -43,6 +43,8 @@
 #' @references
 #' \insertAllCited{}
 #' 
+#' @seealso \code{vignette("beales", package = "funtimes")}
+#' 
 #' @keywords power sample ts
 #' 
 #' @author Vyacheslav Lyubchich

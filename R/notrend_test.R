@@ -53,11 +53,11 @@
 #' \insertAllCited{}
 #' 
 #' @seealso \code{\link[stats]{ar}}, \code{\link{HVK}}, \code{\link{WAVK}}, 
-#' \code{\link{wavk_test}}
+#' \code{\link{wavk_test}}, \code{vignette("trendtests", package = "funtimes")}
 #' 
 #' @keywords htest ts trend
 #' 
-#' @author Yulia R. Gel, Vyacheslav Lyubchich
+#' @author Vyacheslav Lyubchich
 #' 
 #' @export
 #' @examples
@@ -124,11 +124,7 @@ notrend_test <- function(x, B = 1000, test = c("t", "MK", "WAVK"),
     if (!is.vector(j) | !is.numeric(j)) {
         stop("j is not a numeric vector.")
     }
-    if (factor.length == "user.defined") {
-        kn <- Window[1]
-    } else {
-        kn <- n*q^j
-    }  
+    kn <- ifelse(factor.length == "user.defined", Window[1], n*q^j)
     kn <- unique(sort(floor(kn)))
     kn <- kn[kn > 2 & kn < n]
     if (length(kn) == 0) {
