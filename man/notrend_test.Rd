@@ -133,10 +133,10 @@ notrend_test(U, test = "WAVK", factor.length = "adaptive.selection")
 }
 \seealso{
 \code{\link[stats]{ar}}, \code{\link{HVK}}, \code{\link{WAVK}},
-\code{\link{wavk_test}}
+\code{\link{wavk_test}}, \code{vignette("trendtests", package = "funtimes")}
 }
 \author{
-Yulia R. Gel, Vyacheslav Lyubchich
+Vyacheslav Lyubchich
 }
 \keyword{htest}
 \keyword{trend}

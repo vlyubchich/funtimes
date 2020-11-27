@@ -9,3 +9,5 @@
 ^old*$
 
 CRAD
+R/.*DOB.R
+man/boot.test.stat*

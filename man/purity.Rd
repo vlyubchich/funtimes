@@ -43,6 +43,7 @@ in \code{classes} and \code{clusters} may differ.
 }
 \examples{
 # Fix seed for reproducible simulations:
+# RNGkind(sample.kind = "Rounding") #run this line to have same seed across R versions > R 3.6.0
 set.seed(1)
 
 ##### Example 1

@@ -37,7 +37,7 @@ For a list of deprecated functions, use \code{?'funtimes-deprecated'}
 \insertAllCited{}
 }
 \author{
-\strong{Maintainer}: Vyacheslav Lyubchich \email{lyubchic@umces.edu} (\href{https://orcid.org/00000-0001-7936-4285}{ORCID})
+\strong{Maintainer}: Vyacheslav Lyubchich \email{lyubchic@umces.edu} (\href{https://orcid.org/0000-0001-7936-4285}{ORCID})
 
 Authors:
 \itemize{
