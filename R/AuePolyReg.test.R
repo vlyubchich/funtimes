@@ -1,63 +1,75 @@
-#' Testing for change points in time series via polynomial regression
+#' Testing for Change Points in Time Series via Polynomial Regression
 #' 
-#' The function uses a nonlinear polynomial regression model in which it tests for the null hypothesis of
-#  structural stability in the regression parameters against the alternative of a break at an unknown time. 
-#' The method is based on the extreme value distribution of a maximum-type test statistic which is asymptotically 
-#' equivalent to the maximally selected likelihood ratio. The resulting testing approach is easily tractable and delivers accurate size 
-#' and power of the test, even in small samples (see \insertCite{aue2008testing}{funtimes}).
+#' The function uses a nonlinear polynomial regression model in which it tests for the null 
+#' hypothesis of structural stability in the regression parameters against the alternative of 
+#' a break at an unknown time. The method is based on the extreme value distribution of a 
+#' maximum-type test statistic which is asymptotically equivalent to the maximally selected 
+#' likelihood ratio. The resulting testing approach is easily tractable and delivers accurate 
+#' size and power of the test, even in small samples \insertCite{aue2008testing}{funtimes}.
 #'
-#' @param y  A vector that contains univariate time series observations. Missing values are not allowed.
+#' @param y  A vector that contains univariate time series observations. Missing values are 
+#' not allowed.
 #' @param a.order Order of the autoregressive model which must be a nonnegative integer number.
-#' @param alpha Significance level for testing hypothesis of no change point. Default value is 0.05.
+#' @param alpha Significance level for testing hypothesis of no change point. Default value 
+#' is 0.05.
 #' @param crit.type Method of obtaining critical values: "asymptotic" (default) or "bootstrap".
-#' @param bootstrap.method Type of bootstrap if \code{crit.type}="bootstrap":"nonparametric" (default) or "parametric".
-#' @param num.bootstrap Number of bootstrap replications if crit.type="bootstrap". Default number is 1,000.
+#' @param bootstrap.method Type of bootstrap if \code{crit.type}="bootstrap": "nonparametric" 
+#' (default) or "parametric".
+#' @param num.bootstrap Number of bootstrap replications if \code{crit.type}="bootstrap". 
+#' Default number is 1,000.
 #'
 #'
 #' @return A list with the following components:
 #' \item{index}{Time point where the change point has occurred.}
-#' \item{stat}{Test statistic.}
+#' \item{stat}{Test statistic.} 
 #' \item{crit.val}{Critical region value (CV(alpha, n)).}
 #' \item{p.value}{\code{p-value} of the change point test.}
 #'  
 #' @references 
 #' \insertAllCited{}
 #' 
-#' @seealso \code{\link{mcusum.test}} for change point test for regression
+#' @seealso \code{\link{mcusum.test}}  change point test for regression
 #' 
 #' @keywords time series, ts
 #' 
-#' @author  Poli Nemkova, Dorcas Ofori-Boateng, Yulia R. Gel
+#' @author  Palina Niamkova, Dorcas Ofori-Boateng, Yulia R. Gel
 #' @export 
 #' @examples
 #' 
 #' #Example 1:
+#' 
 #' #Simulate some time series:
+#' 
 #' set.seed(23450)
 #' series_1 = rnorm(137, 3, 5)
 #' series_2 = rnorm(213, 0, 1)
 #' series_val = c(series_1, series_2)
-#' boot.test.stat.aue(series_1, 1) #=== no change (asymptotic) ===#
-#' boot.test.stat.aue(series_val,1) #=== one change (asymptotic) ===#
+#' AuePolyReg.test(series_1, 1) #=== no change (asymptotic) ===#
+#' AuePolyReg.test(series_val,1) #=== one change (asymptotic) ===#
 #'
 #' #Example 2:
+#' 
 #' #Consider a time series with annual number of world terrorism incidents from 1970 till 2016:
+#' 
 #' c.data = (Ecdat::terrorism["incidents"])
 #' incidents.ts<-ts(c.data,start=(1970),end=(2016), frequency = 1)
+#' 
 #' #Run a test for change points:
-#' boot.test.stat.aue(incidents.ts, 2) #=== one change (asymptotic) ===#
-#' boot.test.stat.aue(incidents.ts, 2, "bootstrap", "parametric") #=== one change (bootstrap) ===#
-#' boot.test.stat.aue(incidents.ts, 2, "bootstrap", "nonparametric", 500)
+#' 
+#' AuePolyReg.test(incidents.ts, 2) #=== one change (asymptotic) ===#
+#' AuePolyReg.test(incidents.ts, 2, 0.05,"bootstrap", "parametric", 200) 
+#' #=== one change (bootstrap) ===#
 #' incidents.ts[44] #number of victims at the value of change point
 #' year<-1970+44-1  #year when the change point occurred
 #' plot(incidents.ts) #see the visualized data
-#' #The structural change point occurred at the 44th value which corresponds to 2013, with 11,990 identified 
-#' #incidents in that year. These findings can be explained with a recent rise of nationalism 
-#' #and  extremism due to appearance of the social media (/insertCite{Fisher_2019}{funtimes}).
+#' 
+#' #The structural change point occurred at the 44th value which corresponds to 2013, 
+#' #with 11,990 identified incidents in that year. These findings can be explained with 
+#' #a recent rise of nationalism and  extremism due to appearance of the social media, Fisher (2019).
 
 
 
-boot.test.stat.aue<-function(y,a.order, alpha=0.05, crit.type = c("asymptotic", "bootstrap"), 
+AuePolyReg.test<-function(y,a.order, alpha=0.05, crit.type = c("asymptotic", "bootstrap"), 
                              bootstrap.method=c("nonparametric","parametric"), num.bootstrap=1000)
 {
     test.stat<-function(y, alpha)

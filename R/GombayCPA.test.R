@@ -1,21 +1,23 @@
 #' Change Point Detection in Autoregressive Time Series
 #' 
-#' The function detects change points in autoregressive (AR) models for time series. Changes can be detected in any
-#' of $p+2$ (mean, var, phi) autoregressive parameters where $p$ is the order of the AR model. The test statistic is based on 
-#' the efficient score vector (See \insertCite{Gombay_2008}{funtimes}). 
+#' The function detects change points in autoregressive (AR) models for time series. Changes 
+#' can be detected in any of \code{p+2} (mean, var, phi) autoregressive parameters where \code{p} 
+#' is the order of the AR model. The test statistic is based on the efficient score vector \insertCite{Gombay_2008}{funtimes}. 
 #' 
 #' @details The function allows for
 #' testing for a temporary change and for a change in a specific model parameters. 
-#' Critical values can be estimated via asymptotic distribution \code{"asymptotic"} (i.e., the default option) or via sieve bootstrap \code{"bootstrap"}. 
-#' The function employs internal function \code{change.point} and 
-#' sieve bootstrap \code{change.point.sieve} function.
+#' Critical values can be estimated via asymptotic distribution \code{"asymptotic"} (i.e., the
+#' default option) or via sieve bootstrap \code{"bootstrap"}. The function employs internal 
+#' function \code{change.point} and sieve bootstrap \code{change.point.sieve} function.
 #' 
 #' @param y A vector that contains univariate time series observations. Missing values are not allowed.
 #' @param a.order Order of the autoregressive model which must be a nonnegative integer number. 
-#' @param alternatives A string parameter that specifies a type of the test (i.e., "two-sided", "greater", "lesser", and "temporary").  The option "temporary" examines
-#' the temporary change in one of the parameters (for details see \insertCite{Gombay_2008}{funtimes})
+#' @param alternatives A string parameter that specifies a type of the test (i.e., "two-sided",
+#' "greater", "lesser", and "temporary").  The option "temporary" examines the temporary change
+#' in one of the parameters \insertCite{Gombay_2008}{funtimes}.
 #' @param crit.type Method of obtaining critical values: "asymptotic" (default) or "bootstrap".
-#' @param num.bootstrap Number of bootstrap replications if crit.type="bootstrap". Default number is 1,000.
+#' @param num.bootstrap Number of bootstrap replications if \code{"crit.type"} ="bootstrap". 
+#' Default number is 1,000.
 
 #'
 #' 
@@ -33,72 +35,74 @@
 #' @references 
 #' \insertAllCited{}
 #' 
-#' @seealso \code{\link{mcusum.test}} for change point test for regression
-#' \code{\link[Ecdat]{terrorism}} dataset that was used for the Example 2
+#' @seealso \code{\link{mcusum.test}}  change point test for regression and 
+#' \code{\link[Ecdat]{terrorism}} dataset used in the Example 2
 #' 
 #' @keywords time series, ts
 #' 
-#' @author Poli Nemkova, Dorcas Ofori-Boateng, Yulia R. Gel
+#' @author Palina Niamkova, Dorcas Ofori-Boateng, Yulia R. Gel
 #' 
 #' @export
 #' @examples 
 #' 
 #' #Example 1:
+#' 
 #' #Simulate some time series:
+#' 
 #' series_1 = arima.sim(n = 100, list(order = c(2,0,0), ar = c(-0.7, -0.1)))
 #' series_2 = arima.sim(n = 200, list(order = c(2,0,0), ar = c(0.1, -0.6)))
 #' main_series = c(series_1, series_2)
 #'
-#' result11 = change.point.boot(series_1, 2, "two-sided")
+#' result11 = GombayCPA.test(series_1, 2, "two-sided")
 #' result11 #== No change point ===#
 #'
-#' result12 = change.point.boot(main_series, 2, "two-sided")
+#' result12 = GombayCPA.test(main_series, 2, "two-sided")
 #' result12  #=== One change at phi values ===#
 #'
-#' result13 = change.point.boot(main_series, 2, "two-sided", "bootstrap")
+#' result13 = GombayCPA.test(main_series, 2, "two-sided", "bootstrap")
 #' result13  #=== One change at phi values ===#
 #'
 #'
 #' 
 #' #Example 2:
-#' #From the package 'Ecdat' consider a time series with annual world number of victims of terrorism in the US
-#' #from 1970 till 2016:
+#' 
+#' #From the package 'Ecdat' consider a time series with annual world number of victims of 
+#' #terrorism in the US from 1970 till 2016:
 #'
 #' c.data = (Ecdat::terrorism['nkill.us'])
 #' nkill.us.ts<-ts(c.data,start=(1970), end=(2016), frequency(47))
 #'
 #' #Now let's perform a change point detection with one sided tests:
 #'
-#' change.point.boot(nkill.us.ts, 0, "lesser")
-#' change.point.boot(nkill.us.ts, 0, "greater")
+#' GombayCPA.test(nkill.us.ts, 0, "lesser")
+#' GombayCPA.test(nkill.us.ts, 0, "greater")
 #' nkill.us.ts[32]
 #' year=1970+31
 #' print(year)
 #' plot(nkill.us.ts)
 #'
-#' #In both cases we find that the change point is located at the position 31 or 32. We can examine it further 
-#  #by checking the value of this position\code{nkill.us.ts[32]} as well as by plotting the graph
-#  \code{plot(nkill.us.ts)}. The detected change point corresponds to the year of 2001, when the 9/11 attack happened.
+#' #In both cases we find that the change point is located at the position 31 or 32. We can 
+#' # examine it further by checking the value of this position (using: nkill.us.ts[32]) as well as
+#' # by plotting the graph (using: plot(nkill.us.ts)). The detected change point corresponds to 
+#' #the year of 2001, when the 9/11 attack happened.
 #'
 
 
-change.point.boot = function(y, a.order, alternatives = c("two-sided", "greater", "lesser", "temporary"), crit.type = c("asymptotic", "bootstrap"), num.bootstrap=1000)
+GombayCPA.test = function(y, a.order, alternatives = c("two-sided", "greater", "lesser", "temporary"), crit.type = c("asymptotic", "bootstrap"), num.bootstrap=1000)
 {
   
-  ############## internal function change.point  ##############
   
   change.point = function(y, a.order, alternatives = c("two-sided", "greater", "lesser", "temporary"))
   {
     if(a.order < 0) stop("a.order must be greater than or equal to 0.")
     
-    
-    ##library(MASS) --УБРАТЬ
+
     n = length(y)
     
     #=== demeaning ===#
     y.dem = y - mean(na.omit(y))
     ar.p  = arima0(y.dem, order = c(a.order, 0, 0), include.mean = T, method = "ML") 
-    # ar.p = ar(y.dem,order=p,aic=FALSE) #
+    # ar.p = ar(y.dem,order=a.order,aic=FALSE) #
     
     mu     = mean(na.omit(y.dem)) #=== this is equal to zero ===#
     sigma2 = ar.p$sigma2
@@ -184,7 +188,7 @@ change.point.boot = function(y, a.order, alternatives = c("two-sided", "greater"
       rownames(maxstats) = "abs.max"
       if(a.order > 0)
       {
-        colnames(maxstats) = c("mean","var",paste("phi",c(1:p),sep=""))
+        colnames(maxstats) = c("mean","var",paste("phi",c(1:a.order),sep=""))
       }
       if(a.order == 0)
       {
@@ -288,7 +292,6 @@ change.point.boot = function(y, a.order, alternatives = c("two-sided", "greater"
   {
     if(a.order < 0) stop("a.order must be greater than or equal to 0.")
     
-    #library(MASS) УБРАТЬ
     n = length(y)
     
     ### demeaning ###

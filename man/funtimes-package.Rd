@@ -51,6 +51,7 @@ Other contributors:
   \item Ethan D. Schaeffer [contributor]
   \item Srishti Vishwakarma [contributor]
   \item Xingyu Wang [contributor]
+  \item Palina Niamkova [contributor]
 }
 
 }
