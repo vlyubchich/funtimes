@@ -28,9 +28,8 @@
 #' \item{nClust}{Number of clusters}
 #' \item{cSize}{Cluster sizes (vector of length nClust)}
 #' 
-#' @import FNN TDA igraph randomcoloR graphics
-#' 
-#' 
+#' @import igraph TDA randomcoloR graphics
+#' @importFrom FNN knn.index knn.dist
 #' @references 
 #' \insertAllCited{}
 #' 
