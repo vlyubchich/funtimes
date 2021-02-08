@@ -40,11 +40,11 @@
 #' 
 #' #Now let's perform a change point detection:
 #' 
-#' cumsumCPA.test(series_1, 1) #== no change ==#
-#' cumsumCPA.test(main_val, 1) #== one change, asymptotic critical region ==#
-#' cumsumCPA.test(main_val, 1, "bootstrap", "parametric") #== one change, parametric 
+#' cumsumCPA_test(series_1, 1) #== no change ==#
+#' cumsumCPA_test(main_val, 1) #== one change, asymptotic critical region ==#
+#' cumsumCPA_test(main_val, 1, "bootstrap", "parametric") #== one change, parametric 
 #' #bootstrap==#
-#' cumsumCPA.test(main_val, 1, "bootstrap", "nonparametric") #== one change, nonparametric 
+#' cumsumCPA_test(main_val, 1, "bootstrap", "nonparametric") #== one change, nonparametric 
 #' #bootstrap ==#
 #'
 #' 
@@ -58,9 +58,9 @@
 #' 
 #' #Now let's perform a change point detection:
 #' 
-#' cumsumCPA.test(incomeInequality.ts, 0)
-#' cumsumCPA.test(incomeInequality.ts, 0, "bootstrap", "parametric")
-#' cumsumCPA.test(incomeInequality.ts, 0, "bootstrap", "nonparametric")
+#' cumsumCPA_test(incomeInequality.ts, 0)
+#' cumsumCPA_test(incomeInequality.ts, 0, "bootstrap", "parametric")
+#' cumsumCPA_test(incomeInequality.ts, 0, "bootstrap", "nonparametric")
 #' incomeInequality.ts[13] # median income
 #' Ecdat::incomeInequality$Year[13] + 1 # year of change point
 #' 
@@ -74,7 +74,7 @@
 
 
 
-cumsumCPA.test<-function(y,a.order, crit.type = c("asymptotic", "bootstrap"), bootstrap.method=c("nonparametric","parametric"), num.bootstrap=1000)
+cumsumCPA_test<-function(y,a.order, crit.type = c("asymptotic", "bootstrap"), bootstrap.method=c("nonparametric","parametric"), num.bootstrap=1000)
 {
   test.stat<-function(y)
   {

@@ -44,8 +44,8 @@
 #' series_1 = rnorm(137, 3, 5)
 #' series_2 = rnorm(213, 0, 1)
 #' series_val = c(series_1, series_2)
-#' AuePolyReg.test(series_1, 1) #=== no change (asymptotic) ===#
-#' AuePolyReg.test(series_val,1) #=== one change (asymptotic) ===#
+#' AuePolyReg_test(series_1, 1) #=== no change (asymptotic) ===#
+#' AuePolyReg_test(series_val,1) #=== one change (asymptotic) ===#
 #'
 #' #Example 2:
 #' 
@@ -56,8 +56,8 @@
 #' 
 #' #Run a test for change points:
 #' 
-#' AuePolyReg.test(incidents.ts, 2) #=== one change (asymptotic) ===#
-#' AuePolyReg.test(incidents.ts, 2, 0.05,"bootstrap", "parametric", 200) 
+#' AuePolyReg_test(incidents.ts, 2) #=== one change (asymptotic) ===#
+#' AuePolyReg_test(incidents.ts, 2, 0.05,"bootstrap", "parametric", 200) 
 #' #=== one change (bootstrap) ===#
 #' incidents.ts[44] #number of victims at the value of change point
 #' year<-1970+44-1  #year when the change point occurred
@@ -69,7 +69,7 @@
 
 
 
-AuePolyReg.test<-function(y,a.order, alpha=0.05, crit.type = c("asymptotic", "bootstrap"), 
+AuePolyReg_test<-function(y,a.order, alpha=0.05, crit.type = c("asymptotic", "bootstrap"), 
                              bootstrap.method=c("nonparametric","parametric"), num.bootstrap=1000)
 {
     test.stat<-function(y, alpha)

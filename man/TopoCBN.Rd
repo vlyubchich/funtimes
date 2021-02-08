@@ -97,7 +97,7 @@ print(result)
 \insertAllCited{}
 }
 \seealso{
-\code{\link{cumsumCPA.test}} for change point detection in time series via a linear
+\code{\link{cumsumCPA_test}} for change point detection in time series via a linear
 regression with temporally correlated errors
 }
 \author{

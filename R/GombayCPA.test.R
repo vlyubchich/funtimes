@@ -53,13 +53,13 @@
 #' series_2 = arima.sim(n = 200, list(order = c(2,0,0), ar = c(0.1, -0.6)))
 #' main_series = c(series_1, series_2)
 #'
-#' result11 = GombayCPA.test(series_1, 2, "two-sided")
+#' result11 = GombayCPA_test(series_1, 2, "two-sided")
 #' result11 #== No change point ===#
 #'
-#' result12 = GombayCPA.test(main_series, 2, "two-sided")
+#' result12 = GombayCPA_test(main_series, 2, "two-sided")
 #' result12  #=== One change at phi values ===#
 #'
-#' result13 = GombayCPA.test(main_series, 2, "two-sided", "bootstrap")
+#' result13 = GombayCPA_test(main_series, 2, "two-sided", "bootstrap")
 #' result13  #=== One change at phi values ===#
 #'
 #'
@@ -74,8 +74,8 @@
 #'
 #' #Now let's perform a change point detection with one sided tests:
 #'
-#' GombayCPA.test(nkill.us.ts, 0, "lesser")
-#' GombayCPA.test(nkill.us.ts, 0, "greater")
+#' GombayCPA_test(nkill.us.ts, 0, "lesser")
+#' GombayCPA_test(nkill.us.ts, 0, "greater")
 #' nkill.us.ts[32]
 #' year=1970+31
 #' print(year)
@@ -88,7 +88,7 @@
 #'
 
 
-GombayCPA.test = function(y, a.order, alternatives = c("two-sided", "greater", "lesser", "temporary"), crit.type = c("asymptotic", "bootstrap"), num.bootstrap=1000)
+GombayCPA_test = function(y, a.order, alternatives = c("two-sided", "greater", "lesser", "temporary"), crit.type = c("asymptotic", "bootstrap"), num.bootstrap=1000)
 {
   
   
