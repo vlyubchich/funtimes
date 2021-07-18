@@ -14,27 +14,27 @@ AuePolyReg_test(
 )
 }
 \arguments{
-\item{y}{A vector that contains univariate time series observations. Missing values are
+\item{y}{a vector that contains univariate time series observations. Missing values are
 not allowed.}
 
-\item{a.order}{Order of the autoregressive model which must be a nonnegative integer number.}
+\item{a.order}{order of the autoregressive model which must be a nonnegative integer number.}
 
-\item{alpha}{Significance level for testing hypothesis of no change point. Default value
+\item{alpha}{significance level for testing hypothesis of no change point. Default value
 is 0.05.}
 
-\item{crit.type}{Method of obtaining critical values: "asymptotic" (default) or "bootstrap".}
+\item{crit.type}{method of obtaining critical values: "asymptotic" (default) or "bootstrap".}
 
-\item{bootstrap.method}{Type of bootstrap if \code{crit.type}="bootstrap": "nonparametric"
+\item{bootstrap.method}{type of bootstrap if \code{crit.type = "bootstrap"}: "nonparametric"
 (default) or "parametric".}
 
-\item{num.bootstrap}{Number of bootstrap replications if \code{crit.type}="bootstrap".
-Default number is 1,000.}
+\item{num.bootstrap}{number of bootstrap replications if \code{crit.type = "bootstrap"}.
+Default number is 1000.}
 }
 \value{
 A list with the following components:
-\item{index}{Time point where the change point has occurred.}
-\item{stat}{Test statistic.}
-\item{crit.val}{Critical region value (CV(alpha, n)).}
+\item{index}{time point where the change point has occurred.}
+\item{stat}{test statistic.}
+\item{crit.val}{critical region value (CV(alpha, n)).}
 \item{p.value}{\code{p-value} of the change point test.}
 }
 \description{
@@ -50,33 +50,32 @@ size and power of the test, even in small samples \insertCite{aue2008testing}{fu
 #Example 1:
 
 #Simulate some time series:
-
 set.seed(23450)
 series_1 = rnorm(137, 3, 5)
 series_2 = rnorm(213, 0, 1)
 series_val = c(series_1, series_2)
-AuePolyReg_test(series_1, 1) #=== no change (asymptotic) ===#
-AuePolyReg_test(series_val,1) #=== one change (asymptotic) ===#
+AuePolyReg_test(series_1, 1) # no change (asymptotic)
+AuePolyReg_test(series_val,1) # one change (asymptotic)
 
 #Example 2:
 
 #Consider a time series with annual number of world terrorism incidents from 1970 till 2016:
-
-c.data = (Ecdat::terrorism["incidents"])
-incidents.ts<-ts(c.data,start=(1970),end=(2016), frequency = 1)
+c.data = Ecdat::terrorism["incidents"]
+incidents.ts <- ts(c.data, start = 1970, end = 2016)
 
 #Run a test for change points:
-
-AuePolyReg_test(incidents.ts, 2) #=== one change (asymptotic) ===#
+AuePolyReg_test(incidents.ts, 2) # one change (asymptotic)
 AuePolyReg_test(incidents.ts, 2, 0.05,"bootstrap", "parametric", 200) 
-#=== one change (bootstrap) ===#
+# one change (bootstrap)
 incidents.ts[44] #number of victims at the value of change point
-year<-1970+44-1  #year when the change point occurred
-plot(incidents.ts) #see the visualized data
+year <- 197 + 44 - 1  # year when the change point occurred
+plot(incidents.ts) # see the visualized data
 
 #The structural change point occurred at the 44th value which corresponds to 2013, 
 #with 11,990 identified incidents in that year. These findings can be explained with 
-#a recent rise of nationalism and  extremism due to appearance of the social media, Fisher (2019).
+#a recent rise of nationalism and  extremism due to appearance of the social media, 
+#Fisher (2019): White Terrorism Shows 'Stunning' Parallels to Islamic State's Rise. 
+#The New York Times.
 }
 
 }
@@ -84,9 +83,10 @@ plot(incidents.ts) #see the visualized data
 \insertAllCited{}
 }
 \seealso{
-\code{\link{mcusum.test}}  change point test for regression
+\code{\link{mcusum.test}} change point test for regression
 }
 \author{
 Palina Niamkova, Dorcas Ofori-Boateng, Yulia R. Gel
 }
+\keyword{changepoint}
 \keyword{ts}

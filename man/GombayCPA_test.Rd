@@ -13,33 +13,33 @@ GombayCPA_test(
 )
 }
 \arguments{
-\item{y}{A vector that contains univariate time series observations. Missing values are not allowed.}
+\item{y}{a vector that contains univariate time series observations. Missing values are not allowed.}
 
-\item{a.order}{Order of the autoregressive model which must be a nonnegative integer number.}
+\item{a.order}{order of the autoregressive model which must be a nonnegative integer number.}
 
-\item{alternatives}{A string parameter that specifies a type of the test (i.e., "two-sided",
+\item{alternatives}{a string parameter that specifies a type of the test (i.e., "two-sided",
 "greater", "lesser", and "temporary").  The option "temporary" examines the temporary change
 in one of the parameters \insertCite{Gombay_2008}{funtimes}.}
 
-\item{crit.type}{Method of obtaining critical values: "asymptotic" (default) or "bootstrap".}
+\item{crit.type}{method of obtaining critical values: "asymptotic" (default) or "bootstrap".}
 
-\item{num.bootstrap}{Number of bootstrap replications if \code{"crit.type"} ="bootstrap".
-Default number is 1,000.}
+\item{num.bootstrap}{number of bootstrap replications if \code{crit.type = "bootstrap"}.
+Default number is 1000.}
 }
 \value{
 A list with the following components:
-\item{index}{Points of change for each parameter. The value of the \code{"alternatives"}
+\item{index}{points of change for each parameter. The value of the \code{"alternatives"}
 determines the return:
-"temporary - returns max, min and abs.max points;
+"temporary" - returns max, min and abs.max points;
 "greater" - returns max points;
 "lesser" -  returns min points;
-"two-sided" - returns abs.max. }
-\item{stats}{Test statistic values for change points in: mean, var, phi.}
+"two-sided" - returns abs.max.}
+\item{stats}{test statistic values for change points in: mean, var, phi.}
 \item{p.values}{\code{p-value} of the change point test.}
 }
 \description{
 The function detects change points in autoregressive (AR) models for time series. Changes
-can be detected in any of \code{p+2} (mean, var, phi) autoregressive parameters where \code{p}
+can be detected in any of \code{p + 2} (mean, var, phi) autoregressive parameters where \code{p}
 is the order of the AR model. The test statistic is based on the efficient score vector \insertCite{Gombay_2008}{funtimes}.
 }
 \details{
@@ -54,7 +54,6 @@ function \code{change.point} and sieve bootstrap \code{change.point.sieve} funct
 #Example 1:
 
 #Simulate some time series:
-
 series_1 = arima.sim(n = 100, list(order = c(2,0,0), ar = c(-0.7, -0.1)))
 series_2 = arima.sim(n = 200, list(order = c(2,0,0), ar = c(0.1, -0.6)))
 main_series = c(series_1, series_2)
@@ -74,16 +73,14 @@ result13  #=== One change at phi values ===#
 
 #From the package 'Ecdat' consider a time series with annual world number of victims of 
 #terrorism in the US from 1970 till 2016:
+c.data = Ecdat::terrorism['nkill.us']
+nkill.us.ts <- ts(c.data, start = 1970, end = 2016)
 
-c.data = (Ecdat::terrorism['nkill.us'])
-nkill.us.ts<-ts(c.data,start=(1970), end=(2016), frequency(47))
-
-#Now let's perform a change point detection with one sided tests:
-
+#Now perform a change point detection with one sided tests:
 GombayCPA_test(nkill.us.ts, 0, "lesser")
 GombayCPA_test(nkill.us.ts, 0, "greater")
 nkill.us.ts[32]
-year=1970+31
+year = 1970 + 31
 print(year)
 plot(nkill.us.ts)
 
@@ -104,4 +101,5 @@ plot(nkill.us.ts)
 \author{
 Palina Niamkova, Dorcas Ofori-Boateng, Yulia R. Gel
 }
+\keyword{changepoint}
 \keyword{ts}

@@ -44,18 +44,14 @@
 #' 
 #' @export
 #' @examples
-#' # Fix seed for reproducible simulations:
-#' set.seed(1)
-#' 
-#' #Simulate some time series, possibly with trend:
-#' n <- 100
-#' Y <- arima.sim(n = n, list(order = c(2, 0, 0), ar = c(-0.7, -0.1)))
+#' # Simulate a time series Y:
+#' Y <- arima.sim(n = 200, list(order = c(2, 0, 0), ar = c(-0.7, -0.1)))
 #' plot.ts(Y)
 #' 
-#' #Estimate the coefficients:
-#' ARest(Y) #HVK by default
-#' ARest(Y, ar.method = "yw") #Yule--Walker
-#' ARest(Y, ar.method = "burg") #Burg
+#' # Estimate the coefficients:
+#' ARest(Y) # HVK, by default
+#' ARest(Y, ar.method = "yw") # Yule--Walker
+#' ARest(Y, ar.method = "burg") # Burg
 #' 
 ARest <- function(x, ar.order = NULL, ar.method = "HVK", BIC = TRUE)
 {

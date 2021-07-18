@@ -14,23 +14,23 @@ cumsumCPA_test(
 )
 }
 \arguments{
-\item{y}{A numeric time series vector. Missing values are not allowed.}
+\item{y}{a numeric time series vector. Missing values are not allowed.}
 
-\item{a.order}{Order of the autoregressive model which must be a nonnegative integer number.}
+\item{a.order}{order of the autoregressive model which must be a nonnegative integer number.}
 
-\item{crit.type}{A string parameter allowing to choose "asymptotic" or "bootstrap" options.}
+\item{crit.type}{a string parameter allowing to choose "asymptotic" or "bootstrap" options.}
 
-\item{bootstrap.method}{A string parameter allowing to choose "nonparametric" or
+\item{bootstrap.method}{a string parameter allowing to choose "nonparametric" or
 "parametric" method of bootstrapping. "nonparametric" - resampling of the estimated
-residuals (with replacement)."parametric" - sampling innovations from a normal distribution.}
+residuals (with replacement); "parametric" - sampling innovations from a normal distribution.}
 
-\item{num.bootstrap}{Number of bootstrap replications if \code{"crit.type"}="bootstrap".
-Default number is 1,000.}
+\item{num.bootstrap}{number of bootstrap replications if \code{crit.type = "bootstrap"}.
+Default number is 1000.}
 }
 \value{
 A list with the following components:
-\item{index}{Time point where the change has occurred.}
-\item{stat}{Test statistic.}
+\item{index}{time point where the change has occurred.}
+\item{stat}{test statistic.}
 \item{p.value}{\code{p-value} of the change point test.}
 }
 \description{
@@ -38,7 +38,7 @@ The function tests for a change point in parameters of a linear regression model
 exhibiting a general weakly dependent structure. The approach extends earlier methods based
 on cumulative sums derived under assumption of independent errors. The approach applies
 smoothing when the time series is dominated by high frequencies. To detect multiple changes,
-it is recommended to employ a binary or wild segmentation \insertCite{gombay2010change}{funtimes}.
+it is recommended to employ a binary or wild segmentation \insertCite{Gombay_2010}{funtimes}.
 }
 \examples{
 \dontrun{
@@ -49,26 +49,21 @@ series_1 = rnorm(157, 2, 1)
 series_2 = rnorm(43, 7, 10)
 main_val = c(series_1, series_2)
 
-#Now let's perform a change point detection:
-
-cumsumCPA_test(series_1, 1) #== no change ==#
-cumsumCPA_test(main_val, 1) #== one change, asymptotic critical region ==#
-cumsumCPA_test(main_val, 1, "bootstrap", "parametric") #== one change, parametric 
-#bootstrap==#
-cumsumCPA_test(main_val, 1, "bootstrap", "nonparametric") #== one change, nonparametric 
-#bootstrap ==#
-
+#Now perform a change point detection:
+cumsumCPA_test(series_1, 1) # no change
+cumsumCPA_test(main_val, 1) # one change, asymptotic critical region
+cumsumCPA_test(main_val, 1, "bootstrap", "parametric") # one change, parametric bootstrap
+cumsumCPA_test(main_val, 1, "bootstrap", "nonparametric") # one change, nonparametric 
+#bootstrap
 
 #Example 2:
 
 #Consider time series with ratio of real GDP per family to the median income. This is a
 #skewness and income inequality measure for the US families from 1947 till 2012. 
-      
 e.data = (Ecdat::incomeInequality['mean.median'])
-incomeInequality.ts = ts(e.data,start=(1947),end=(2012),frequency = 1)
+incomeInequality.ts = ts(e.data, start = 1947, end = 2012, frequency = 1)
 
-#Now let's perform a change point detection:
-
+#Now perform a change point detection:
 cumsumCPA_test(incomeInequality.ts, 0)
 cumsumCPA_test(incomeInequality.ts, 0, "bootstrap", "parametric")
 cumsumCPA_test(incomeInequality.ts, 0, "bootstrap", "nonparametric")
@@ -80,7 +75,7 @@ Ecdat::incomeInequality$Year[13] + 1 # year of change point
 #wealth was not distributed equally between all the population and that most people earn 
 #almost twice less than the equal share of the all produced goods and services by the nation.
 
-#Note: In order to look for the other possible change points run the same function for the 
+#Note: To look for the other possible change points, run the same function for the 
 #segment of time series after value 13.
 }
 
@@ -94,3 +89,5 @@ Ecdat::incomeInequality$Year[13] + 1 # year of change point
 \author{
 Palina Niamkova, Dorcas Ofori-Boateng, Yulia R. Gel
 }
+\keyword{changepoint}
+\keyword{ts}

@@ -44,18 +44,14 @@ The same formula for BIC is used consistently for all methods:
 where \eqn{n} = \code{length(x)}, \eqn{k=p+1}.
 }
 \examples{
-# Fix seed for reproducible simulations:
-set.seed(1)
-
-#Simulate some time series, possibly with trend:
-n <- 100
-Y <- arima.sim(n = n, list(order = c(2, 0, 0), ar = c(-0.7, -0.1)))
+# Simulate a time series Y:
+Y <- arima.sim(n = 200, list(order = c(2, 0, 0), ar = c(-0.7, -0.1)))
 plot.ts(Y)
 
-#Estimate the coefficients:
-ARest(Y) #HVK by default
-ARest(Y, ar.method = "yw") #Yule--Walker
-ARest(Y, ar.method = "burg") #Burg
+# Estimate the coefficients:
+ARest(Y) # HVK, by default
+ARest(Y, ar.method = "yw") # Yule--Walker
+ARest(Y, ar.method = "burg") # Burg
 
 }
 \references{

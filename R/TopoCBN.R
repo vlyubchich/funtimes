@@ -1,44 +1,47 @@
-#' Topological Clustering using Betti Numbers (TopoCBN)
+#' Topological Clustering using Betti Numbers
 #' 
 #' The function performs unsupervised clustering of multivariate data based on topological data
 #' analysis (TDA). The objective is to partition data into non-overlapping clusters, where the 
-#' definition of a cluster falls under #' a general framework of density based clustering, 
-#' e.g., DBSCAN, OPTICS etc. That is, intuitively the cluster is to be a subset of points which
-#' is path-connected, i.e. any point in the subset can be reached from any other one through 
+#' definition of a cluster falls under a general framework of density based clustering, 
+#' e.g., DBSCAN and OPTICS. That is, intuitively the cluster is a subset of points which
+#' is path-connected, i.e., any point in the subset can be reached from any other one through 
 #' a path consisting of points (also belonging to the subset); furthermore, the consecutive 
 #' points on the path are close enough and their local neighborhoods are similar in 
-#' shape \insertCite{islambekov2019unsupervised}{funtimes}. To compare shapes, TopoCBN builds 
-#' a Vietoris-Rips (VR) filtration upon such neighborhoods around each point and compute 
+#' shape \insertCite{Islambekov_Gel_2019}{funtimes}. To compare shapes, TopoCBN builds 
+#' a Vietoris--Rips (VR) filtration upon such neighborhoods around each point and computes 
 #' topological summaries in the form of the Betti sequences using persistent homology. The closer
-#' the Betti sequences to one another for a pair of close-by points, the more likely similar the 
+#' the Betti sequences to one another for a pair of close-by points, the more similar the 
 #' shapes of their neighborhoods. Thus, when identifying clusters, TopoCBN utilizes both the
 #' distance function and local geometric information around the points. Note that accounting 
 #' for shape similarity can be viewed as an extension of conventional clustering properties in 
 #' the density-based clustering framework.
 #' 
-#' @param data A point cloud given as an N by d matrix, where N = number of points, d = dimension of Euclidean space
-#' OR an N by N matrix of pairwise distances.
-#' @param nKNN Number of k nearest neighbors to take around each point.
-#' @param filt_len Filtration length (also length of Betti sequences). Default is 25.
-#' @param dist_matrix  Is set to FALSE by default, if data is a point cloud. dist_matrix=TRUE if data
+#' 
+#' @param data a point cloud given as an N by d matrix, where N = number of points, d = dimension of Euclidean space
+#' or an N by N matrix of pairwise distances.
+#' @param nKNN number of k nearest neighbors to take around each point.
+#' @param filt_len filtration length (also length of Betti sequences). Default is 25.
+#' @param dist_matrix is set to \code{FALSE} by default, assuming \code{data} is a point cloud. Set \code{dist_matrix = TRUE} if data
 #' is a matrix of pairwise distances.
 #' 
-#' @return A list with the following components:
-#' \item{assignments}{Cluster labels (vector of length N)}
-#' \item{nClust}{Number of clusters}
-#' \item{cSize}{Cluster sizes (vector of length nClust)}
 #' 
-#' @import igraph TDA randomcoloR graphics
-#' @importFrom FNN knn.index knn.dist
+#' @return A list with the following components:
+#' \item{assignments}{cluster labels (vector of length N).}
+#' \item{nClust}{number of clusters.}
+#' \item{cSize}{cluster sizes (vector of length \code{nClust}).}
+#' 
 #' @references 
 #' \insertAllCited{}
 #' 
 #' @seealso \code{\link{cumsumCPA_test}} for change point detection in time series via a linear
 #' regression with temporally correlated errors
 #' 
-#' @keywords cluster topology Betti
+#' @keywords Betti cluster topology 
 #' 
 #' @author Palina Niamkova, Umar Islambekov, Yulia R. Gel
+#' 
+#' @importFrom graphics boxplot
+#' @importFrom FNN knn.index knn.dist
 #' @export 
 #' @examples
 #' \dontrun{
@@ -50,7 +53,7 @@
 #' #We also need to replace NA values to integer 0:  
 #' data[is.na(data)] = 0
 #' 
-#' #Now we can run CBN:
+#' #Now run CBN:
 #' result <- TopoCBN(data,nKNN=12) # can also try with filt_len=50,75,100
 #' 
 #' #We can obtain the same results using matrix of pairwise distances:
@@ -93,22 +96,20 @@
 #' #correspond to the dramatically increased (deteriorated) levels of air pollution.
 #' }
 #' 
-TopoCBN = function(data,nKNN,filt_len=25,dist_matrix=FALSE){
-  
+TopoCBN = function(data, nKNN, filt_len = 25, dist_matrix = FALSE) {
   # extract betti sequence from PD
-  extract_betti=function(PD){
-    b<-numeric(length = filt_len)
+  extract_betti = function(PD) {
+    b <- numeric(length = filt_len)
     for (k in 1:filt_len)
-      b[k]<-sum((scale_seq[k]>=PD[,1])&(scale_seq[k]<PD[,2]))
+      b[k] <- sum((scale_seq[k] >= PD[,1]) & (scale_seq[k] < PD[,2]))
     b
   }
   #main body#
-  
   N <- nrow(data) # number of data points
-  if (dist_matrix){
+  if (dist_matrix) {
     ind <- t(apply(data,1,order))[,1:nKNN]
     maxscale <- max(t(apply(data,1,sort))[,nKNN])
-  } else{
+  } else {
     ind <- cbind(1:N,FNN::knn.index(data,k=nKNN-1)) # indices of k nearest neighbors
     maxscale<-max(FNN::knn.dist(data,k=nKNN-1)[,nKNN-1]) # maxscale
   }
@@ -119,11 +120,10 @@ TopoCBN = function(data,nKNN,filt_len=25,dist_matrix=FALSE){
   print("Extracting Betti sequences (1/4)")
   betti_0<-betti_1<-matrix(nrow = N,ncol = filt_len) 
   for (i in 1:N){
-    
     # construct Rips filtration built on neighborhood around point i
-    if (dist_matrix){
+    if (dist_matrix) {
       ripsFltr<-TDA::ripsFiltration(data[ind[i,],ind[i,]],maxdimension = 0,maxscale = maxscale,dist = 'arbitrary') 
-    } else{
+    } else {
       ripsFltr<-TDA::ripsFiltration(data[ind[i,],],maxdimension = 0,maxscale = maxscale,dist = 'euclidean') 
     }
     # compute PD of Rips filtration
@@ -142,12 +142,10 @@ TopoCBN = function(data,nKNN,filt_len=25,dist_matrix=FALSE){
   ##################################################
   print("Computing relative change in Betti sequences (2/4)")
   delta_betti_0<-delta_betti_1<-matrix(nrow = N,ncol = nKNN)
-  for (i in 1:N){
-    
+  for (i in 1:N) {
     bi_bj<-as.matrix(dist(betti_0[ind[i,],]))[1,]
     denom<-norm(as.matrix(betti_0[i,]),type = 'f')
     delta_betti_0[i,]=bi_bj/denom
-    
     bi_bj<-as.matrix(dist(betti_1[ind[i,],]))[1,]
     denom<-norm(as.matrix(betti_1[i,]),type = 'f')
     delta_betti_1[i,]=bi_bj/denom 
@@ -168,22 +166,19 @@ TopoCBN = function(data,nKNN,filt_len=25,dist_matrix=FALSE){
   ############################
   print('Forming adjacency matrix (3/4)')
   A<-matrix(0,ncol = N,nrow = N) 
-  for (i in 1:N)
-  {
+  for (i in 1:N) {
     index_0<-ind[i,which(delta_betti_0[i,]<=cutoff_0)]
     index_1<-ind[i,which(delta_betti_1[i,]<=cutoff_1)]
-    
     A[i,intersect(index_0,index_1)]=1
-    
   }
   ############################
   # Performing clustering
   ############################
   print('Performing clustering (4/4)')
-  g<-igraph::graph_from_adjacency_matrix(A,mode='directed') # form graph g from adj. matrix A
-  clstrs<-clusters(g,mode = 'strong') # define clusters as strongly connected compents of graph g
+  g <- igraph::graph_from_adjacency_matrix(A, mode = 'directed') # form graph g from adj. matrix A
+  clstrs <- igraph::clusters(g, mode = 'strong') # define clusters as strongly connected compents of graph g
   
-  return(list(assignments=clstrs$membership,nClust=clstrs$no,cSize=clstrs$csize))
+  return(list(assignments = clstrs$membership, nClust = clstrs$no, cSize = clstrs$csize))
 }
 
 
