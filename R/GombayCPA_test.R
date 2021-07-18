@@ -38,13 +38,13 @@
 #' @seealso \code{\link{mcusum.test}}  change point test for regression and 
 #' \code{\link[Ecdat]{terrorism}} dataset used in the Example 2
 #' 
-#' @keywords time series, ts
+#' @keywords ts
 #' 
 #' @author Palina Niamkova, Dorcas Ofori-Boateng, Yulia R. Gel
 #' 
 #' @export
 #' @examples 
-#' 
+#' \dontrun{
 #' #Example 1:
 #' 
 #' #Simulate some time series:
@@ -85,28 +85,20 @@
 #' # examine it further by checking the value of this position (using: nkill.us.ts[32]) as well as
 #' # by plotting the graph (using: plot(nkill.us.ts)). The detected change point corresponds to 
 #' #the year of 2001, when the 9/11 attack happened.
+#' }
 #'
-
-
 GombayCPA_test = function(y, a.order, alternatives = c("two-sided", "greater", "lesser", "temporary"), crit.type = c("asymptotic", "bootstrap"), num.bootstrap=1000)
 {
-  
-  
   change.point = function(y, a.order, alternatives = c("two-sided", "greater", "lesser", "temporary"))
   {
     if(a.order < 0) stop("a.order must be greater than or equal to 0.")
-    
-
     n = length(y)
-    
     #=== demeaning ===#
     y.dem = y - mean(na.omit(y))
     ar.p  = arima0(y.dem, order = c(a.order, 0, 0), include.mean = T, method = "ML") 
     # ar.p = ar(y.dem,order=a.order,aic=FALSE) #
-    
     mu     = mean(na.omit(y.dem)) #=== this is equal to zero ===#
     sigma2 = ar.p$sigma2
-    
     if(a.order > 0)
     {
       phi    = ar.p$coef
@@ -117,7 +109,6 @@ GombayCPA_test = function(y, a.order, alternatives = c("two-sided", "greater", "
       abdiff = abs(rownum - colnum) + 1
       gamma  = matrix(cov[abdiff], ncol = a.order, nrow = a.order)
     }
-    
     muvec    = double(n)
     muvec[1] = y.dem[1]
     for(i in 2:n)
@@ -132,7 +123,6 @@ GombayCPA_test = function(y, a.order, alternatives = c("two-sided", "greater", "
         muvec[i] = y.dem[i]
       }
     }
-    
     if(a.order > 0)
     {
       mustat = ((1-sum(phi))/sigma2)*cumsum(muvec)
@@ -141,11 +131,9 @@ GombayCPA_test = function(y, a.order, alternatives = c("two-sided", "greater", "
     {
       mustat = 1/sigma2*cumsum(muvec)
     }
-    
     sigmastat = -c(1:n)/(2*sigma2) + 1/(2*sigma2^2)*cumsum((muvec^2))
     
-    if(a.order > 0)
-    {
+    if(a.order > 0) {
       phistat = matrix(NA, nrow = a.order, ncol = n)
       
       for(s in 1:a.order)
@@ -542,9 +530,7 @@ GombayCPA_test = function(y, a.order, alternatives = c("two-sided", "greater", "
         bootpvals[i] = length(which(bootstats[i,] > origstats[i]))/B
       }
     }
-    
-    
-    bootpvals           = rbind(bootpvals)
+    bootpvals = rbind(bootpvals)
     rownames(bootpvals) = "p.value"
     if(a.order > 0)
     {
@@ -556,16 +542,13 @@ GombayCPA_test = function(y, a.order, alternatives = c("two-sided", "greater", "
     }
     return(list(index = origpoints, stats = origstats, p.values = bootpvals))
   }else{
-    
     asympvals = double((a.order + 2))
     for(i in 1:(a.order + 2))
     {
       k1   = seq(-1999999, -1, by = 1)
       k2   = seq(1, 1999999, by = 1)
-      
       k1sq = k1^2
       k2sq = k2^2
-      
       SQtest_stat = origstats[i]^2
       
       if(alternatives == "greater" || alternatives == "lesser"){
@@ -581,10 +564,7 @@ GombayCPA_test = function(y, a.order, alternatives = c("two-sided", "greater", "
         eqnd          = 1- sum(2*((4*k2sq*SQtest_stat) - 1)*exp(-2*k2sq*SQtest_stat))
         asympvals[i]  = round(eqnd,3)
       }
-      
-      
     }
-    
     asympvals = rbind(asympvals)
     rownames(asympvals) = "p.value"
     if(a.order > 0)
@@ -596,10 +576,6 @@ GombayCPA_test = function(y, a.order, alternatives = c("two-sided", "greater", "
       colnames(asympvals) = c("mean", "var")
     }
     return(list(index = origpoints, stats = origstats, p.values = asympvals))
-    
-    
-    
-    
   }
   
 }

@@ -30,12 +30,12 @@
 #' 
 #' @seealso \code{\link{mcusum.test}}  change point test for regression
 #' 
-#' @keywords time series, ts
+#' @keywords ts
 #' 
-#' @author  Palina Niamkova, Dorcas Ofori-Boateng, Yulia R. Gel
+#' @author Palina Niamkova, Dorcas Ofori-Boateng, Yulia R. Gel
 #' @export 
 #' @examples
-#' 
+#' \dontrun{
 #' #Example 1:
 #' 
 #' #Simulate some time series:
@@ -66,9 +66,8 @@
 #' #The structural change point occurred at the 44th value which corresponds to 2013, 
 #' #with 11,990 identified incidents in that year. These findings can be explained with 
 #' #a recent rise of nationalism and  extremism due to appearance of the social media, Fisher (2019).
-
-
-
+#' }
+#' 
 AuePolyReg_test<-function(y,a.order, alpha=0.05, crit.type = c("asymptotic", "bootstrap"), 
                              bootstrap.method=c("nonparametric","parametric"), num.bootstrap=1000)
 {

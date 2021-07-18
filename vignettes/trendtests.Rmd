@@ -72,7 +72,7 @@ with stationary autocorrelated innovations `X0`: $X0_t = 0.5X0_{t-1} + e_t$, whe
 ggplot(X, aes(x = Time, y = X0)) + geom_line() + theme_minimal()
 ```
 
-Let's test these time series using the functions from package `funtimes`, using significance level 0.05.
+Let's test these time series using the functions from package `funtimes`, using significance level $\alpha = 0.05$.
 
 
 # Testing for presence of a trend
@@ -139,10 +139,13 @@ where $f$ belongs to a known family of smooth parametric functions, and $\theta$
 
 **Note** Considering $f(\theta,t)$ being some polynomial function, non-rejection of the null hypothesis means that function $f(\theta,t)$ or its simpler form (lower-order polynomial) is sufficient for describing the trend in the tested time series. 
 
-For example, the case of $f(\theta,t) \equiv 0$ corresponds to testing for no trend (in other words, for a constant trend), and the following code differs only in the type of bootstrap used, sieve bootstrap in `notrend_test` (the statistic is calculated on original time series and simulated autoregressive series) and hybrid bootstrap in `wavk_test` (the statistic is calculated on time series after the trend $f(\theta,t)$ and autoregressive dependence are removed and on simulated independent normal series):
+**Note** The case of $f(\theta,t) \equiv 0$ corresponds to testing for no trend (in other words, for a constant trend, same as in the previous section), and the following code differs only in the type of bootstrap used, 
+
+* sieve bootstrap in `notrend_test` (WAVK statistic is calculated on original time series and simulated autoregressive series) and 
+* hybrid bootstrap in `wavk_test` (WAVK statistic is calculated on time series after the trend $f(\theta,t)$ and autoregressive dependence are removed, and on simulated independent normal series)
 ```{r}
-notrend_test(X0, test = "WAVK", factor.length = "adaptive.selection")
-wavk_test(X0 ~ 0, factor.length = "adaptive.selection")
+notrend_test(X0, test = "WAVK", factor.length = "adaptive.selection") # WAVK with sieve bootstrap
+wavk_test(X0 ~ 0, factor.length = "adaptive.selection") # WAVK with hybrid bootstrap
 ```
 
 To test a linear trend $f(\theta,t) = \theta_0 + \theta_1 t$, use
@@ -156,9 +159,9 @@ For the other time series, $p$-values are shown below:
 sapply(names(X[,-1]), function(x) wavk_test(eval(parse(text = x)) ~ t)$p.value)
 ```
 
-The function `poly` could also be used, for example, test quadratic trend $f(\theta,t) = \theta_0 + \theta_1 t + \theta_2 t^2$
+The function `poly` could also be used, for example, test quadratic trend $f(\theta,t) = \theta_0 + \theta_1 t + \theta_2 t^2$ and show the trend estimates using the argument `out = TRUE`:
 ```{r}
-wavk_test(X3 ~ poly(t, 2), factor.length = "adaptive.selection")
+wavk_test(X3 ~ poly(t, 2), factor.length = "adaptive.selection", out = TRUE)
 ```
 
 

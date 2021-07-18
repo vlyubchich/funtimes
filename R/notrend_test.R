@@ -153,7 +153,7 @@ notrend_test <- function(x, B = 1000, test = c("t", "MK", "WAVK"),
     pheta <- ARest(x, ar.order = ar.order, ar.method = ar.method, BIC = BIC)
     if (length(pheta) > 0) {
         names(pheta) <- paste(rep("phi_", length(pheta)), c(1:length(pheta)), sep = "")
-        tmp <- filter(x, pheta, sides = 1)
+        tmp <- stats::filter(x, pheta, sides = 1)
         Z <- x[(length(pheta) + 1):n] - tmp[length(pheta):(n - 1)]
         for (i in 1:B) {
             e <- sample(Z, size = n, replace = TRUE)

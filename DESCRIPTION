@@ -1,22 +1,23 @@
 Package: funtimes
 Type: Package
 Title: Functions for Time Series Analysis
-Version: 7.0
-Date: 2020-11-27
+Version: 8.0
+Date: 2021-07-17
 Authors@R: c(person("Vyacheslav", "Lyubchich", 
                     role = c("aut", "cre"),
                     comment = c(ORCID = "0000-0001-7936-4285"),
-                    email="lyubchic@umces.edu"),
+                    email="lyubchich@umces.edu"),
              person("Yulia R.", "Gel", role = "aut"),
              person("Calvin", "Chu", role = "ctb"),
              person("Xin", "Huang", role = "ctb"),
+             person("Palina", "Niamkova", role = "aut"),
+             person("Dorcas", "Ofori-Boateng", role = "ctb"),
              person("Ethan D.", "Schaeffer", role = "ctb"),
              person("Srishti", "Vishwakarma", role = "ctb"),
-             person("Xingyu", "Wang", role = "ctb"),
-             person("Palina", "Niamkova", role = "ctb"))
+             person("Xingyu", "Wang", role = "ctb"))
 Depends: R (>= 3.0.0)
 License: GPL (>= 2)
-Imports: dbscan, Jmisc, Kendall, Rdpack, Ecdat, covid19us, TDA, FNN, igraph, Matrix, randomcoloR, clusteval, graphics
+Imports: dbscan, Jmisc, Kendall, Rdpack, Ecdat, covid19us, TDA, FNN, igraph, Matrix, randomcoloR, graphics
 Suggests: ggplot2, knitr, patchwork, rmarkdown
 Description: Includes nonparametric estimators and tests for time series analysis. The functions are to test for presence of possibly non-monotonic trends and for synchronism of trends in multiple time series, using bootstrap techniques and robust nonparametric difference-based estimators.
 RdMacros: Rdpack

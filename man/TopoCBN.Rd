@@ -41,7 +41,7 @@ for shape similarity can be viewed as an extension of conventional clustering pr
 the density-based clustering framework.
 }
 \examples{
-
+\dontrun{
 #Example 1:
 #Let's import dataset with today's Covid-19 parameters per each state:
 data<-covid19us::get_states_current()
@@ -90,7 +90,8 @@ print(result)
 #We see that TopoCBN identified 4 clusters within our dataset of the sizes 
 #1,3,5, and 21. These results suggest that companies with added values under $5,000 may 
 #have any value of air pollution. However, companies with higher added values (>$5,000)
-#correspond to the dramatically increased (deteriorated) levels of air pollution.  
+#correspond to the dramatically increased (deteriorated) levels of air pollution.
+}
 
 }
 \references{
@@ -104,7 +105,5 @@ regression with temporally correlated errors
 Palina Niamkova, Umar Islambekov, Yulia R. Gel
 }
 \keyword{Betti}
-\keyword{clustering,}
-\keyword{data,}
-\keyword{numbers}
-\keyword{topological}
+\keyword{cluster}
+\keyword{topology}

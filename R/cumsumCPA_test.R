@@ -26,11 +26,11 @@
 #' 
 #' @seealso \code{\link{mcusum.test}} for change point test for regression
 #' 
-#' 
 #' @author Palina Niamkova, Dorcas Ofori-Boateng, Yulia R. Gel
 #' 
 #' @export 
 #' @examples
+#' \dontrun{
 #' #Example 1:
 #' 
 #' #Simulate some time series:
@@ -71,9 +71,8 @@
 #' 
 #' #Note: In order to look for the other possible change points run the same function for the 
 #' #segment of time series after value 13.
-
-
-
+#' }
+#' 
 cumsumCPA_test<-function(y,a.order, crit.type = c("asymptotic", "bootstrap"), bootstrap.method=c("nonparametric","parametric"), num.bootstrap=1000)
 {
   test.stat<-function(y)

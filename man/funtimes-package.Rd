@@ -37,21 +37,22 @@ For a list of deprecated functions, use \code{?'funtimes-deprecated'}
 \insertAllCited{}
 }
 \author{
-\strong{Maintainer}: Vyacheslav Lyubchich \email{lyubchic@umces.edu} (\href{https://orcid.org/0000-0001-7936-4285}{ORCID})
+\strong{Maintainer}: Vyacheslav Lyubchich \email{lyubchich@umces.edu} (\href{https://orcid.org/0000-0001-7936-4285}{ORCID})
 
 Authors:
 \itemize{
   \item Yulia R. Gel
+  \item Palina Niamkova
 }
 
 Other contributors:
 \itemize{
   \item Calvin Chu [contributor]
   \item Xin Huang [contributor]
+  \item Dorcas Ofori-Boateng [contributor]
   \item Ethan D. Schaeffer [contributor]
   \item Srishti Vishwakarma [contributor]
   \item Xingyu Wang [contributor]
-  \item Palina Niamkova [contributor]
 }
 
 }

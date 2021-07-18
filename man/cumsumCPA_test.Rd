@@ -41,6 +41,7 @@ smoothing when the time series is dominated by high frequencies. To detect multi
 it is recommended to employ a binary or wild segmentation \insertCite{gombay2010change}{funtimes}.
 }
 \examples{
+\dontrun{
 #Example 1:
 
 #Simulate some time series:
@@ -81,6 +82,8 @@ Ecdat::incomeInequality$Year[13] + 1 # year of change point
 
 #Note: In order to look for the other possible change points run the same function for the 
 #segment of time series after value 13.
+}
+
 }
 \references{
 \insertAllCited{}

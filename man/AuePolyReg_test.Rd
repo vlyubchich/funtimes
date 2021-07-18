@@ -46,7 +46,7 @@ likelihood ratio. The resulting testing approach is easily tractable and deliver
 size and power of the test, even in small samples \insertCite{aue2008testing}{funtimes}.
 }
 \examples{
-
+\dontrun{
 #Example 1:
 
 #Simulate some time series:
@@ -78,6 +78,8 @@ plot(incidents.ts) #see the visualized data
 #with 11,990 identified incidents in that year. These findings can be explained with 
 #a recent rise of nationalism and  extremism due to appearance of the social media, Fisher (2019).
 }
+
+}
 \references{
 \insertAllCited{}
 }
@@ -87,6 +89,4 @@ plot(incidents.ts) #see the visualized data
 \author{
 Palina Niamkova, Dorcas Ofori-Boateng, Yulia R. Gel
 }
-\keyword{series,}
-\keyword{time}
 \keyword{ts}
