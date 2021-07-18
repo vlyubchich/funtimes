@@ -18,7 +18,7 @@ Authors@R: c(person("Vyacheslav", "Lyubchich",
              person("Xingyu", "Wang", role = "ctb"))
 Depends: R (>= 3.0.0)
 License: GPL (>= 2)
-Imports: dbscan, Jmisc, Kendall, Rdpack, TDA, FNN, igraph, graphics
+Imports: Jmisc, Kendall, Rdpack, TDA, FNN, dbscan, igraph
 Suggests: covid19us, Ecdat, ggplot2, knitr, patchwork, randomcoloR, rmarkdown
 Description: Includes nonparametric estimators and tests for time series analysis. The functions are to test for presence of possibly non-monotonic trends and for synchronism of trends in multiple time series, using bootstrap techniques and robust nonparametric difference-based estimators.
 RdMacros: Rdpack

@@ -43,7 +43,7 @@ hypothesis of structural stability in the regression parameters against the alte
 a break at an unknown time. The method is based on the extreme value distribution of a
 maximum-type test statistic which is asymptotically equivalent to the maximally selected
 likelihood ratio. The resulting testing approach is easily tractable and delivers accurate
-size and power of the test, even in small samples \insertCite{aue2008testing}{funtimes}.
+size and power of the test, even in small samples \insertCite{Aue_etal_2008}{funtimes}.
 }
 \examples{
 \dontrun{
