@@ -47,7 +47,7 @@
 #' 
 #' @keywords power sample ts
 #' 
-#' @author Vyacheslav Lyubchich
+#' @author Vyacheslav Lyubchich, thanks to Dave Lorenz for pointing out an error in version 7 and below of the package
 #' 
 #' @export
 #' @examples
@@ -71,14 +71,15 @@ beales <- function(x, y, level = 0.95, N = NULL, p = NULL, d = NULL, verbose = T
     #Population and sample sizes:
     if (is.null(N)) N <- length(x)
     n <- sum(!is.na(y))
-    if (n >= N | length(x) > N) stop("Population size 'N' must be bigger than the sample.")
+    if (n >= N || length(x) > N) stop("Population size 'N' must be bigger than the sample.")
     
     #Components of Beale's estimator:
-    xbar <- mean(x, na.rm = TRUE)
+    xbarprime <- mean(x, na.rm = TRUE)
+    x[is.na(x)] <- xbarprime #if some x-values are missing, they are replaced with mean
+    xbar <- mean(x[!is.na(y)])
     ybar <- mean(y, na.rm = TRUE)
-    s2x <- var(x, na.rm = TRUE)
-    x[is.na(x)] <- xbar #if some x-values are missing, they are replaced with mean
-    X <- N * xbar 
+    s2x <- var(x[!is.na(y)])
+    X <- N * xbarprime
     theta <- 1/n - 1/N
     sxy <- cov(x, y, use = "complete.obs")
     
@@ -108,7 +109,7 @@ beales <- function(x, y, level = 0.95, N = NULL, p = NULL, d = NULL, verbose = T
                     round(CI[1], 3), " to ", round(CI[2], 3), ".", sep = ""))
     }
     #Check if additional arguments are set, calculate sample size:
-    if (is.null(p) & is.null(d)) {
+    if (is.null(p) && is.null(d)) {
         result <- list(estimate = Yhat,
                        se = seYhat,
                        CI = CI,
@@ -117,10 +118,8 @@ beales <- function(x, y, level = 0.95, N = NULL, p = NULL, d = NULL, verbose = T
                        n = n)
     } else if (!is.null(p)) {#the relative error "p" is set by user
         c_hatprime <- p^2 / z^2
-        #theta_1 <- (-b_hat - sqrt(b_hat^2 + 4*a_hat*c_hatprime)) / (2*a_hat)
         theta_2 <- (-b_hat + sqrt(b_hat^2 + 4*a_hat*c_hatprime)) / (2*a_hat)
-        #n1 <- ceiling(1 / (theta_1 + 1/N) )
-        n2 <- ceiling(1 / (theta_2 + 1/N) )
+        n2 <- ceiling(1 / (theta_2 + 1/N))
         result <- list(estimate = Yhat,
                        se = seYhat,
                        CI = CI,

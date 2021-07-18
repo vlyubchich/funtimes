@@ -48,6 +48,7 @@ The function uses the following groups of arguments as its inputs.
   + `p` relative error, or 
   + `d` margin of error.
 
+
 # General case, when all discharge data are known
 
 The ideal case is when all discharge data are know, and only some measurements of loads are missing.
@@ -79,7 +80,6 @@ To suppress the text outputs, use `verbose = FALSE`:
 ```{r}
 B12 <- beales(x = discharge, y = loads, level = 0.9, verbose = FALSE)
 ```
-
 
 
 # Common case, when some discharge data are missing {#sec:dm}
@@ -126,11 +126,18 @@ Similarly, when the margin of error is set:
 B32 <- beales(x = discharge2, y = loads2, N = 12, d = 15)
 ```
 
+The estimated sample size can be extracted as follows:
+```{r}
+B32$nhat
+```
+
+
 # Notes
 
 1. The function will not run if the inputs `x` and `y` are of different lengths.
-2. The reported sample size `n` is the number of non-missing values in `y` (missing values in `x` are replaced with an average, $\bar{x}$, automatically).
+2. The reported sample size `n` is the number of non-missing values in `y` (missing values in `x` are automatically replaced with an average of non-missing `x`).
 3. The function will not run if the argument `N` is set such that `N < length(x)` (more discharge samples than possible in a given period) or if `N <= n` (sample size is bigger than or equals the population size). In the case when `N = n`, no estimation is needed, because the total load can be calculated just by summing up all individual loads.
 4. The form of the Beale's estimator assumes `n > 1` (for estimating the variances and covariance), and $\bar{x}\neq 0$ and $\bar{y}\neq 0$.
+
 
 # References
