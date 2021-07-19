@@ -78,7 +78,7 @@ beales(discharge, loads, level = 0.9, d = 30)
 \code{vignette("beales", package = "funtimes")}
 }
 \author{
-Vyacheslav Lyubchich
+Vyacheslav Lyubchich, thanks to Dave Lorenz for pointing out an error in version 7 and below of the package
 }
 \keyword{power}
 \keyword{sample}
