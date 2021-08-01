@@ -35,7 +35,7 @@
 #' @param ksm.arg used only if \code{ksm = TRUE}. A list of arguments for kernel smoothing
 #' to be passed to \code{\link[stats]{density}} function. Default settings specify the 
 #' use of Gaussian kernel and the \code{"sj"} rule to choose the bandwidth.
-#' @param shortboot if \code{TRUE} (and \code{ksm} is \cod{FALSE}), then a heuristic
+#' @param shortboot if \code{TRUE} (and \code{ksm} is \code{FALSE}), then a heuristic
 #' is used to perform the test with a reduced number of bootstrap replicates.
 #' Specifically, \code{B/4} replicates are used, which may reduce computing time by
 #' up to 75 percent when the number of retained null hypotheses is large. 
@@ -114,7 +114,7 @@ mcusum_test <- function(e, k,
         MTboot <- sapply(1:B, function(b) 
             MTfun(arima.sim(T, model = list(order = c(length(phi), 0, 0), ar = phi), 
                             innov = rnorm(T, mean = sample(e, size = T, replace = TRUE), sd = bw)), 
-                  k = k)$MT
+                  k = k, m = m)$MT
         )
     } else {#use bootstrapped e
         
