@@ -116,6 +116,8 @@ mcusum_test <- function(e, k,
                             innov = rnorm(T, mean = sample(e, size = T, replace = TRUE), sd = bw)), 
                   k = k, m = m)$MT
         )
+        pval <- (1 + sum(MTboot >= MTobs$MT)) / (B + 1)
+        
     } else {#use bootstrapped e
         
         if(shortboot){
