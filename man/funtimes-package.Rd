@@ -49,6 +49,7 @@ Authors:
 
 Other contributors:
 \itemize{
+  \item Alexander Brenning [contributor]
   \item Calvin Chu [contributor]
   \item Xin Huang [contributor]
   \item Umar Islambekov [contributor]

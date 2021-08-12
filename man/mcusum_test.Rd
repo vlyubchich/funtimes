@@ -7,7 +7,9 @@
 mcusum_test(
   e,
   k,
+  m = length(k),
   B = 1000,
+  shortboot = FALSE,
   ksm = FALSE,
   ksm.arg = list(kernel = "gaussian", bw = "sj"),
   ...
@@ -17,12 +19,22 @@ mcusum_test(
 \item{e}{vector of regression residuals (a stationary time series).}
 
 \item{k}{an integer vector or scalar with hypothesized change point location(s) to
-test. The length of this vector is treated as \eqn{m}, that is, the number of change
+test.}
+
+\item{m}{an integer specifying the maximum number of change
 points being confirmed as statistically significant (from those
-specified in \code{k}) would be \eqn{\le m}.}
+specified in \code{k}) would be \eqn{\le m}. Thus, \code{m} must
+be in 1,...,\code{k}.}
 
 \item{B}{number of bootstrap simulations to obtain empirical critical values.
 Default is 1000.}
+
+\item{shortboot}{if \code{TRUE} (and \code{ksm} is \code{FALSE}), then a heuristic
+is used to perform the test with a reduced number of bootstrap replicates.
+Specifically, \code{B/4} replicates are used, which may reduce computing time by
+up to 75 percent when the number of retained null hypotheses is large.
+A p-value of 999 is reported whenever a null hypothesis
+is retained as a result of this mechanism.}
 
 \item{ksm}{logical value indicating whether a kernel smoothing to innovations in sieve
 bootstrap shall be applied (default is \code{FALSE}, that is, the original estimated
@@ -70,7 +82,7 @@ bootstrapped series is used to obtain bootstrap-based \eqn{p}-values for the tes
 \insertCite{Lyubchich_etal_2020_changepoints}{funtimes}.
 
 The test statistic corresponds to the maximal value of the modified CUSUM over
-all combinations of hypothesized change points specified in \code{k}. The change
+all up to \code{m} combinations of hypothesized change points specified in \code{k}. The change
 points that correspond to that maximum are reported in \code{estimate$khat},
 and their number is reported as \code{parameter}.
 }
