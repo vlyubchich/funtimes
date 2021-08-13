@@ -96,7 +96,7 @@ For the other time series, $p$-values are reported below:
 ```{r}
 apply(X[,-1], 2, function(x) notrend_test(x)$p.value)
 ```
-indicating that the null hypothesis of no trend could be rejected and hypothesis of a linear trend could be accepted for `X1` and `X2`. While `X3` has a trend (based on the way it was simulated and the time series plot above), the alternative hypothesis of a linear trend does not fit in this case.
+indicating that the null hypothesis of no trend could be rejected and hypothesis of a linear trend could be accepted for `X1` and `X2`. While `X3` has a trend (based on the way it was simulated and the time series plot above), the alternative hypothesis of a linear trend does not fit in this case, so the test for linear trend (t-test) failed to reject the null hypothesis.
 
 
 ## Monotonic trend
@@ -156,7 +156,7 @@ Note that the time sequence `t` is specified automatically within the function.
 
 For the other time series, $p$-values are shown below:
 ```{r}
-sapply(names(X[,-1]), function(x) wavk_test(eval(parse(text = x)) ~ t)$p.value)
+apply(X[,-1], 2, function(x) wavk_test(x ~ t, factor.length = "adaptive.selection")$p.value)
 ```
 
 The function `poly` could also be used, for example, test quadratic trend $f(\theta,t) = \theta_0 + \theta_1 t + \theta_2 t^2$ and show the trend estimates using the argument `out = TRUE`:
