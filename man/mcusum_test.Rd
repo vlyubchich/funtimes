@@ -29,10 +29,10 @@ be in 1,...,\code{k}.}
 \item{B}{number of bootstrap simulations to obtain empirical critical values.
 Default is 1000.}
 
-\item{shortboot}{if \code{TRUE} (and \code{ksm} is \code{FALSE}), then a heuristic
+\item{shortboot}{if \code{TRUE} (and \code{ksm = FALSE}), then a heuristic
 is used to perform the test with a reduced number of bootstrap replicates.
 Specifically, \code{B/4} replicates are used, which may reduce computing time by
-up to 75 percent when the number of retained null hypotheses is large.
+up to 75\% when the number of retained null hypotheses is large.
 A p-value of 999 is reported whenever a null hypothesis
 is retained as a result of this mechanism.}
 
@@ -80,6 +80,10 @@ are simulated under the null hypothesis of no change points.
 The distribution of test statistics \eqn{M_T} computed on each of those
 bootstrapped series is used to obtain bootstrap-based \eqn{p}-values for the test
 \insertCite{Lyubchich_etal_2020_changepoints}{funtimes}.
+
+In the current implementation, \eqn{p}-value is calculated using equation 4.10 of
+\insertCite{Davison_Hinkley_1997;textual}{funtimes}: \code{p.value} = (1 + n) / (\code{B} + 1),
+where n is number of bootstrapped statistics greater or equal to the observed statistic.
 
 The test statistic corresponds to the maximal value of the modified CUSUM over
 all up to \code{m} combinations of hypothesized change points specified in \code{k}. The change

@@ -5,9 +5,7 @@
 ##### The function for M(k1,...,km) on p. 553:
 Mfun <- function(e, k) {
     T <- length(e)
-    # AB: Disabled, since sorting is redundant and time-consuming -
-    #     k already comes pre-sorted from the calling function.
-    # k <- unique(sort(k))
+    # k <- unique(sort(k)) #k already comes pre-sorted from the calling function.
     m <- length(k)
     sume <- sum(e)
     m1 <- (sum(e[1:k[1]]) - k[1]*sume/T) / sqrt(k[1])
@@ -23,11 +21,10 @@ Mfun <- function(e, k) {
 }
 
 
-# AB: same as Mfun, but only for at most one change point:
-M1fun <- function(x, e) { 
+# Same as Mfun, but only for at most one change point:
+M1fun <- function(e, x) { 
     T <- length(e)
-    me <- .Internal(mean(e)) # 'naked' mean function
-    #me <- mean(e)
+    me <- mean(e)
     m1 <- (sum(e[1:x]) - x*me) / sqrt(x)
     mm <- (sum(e[(x + 1):T]) - me*(T - x)) / sqrt(T - x)
     sum(abs(c(m1, mm)))
@@ -36,7 +33,7 @@ M1fun <- function(x, e) {
 
 ##### The function for MT on p. 554, or as the first equation on p. 568 (if k = NULL):
 # AB: ignore the argument x, which is a dummy variable needed for sapply
-MTfun <- function(e, m, k = NULL, x = NULL) {
+MTfun <- function(e, m = NULL, k = NULL, x = NULL) {
     if (is.null(k)) { #explore all combinations of at-most-m change points
         T <- length(e)
         M <- K <- as.list(rep(NA, m))
@@ -45,13 +42,14 @@ MTfun <- function(e, m, k = NULL, x = NULL) {
             M[[i]] <- sapply(1:ncol(K[[i]]), function(x) Mfun(e, K[[i]][,x]))
         }
     } else {#explore only the pre-defined k's
-        # AB: Sorting is redundant because it is already sorted:
-        # k <- unique(sort(k))
-        # AB: m can be independent of length(k):
-        # m <- length(k)
+        # k <- unique(sort(k)) #k already comes pre-sorted from the calling function.
+        # m can be independent of length(k)
+        if (is.null(m)) {
+            m <- length(k)
+        }
         M <- K <- as.list(rep(NA, m))
-        # AB: m can now be <length(k); in the case where both are 1,
-        #     we can optimize the execution by avoiding matrix and sapply:
+        # 2021-08: m can now be <length(k); in the case where both are 1,
+        # we can optimize the execution by avoiding matrix and sapply:
         if (m == 1) {
             if (length(k) == 1) {
                 K[[1]] <- k
@@ -73,8 +71,6 @@ MTfun <- function(e, m, k = NULL, x = NULL) {
     tmp <- which.max(M[[mhat]])
     if (m == 1) {
         khat <- k[tmp]
-        # AB: was:
-        # khat <- k
     } else {
         khat <- K[[mhat]][,tmp]
     }

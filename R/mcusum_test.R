@@ -15,6 +15,10 @@
 #' bootstrapped series is used to obtain bootstrap-based \eqn{p}-values for the test 
 #' \insertCite{Lyubchich_etal_2020_changepoints}{funtimes}. 
 #' 
+#' In the current implementation, \eqn{p}-value is calculated using equation 4.10 of 
+#' \insertCite{Davison_Hinkley_1997;textual}{funtimes}: \code{p.value} = (1 + n) / (\code{B} + 1),
+#' where n is number of bootstrapped statistics greater or equal to the observed statistic.
+#' 
 #' The test statistic corresponds to the maximal value of the modified CUSUM over
 #' all up to \code{m} combinations of hypothesized change points specified in \code{k}. The change 
 #' points that correspond to that maximum are reported in \code{estimate$khat},
@@ -35,10 +39,10 @@
 #' @param ksm.arg used only if \code{ksm = TRUE}. A list of arguments for kernel smoothing
 #' to be passed to \code{\link[stats]{density}} function. Default settings specify the 
 #' use of Gaussian kernel and the \code{"sj"} rule to choose the bandwidth.
-#' @param shortboot if \code{TRUE} (and \code{ksm} is \code{FALSE}), then a heuristic
+#' @param shortboot if \code{TRUE} (and \code{ksm = FALSE}), then a heuristic
 #' is used to perform the test with a reduced number of bootstrap replicates.
 #' Specifically, \code{B/4} replicates are used, which may reduce computing time by
-#' up to 75 percent when the number of retained null hypotheses is large. 
+#' up to 75% when the number of retained null hypotheses is large. 
 #' A p-value of 999 is reported whenever a null hypothesis
 #' is retained as a result of this mechanism.
 #' @param ... additional arguments passed to \code{\link{ARest}}
@@ -93,19 +97,14 @@ mcusum_test <- function(e, k,
 {
     DNAME <- deparse(substitute(e))
     T <- length(e)
-    e <- e - .Internal(mean(e))
-    # AB: was:
-    # e <- e - mean(e)
-    # AB: Sort k so that it doesn't have to be sorted by Mfun and MTfun:
+    e <- e - mean(e)
     k <- sort(unique(k))
     m <- min(m, length(k))
-    
     phi <- ARest(e, ...)
     MTobs <- MTfun(e, k = k, m = m)
     if (length(phi) > 0) {
         e <-  as.vector(embed(e, length(phi) + 1L) %*% c(1, -phi))
-        # AB: use more efficient .Internal(mean()):
-        e <- e - .Internal(mean(e))
+        e <- e - mean(e)
     }
     if (ksm) { #use e from a smoothed distribution of e
         ksm.arg$x <- e #append x to the arguments of the density function
@@ -117,18 +116,14 @@ mcusum_test <- function(e, k,
                   k = k, m = m)$MT
         )
         pval <- (1 + sum(MTboot >= MTobs$MT)) / (B + 1)
-        
     } else {#use bootstrapped e
-        
         if(shortboot){
-            # AB:
             # Use a heuristic to reduce number of bootstrap replicates
             # needed to retain null hypothesis:
             # E.g. when using B = 1000 and 100 out of the first 250
             # bootstrapped statistics are >= the one obtained from the
             # actual sample, then the p-value must be >= 0.1 even if
             # the remaining 750 bootstrapped values were smaller.
-
             B_part <- ceiling(B/4) # use a quarter of B, but could also be less/more
             sig <- ceiling(B/10) # portion of bootstraps that has to be bigger than original for alpha = 0.1
             thr <- sig/B_part # prior threshold to discard time series which won't reach significant threshold anymore
@@ -138,17 +133,14 @@ mcusum_test <- function(e, k,
                                            innov = sample(e, size = T, replace = TRUE))),
                        k = k, m = m)$MT
             )
-            
-            if(mean(MTboot >= MTobs$MT) < thr){
-                MTboot2 <- sapply(1:(B-B_part), function(b)
+            if (mean(MTboot >= MTobs$MT) < thr) {
+                MTboot2 <- sapply(1:(B - B_part), function(b)
                     MTfun(as.vector(arima.sim(T, model = list(order = c(length(phi), 0, 0), ar = phi),
                                                innov = sample(e, size = T, replace = TRUE))),
                            k = k, m = m)$MT
                 )
                 MTboot <- c(MTboot, MTboot2)
-                # AB:
-                # p-value formula from Davison and Hinkley (1997), 
-                # Bootstrap Methods and their Application, p. 141:
+                # p-value formula from Davison and Hinkley (1997), p. 141:
                 pval <- (1 + sum(MTboot >= MTobs$MT)) / (B + 1)
             } else {
                 # In this situation, we only know that the test is not significant:
@@ -161,9 +153,7 @@ mcusum_test <- function(e, k,
                                            innov = sample(e, size = T, replace = TRUE))),
                        k = k, m = m)$MT
             )
-            # AB:
-            # p-value formula from Davison and Hinkley (1997), 
-            # Bootstrap Methods and their Application, p. 141:
+            # p-value formula from Davison and Hinkley (1997), p. 141:
             pval <- (1 + sum(MTboot >= MTobs$MT)) / (B + 1)
         }
     }
