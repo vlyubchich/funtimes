@@ -1,9 +1,14 @@
 ^misc$
 ^oldrel$
+
 ^.*\.Rproj$
 ^\.Rproj\.user$
+
 ^README\.Rmd$
 ^README\.md$
 ^README-.*\.png$
+
+^\.github$
+
 ^cran-comments\.md$
 ^NEWS\.md$

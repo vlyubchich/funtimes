@@ -29,11 +29,11 @@ be in 1,...,\code{k}.}
 \item{B}{number of bootstrap simulations to obtain empirical critical values.
 Default is 1000.}
 
-\item{shortboot}{if \code{TRUE} (and \code{ksm = FALSE}), then a heuristic
+\item{shortboot}{if \code{TRUE}, then a heuristic
 is used to perform the test with a reduced number of bootstrap replicates.
 Specifically, \code{B/4} replicates are used, which may reduce computing time by
 up to 75\% when the number of retained null hypotheses is large.
-A p-value of 999 is reported whenever a null hypothesis
+A \eqn{p}-value of 999 is reported whenever a null hypothesis
 is retained as a result of this mechanism.}
 
 \item{ksm}{logical value indicating whether a kernel smoothing to innovations in sieve

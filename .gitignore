@@ -1,7 +1,8 @@
 .Rproj.user
 .Rhistory
-.Renviron
 .RData
+.Ruserdata
+.Renviron
 
 # produced vignettes
 vignettes/*.html
@@ -11,3 +12,6 @@ vignettes/plots/figures
 
 # old releases
 oldrel
+
+# extra files
+.DS_Store
