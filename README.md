@@ -1,6 +1,6 @@
 # funtimes: Functions for Time Series Analysis
 
-[![R-CMD-check](https://github.com/vlyubchich/MML/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/vlyubchich/MML/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/vlyubchich/funtimes/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/vlyubchich/funtimes/actions/workflows/R-CMD-check.yaml)
 
 This is the version of the package under development. To use the most recent stable version from CRAN, run
 ```r
