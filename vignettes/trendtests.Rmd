@@ -1,5 +1,6 @@
 ---
 title: "Tests for trends in time series"
+author: Vyacheslav Lyubchich
 date: "`r Sys.Date()`"
 output: 
   rmarkdown::html_vignette:
@@ -74,10 +75,17 @@ ggplot(X, aes(x = Time, y = X0)) + geom_line() + theme_minimal()
 
 Let's test these time series using the functions from package `funtimes`, using significance level $\alpha = 0.05$.
 
+To install and load the package, run
+```{r eval = FALSE}
+install.packages("funtimes")
+library(funtimes)
+```
+
 
 # Testing for presence of a trend
 
 Function `notrend_test` tests the null hypothesis of no trend against different alternatives defined by the corresponding tests.
+
 
 ## Linear trend
 
@@ -162,6 +170,14 @@ apply(X[,-1], 2, function(x) wavk_test(x ~ t, factor.length = "adaptive.selectio
 The function `poly` could also be used, for example, test quadratic trend $f(\theta,t) = \theta_0 + \theta_1 t + \theta_2 t^2$ and show the trend estimates using the argument `out = TRUE`:
 ```{r}
 wavk_test(X3 ~ poly(t, 2), factor.length = "adaptive.selection", out = TRUE)
+```
+
+
+# Citation {-}
+
+This vignette belongs to R package `funtimes`. If you wish to cite this page, please cite the package:
+```{r}
+citation("funtimes")
 ```
 
 
