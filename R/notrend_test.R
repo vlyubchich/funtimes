@@ -111,31 +111,33 @@ notrend_test <- function(x, B = 1000, test = c("t", "MK", "WAVK"),
     x <- as.vector(x)
     n <- length(x)
     test <- match.arg(test)
-    factor.length <- match.arg(factor.length)  
-    if (is.null(Window)) {
-        Window = round(0.1*n)
-    }
-    if (NCOL(q) > 1 | !is.numeric(q) | NROW(q) > 1) {
-        stop("q is not a scalar.")
-    }
-    if (q >= 1 | q <= 0) {
-        stop("q is out of range from 0 to 1.")
-    }
-    if (!is.vector(j) | !is.numeric(j)) {
-        stop("j is not a numeric vector.")
-    }
-    if (factor.length == "user.defined") {
-        kn <- Window[1]
-    } else {
-        kn <- n*q^j
-    }
-    kn <- unique(sort(floor(kn)))
-    kn <- kn[kn > 2 & kn < n]
-    if (length(kn) == 0) {
-        stop("set a proper window.")
-    }
-    if (factor.length == "adaptive.selection" & length(kn) < 3) {
-        stop("number of possible windows is not enough for adaptive selection. Change parameters 'q' and/or 'j'.")
+    if (identical(test, "WAVK")) { #checks only for WAVK
+        factor.length <- match.arg(factor.length)  
+        if (is.null(Window)) {
+            Window = round(0.1*n)
+        }
+        if (NCOL(q) > 1 | !is.numeric(q) | NROW(q) > 1) {
+            stop("q is not a scalar.")
+        }
+        if (q >= 1 | q <= 0) {
+            stop("q is out of range from 0 to 1.")
+        }
+        if (!is.vector(j) | !is.numeric(j)) {
+            stop("j is not a numeric vector.")
+        }
+        if (factor.length == "user.defined") {
+            kn <- Window[1]
+        } else {
+            kn <- n*q^j
+        }
+        kn <- unique(sort(floor(kn)))
+        kn <- kn[kn > 2 & kn < n]
+        if (length(kn) == 0) {
+            stop("set a proper window.")
+        }
+        if (factor.length == "adaptive.selection" & length(kn) < 3) {
+            stop("number of possible windows is not enough for adaptive selection. Change parameters 'q' and/or 'j'.")
+        }
     }
     B <- round(B)
     if (B <= 0) {
