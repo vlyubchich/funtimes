@@ -55,10 +55,10 @@ Below is the plot of annual time series of sea level for 17 locations:
 ```{r}
 ggplot(reshape2::melt(t(d))) + geom_line(aes(x = Var2, y = value, color = Var1), size = 1) +
   ylab('Sea level (m)') + xlab('Year') +
-  theme_bw() +
-  theme(axis.text = element_text(size = 13), axis.title.x = element_text(size = 15), 
-        axis.title.y = element_text(size = 15), legend.text = element_text(size = 10), 
-        legend.title = element_blank(), legend.key.size = unit(0.3, "cm"))
+  theme_bw() #+
+  # theme(axis.text = element_text(size = 13), axis.title.x = element_text(size = 15),
+        # axis.title.y = element_text(size = 15), legend.text = element_text(size = 10),
+        # legend.title = element_blank(), legend.key.size = unit(0.3, "cm"))
 ```
 
 This plot demonstrates the variation in the sea levels across the locations. It can be seen that not all the time series are having a common trend since 1993. Grouping the locations with a common trend could benefit Australian government to assess and implement climate adaptation strategies for the impact of sea level rise on clustered locations.
@@ -68,6 +68,7 @@ This plot demonstrates the variation in the sea levels across the locations. It 
 The first function from the package to test is the `sync_cluster` that groups the time series with the common linear trend. The window parameter `w` is set here for number of slides in each window. If the number of years are not enough in the time series, this parameter is required to be set.
 
 ```{r}
+set.seed(123)
 Clus_sync <- sync_cluster(d ~ t, Window = 3, B = 100)
 Clus_sync
 ```
