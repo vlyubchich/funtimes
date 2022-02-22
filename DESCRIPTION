@@ -1,8 +1,8 @@
 Package: funtimes
 Type: Package
 Title: Functions for Time Series Analysis
-Version: 8.1
-Date: 2021-08-15
+Version: 8.2
+Date: 2022-02-22
 Authors@R: c(person("Vyacheslav", "Lyubchich", 
                     role = c("aut", "cre"),
                     comment = c(ORCID = "0000-0001-7936-4285"),
@@ -19,11 +19,11 @@ Authors@R: c(person("Vyacheslav", "Lyubchich",
              person("Xingyu", "Wang", role = "ctb"))
 Depends: R (>= 3.0.0)
 License: GPL (>= 2)
-Imports: Jmisc, Kendall, Rdpack, TDA, FNN, dbscan, igraph
+Imports: Jmisc, Kendall, Rdpack, FNN, dbscan, igraph
 Suggests: covid19us, Ecdat, ggplot2, knitr, patchwork, randomcoloR, rmarkdown
-Description: Includes nonparametric estimators and tests for time series analysis. The functions are to test for presence of possibly non-monotonic trends and for synchronism of trends in multiple time series, using bootstrap techniques and robust nonparametric difference-based estimators.
+Description: Nonparametric estimators and tests for time series analysis. The functions use bootstrap techniques and robust nonparametric difference-based estimators to test for the presence of possibly nonmonotonic trends and for synchronism of trends in multiple time series.
 RdMacros: Rdpack
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Encoding: UTF-8
 VignetteBuilder: knitr, rmarkdown
