@@ -43,7 +43,7 @@ The daily sea level data are available from 1993-2012 for 17 locations. The data
 
 ```{r}
 data_types <- rep("numeric", 20)
-d_org <- readxl::read_xlsx("Aus Sea Levels 17.xlsx", skip = 1, n_max = 7300, col_types = data_types)
+d_org <- readxl::read_xlsx("Aus_Sea_Levels_17.xlsx", skip = 1, n_max = 7300, col_types = data_types)
 # yearly average
 d = data.frame(aggregate(d_org[, 4:20], list(d_org$Year), FUN = 'mean', na.rm = TRUE)[, -1], row.names = unique(d_org$Year))
 ```
@@ -68,7 +68,7 @@ This plot demonstrates the variation in the sea levels across the locations. It 
 The first function from the package to test is the `sync_cluster` that groups the time series with the common linear trend. The window parameter `w` is set here for number of slides in each window. If the number of years are not enough in the time series, this parameter is required to be set.
 
 ```{r}
-Clus_sync <- sync_cluster(d ~ t, Window = 3)
+Clus_sync <- sync_cluster(d ~ t, Window = 3, B = 100)
 Clus_sync
 ```
 
