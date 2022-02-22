@@ -42,23 +42,20 @@ library(reshape2)
 The daily sea level data are available from 1993-2012 for 17 locations. The data are obtained from @Maharaj_etal_2019 using the following link <http://www.tsclustering.homepage.pt/index.php?p=3>. Download `Application7_3.zip` folder, where the `Aus Sea Levels 17.xlsx` file contains the sea level records. Annual average is taken to convert the temporal resolution.
 
 ```{r}
-data_types <- rep("numeric", 20)
-d_org <- readxl::read_xlsx("Aus_Sea_Levels_17.xlsx", skip = 1, n_max = 7300, col_types = data_types)
+d_org <- readxl::read_xlsx("Aus_Sea_Levels_17.xlsx", skip = 1, n_max = 7300, col_types = rep("numeric", 20))
 # yearly average
-d = data.frame(aggregate(d_org[, 4:20], list(d_org$Year), FUN = 'mean', na.rm = TRUE)[, -1], row.names = unique(d_org$Year))
+d <- data.frame(aggregate(d_org[, 4:20], list(d_org$Year), FUN = 'mean', na.rm = TRUE)[, -1], row.names = unique(d_org$Year))
 ```
 
 ## Plotting time series
 
 Below is the plot of annual time series of sea level for 17 locations:
-
 ```{r}
-ggplot(reshape2::melt(t(d))) + geom_line(aes(x = Var2, y = value, color = Var1), size = 1) +
-  ylab('Sea level (m)') + xlab('Year') +
-  theme_bw() #+
-  # theme(axis.text = element_text(size = 13), axis.title.x = element_text(size = 15),
-        # axis.title.y = element_text(size = 15), legend.text = element_text(size = 10),
-        # legend.title = element_blank(), legend.key.size = unit(0.3, "cm"))
+dlong <- reshape2::melt(t(d))
+names(dlong)[1:2] <- c("Location", "Year")
+ggplot(dlong) + geom_line(aes(x = Year, y = value, color = Location), size = 1) +
+  ylab('Sea level (m)') +
+  theme_bw()
 ```
 
 This plot demonstrates the variation in the sea levels across the locations. It can be seen that not all the time series are having a common trend since 1993. Grouping the locations with a common trend could benefit Australian government to assess and implement climate adaptation strategies for the impact of sea level rise on clustered locations.

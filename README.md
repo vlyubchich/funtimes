@@ -18,12 +18,15 @@ library(funtimes)
 
 -   Combine functions for tail comparison into one, without dots.
 -   Replace BIC argument in AR estimation with penalty, to easily switch to AIC or another penalty.
--   Vignette trend tests: add about `synch_test`.
--   Add vignette on clusters of time series.
+
+## CRAN version 8.2
+
+- Removed dependency on the package `TDA` by omitting the TDA-based clustering function `TopoCBN`.
+- Added a vignette on clusters of time series.
 
 ## CRAN version 8.1
 
-- `mcusum_test` now runs faster, has the option to use heuristic shortened bootstrapping, and an option to set `m <= length(k)` (used to be `m = length(k)`) thanks to contributions from Alexander Brenning.
+- `mcusum_test` now runs faster, has the option to use heuristic shortened bootstrapping, and an option to set `m <= length(k)` (used to be `m = length(k)`) thanks to the contributions from Alexander Brenning.
 
 ## CRAN version 8.0
 
