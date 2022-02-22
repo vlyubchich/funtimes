@@ -100,7 +100,7 @@ Here, `Cluster 0` indicates the locations which are not tied to the locations wi
 
 The `BICC` function applies an unsupervised spatio-temporal clustering algorithm, TRUST, from @ciampi2010discovering. It utilizes both the `CSlideCluster` and `CWindowCluster` functions for clustering. There are few critical parameters to be considered before implementing the `BICC` function. The parameter `p` indicates the number of layers (i.e., number of observations in a time series) within each slide, while window `w` is the number conseqeutive slides. The size of slide and window are set manually. The slide `s` refers to the number of steps required to shift the window.   
 ```{r}
-Clus_BICC <- BICC(as.matrix(d), p = 4, w = 4, s = 4)
+Clus_BICC <- BICC(as.matrix(d), p = 5, w = 4, s = 4)
 Clus_BICC
 ```
 
@@ -111,7 +111,7 @@ Clus_BICC
 ```
 
 
-Despite the combinations of the arguments used, `BICC` function grouped all locations into one cluster.
+Despite these settings, the algorithm detects only one cluster.
 
 # Citation {-}
 
