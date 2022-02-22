@@ -16,16 +16,16 @@ cumsumCPA_test(
 \arguments{
 \item{y}{a numeric time series vector. Missing values are not allowed.}
 
-\item{a.order}{order of the autoregressive model which must be a nonnegative integer number.}
+\item{a.order}{order of the autoregressive model which must be a non-negative integer number.}
 
 \item{crit.type}{a string parameter allowing to choose "asymptotic" or "bootstrap" options.}
 
 \item{bootstrap.method}{a string parameter allowing to choose "nonparametric" or
-"parametric" method of bootstrapping. "nonparametric" - resampling of the estimated
-residuals (with replacement); "parametric" - sampling innovations from a normal distribution.}
+"parametric" method of bootstrapping. "nonparametric" -- resampling of the estimated
+residuals (with replacement); "parametric" -- sampling innovations from a normal distribution.}
 
 \item{num.bootstrap}{number of bootstrap replications if \code{crit.type = "bootstrap"}.
-Default number is 1000.}
+The default number is 1000.}
 }
 \value{
 A list with the following components:
@@ -36,7 +36,7 @@ A list with the following components:
 \description{
 The function tests for a change point in parameters of a linear regression model with errors
 exhibiting a general weakly dependent structure. The approach extends earlier methods based
-on cumulative sums derived under assumption of independent errors. The approach applies
+on cumulative sums derived under the assumption of independent errors. The approach applies
 smoothing when the time series is dominated by high frequencies. To detect multiple changes,
 it is recommended to employ a binary or wild segmentation \insertCite{Gombay_2010}{funtimes}.
 }

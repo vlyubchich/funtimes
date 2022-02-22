@@ -18,15 +18,15 @@ Lengths of \code{x} and \code{y} mush be the same.}
 \item{level}{confidence level, from 0 to 1.
 Default is \code{0.95}, that is, 95\% confidence.}
 
-\item{N}{population size for which the estimate of the total \code{y} required.
+\item{N}{population size for which the estimate of the total \code{y} is required.
 By default, \code{length(x)} is used.}
 
 \item{p}{optional argument specifying the required relative error, from 0 to 1,
-for computing corresponding sample size. For example, \code{p = 0.15} defines
+for computing the corresponding sample size. For example, \code{p = 0.15} defines
 a 15\% relative error.}
 
 \item{d}{optional argument specifying the required margin of error
-for computing corresponding sample size. If both \code{p} and \code{d} are specified,
+for computing the corresponding sample size. If both \code{p} and \code{d} are specified,
 only \code{p} is used.}
 
 \item{verbose}{logical value defining whether the output should be printed out

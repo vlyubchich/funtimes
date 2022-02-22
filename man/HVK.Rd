@@ -12,13 +12,13 @@ HVK(X, m1 = NULL, m2 = NULL, ar.order = 1)
 \item{m1, m2}{subsidiary smoothing parameters. Default
 \code{m1 = round(length(X)^(0.1))}, \code{m2 = round(length(X)^(0.5))}.}
 
-\item{ar.order}{order of the non-parametric autoregression (specified by user).}
+\item{ar.order}{order of the nonparametric autoregression (specified by user).}
 }
 \value{
 Vector of length \code{ar.order} with estimated autoregression coefficients.
 }
 \description{
-Estimate coefficients in non-parametric autoregression using the difference-based
+Estimate coefficients in nonparametric autoregression using the difference-based
 approach by \insertCite{Hall_VanKeilegom_2003;textual}{funtimes}.
 }
 \details{

@@ -15,7 +15,7 @@ ccf_boot(
 )
 }
 \arguments{
-\item{x, y}{univariate numeric time series objects or numeric vectors for which to
+\item{x, y}{univariate numeric time-series objects or numeric vectors for which to
 compute cross-correlation. Different time attributes in \code{ts} objects are
 acknowledged, see Example 2 below.}
 
@@ -24,8 +24,8 @@ automatically limited as in \code{\link[stats]{ccf}}.}
 
 \item{plot}{choose whether to plot results for Pearson correlation (default, or use
 \code{plot = "Pearson"}), Spearman correlation (use \code{plot = "Spearman"}), or
-suppress plotting (use \code{plot = "none"}). Both Pearson and Spearman results are
-given in the output, irregardless of the \code{plot} setting.}
+suppress plotting (use \code{plot = "none"}). Both Pearson's and Spearman's results are
+given in the output, regardless of the \code{plot} setting.}
 
 \item{level}{confidence level, from 0 to 1. Default is 0.95, that is, 95\% confidence.}
 
@@ -47,12 +47,12 @@ A data frame with the following columns:
 \item{lowerS, upperS}{lower and upper quantiles (for the confidence level set by \code{level}) of the bootstrapped Spearman correlations.}
 }
 \description{
-Account for possible autocorrelation of time series when assessing statistical significance
+Account for possible autocorrelation of time series when assessing the statistical significance
 of their cross-correlation. A sieve bootstrap approach is used to generate multiple copies
 of the time series with the same autoregressive dependence, under the null hypothesis of the
-two time series under investigation being uncorrelated. Significance of cross-correlation
+two time series under investigation being uncorrelated. The significance of cross-correlation
 coefficients is assessed based on the distribution of their bootstrapped counterparts.
-Both Pearson and Spearman types of coefficients are obtained, but plot is provided for
+Both Pearson and Spearman types of coefficients are obtained, but a plot is provided for
 only one type, with significant correlations shown using filled circles.
 }
 \examples{

@@ -13,9 +13,9 @@ GombayCPA_test(
 )
 }
 \arguments{
-\item{y}{a vector that contains univariate time series observations. Missing values are not allowed.}
+\item{y}{a vector that contains univariate time-series observations. Missing values are not allowed.}
 
-\item{a.order}{order of the autoregressive model which must be a nonnegative integer number.}
+\item{a.order}{order of the autoregressive model which must be a non-negative integer number.}
 
 \item{alternatives}{a string parameter that specifies a type of the test (i.e., "two-sided",
 "greater", "lesser", and "temporary").  The option "temporary" examines the temporary change
@@ -24,17 +24,17 @@ in one of the parameters \insertCite{Gombay_2008}{funtimes}.}
 \item{crit.type}{method of obtaining critical values: "asymptotic" (default) or "bootstrap".}
 
 \item{num.bootstrap}{number of bootstrap replications if \code{crit.type = "bootstrap"}.
-Default number is 1000.}
+The default number is 1000.}
 }
 \value{
 A list with the following components:
 \item{index}{points of change for each parameter. The value of the \code{"alternatives"}
 determines the return:
-"temporary" - returns max, min and abs.max points;
-"greater" - returns max points;
-"lesser" -  returns min points;
-"two-sided" - returns abs.max.}
-\item{stats}{test statistic values for change points in: mean, var, phi.}
+"temporary" -- returns max, min, and abs.max points;
+"greater" -- returns max points;
+"lesser" --  returns min points;
+"two-sided" -- returns abs.max.}
+\item{stats}{test statistic values for change points in mean, var, phi.}
 \item{p.values}{\code{p-value} of the change point test.}
 }
 \description{
@@ -43,10 +43,9 @@ can be detected in any of \code{p + 2} (mean, var, phi) autoregressive parameter
 is the order of the AR model. The test statistic is based on the efficient score vector \insertCite{Gombay_2008}{funtimes}.
 }
 \details{
-The function allows for
-testing for a temporary change and for a change in a specific model parameters.
+The function tests for a temporary change and a change in specific model parameters.
 Critical values can be estimated via asymptotic distribution \code{"asymptotic"} (i.e., the
-default option) or via sieve bootstrap \code{"bootstrap"}. The function employs internal
+default option) or sieve bootstrap \code{"bootstrap"}. The function employs internal
 function \code{change.point} and sieve bootstrap \code{change.point.sieve} function.
 }
 \examples{

@@ -1,6 +1,6 @@
 #' WAVK Trend Test
 #' 
-#' Non-parametric test to detect (non-)monotonic parametric trends in time series
+#' Nonparametric test to detect (non-)monotonic parametric trends in time series
 #' \insertCite{@based on @Lyubchich_etal_2013_wavk}{funtimes}.
 #' 
 #' @details See more details in \insertCite{Lyubchich_Gel_2016_synchronism;textual}{funtimes} 
@@ -12,7 +12,7 @@
 #' to specify the form, where \eqn{t} is specified within the function as a regular 
 #' sequence on the interval (0,1]. See \code{Examples}.
 #' @param factor.length method to define the length of local windows (factors). 
-#' Default option\cr \code{"user.defined"} allows to set only one value of the argument 
+#' Default option\cr \code{"user.defined"} allows setting only one value of the argument 
 #' \code{Window}. The option \code{"adaptive.selection"} sets \code{method = "boot"} 
 #' and employs heuristic \eqn{m}-out-of-\eqn{n} subsampling algorithm 
 #' \insertCite{Bickel_Sakov_2008}{funtimes} to select an optimal window from the set 
@@ -33,7 +33,7 @@
 #' or bootstrap (\code{"boot"}) distribution. 
 #' If \code{factor.length =} \code{"adaptive.selection"} the option \code{"boot"} is used.
 #' @inheritParams ARest
-#' @param out logical value indicates whether full output should be shown. 
+#' @param out logical value indicates whether the full output should be shown. 
 #' Default is \code{FALSE}.
 #' 
 #' 

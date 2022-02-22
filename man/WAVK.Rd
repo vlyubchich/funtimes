@@ -7,7 +7,7 @@
 WAVK(z, kn = NULL)
 }
 \arguments{
-\item{z}{pre-filtered univariate time series
+\item{z}{filtered univariate time series
 \insertCite{@see formula (2.1) by @Wang_VanKeilegom_2007}{funtimes}:
 \deqn{Z_i=\left(Y_{i+p}-\sum_{j=1}^p{\hat{\phi}_{j,n}Y_{i+p-j}} \right)-
 \left( f(\hat{\theta},t_{i+p})-
@@ -36,7 +36,7 @@ of the \eqn{t}th group and the grand mean, respectively.}
 Theorem 3.1 by \insertCite{Wang_VanKeilegom_2007;textual}{funtimes}:
 \deqn{T_{ns} = \left( \frac{n}{k_n} \right)^{\frac{1}{2}}T_n \bigg/  
 \left(\frac{4}{3}\right)^{\frac{1}{2}} \sigma^2,}{Tns = Tn*(n/kn)^0.5 / (sigma^2 * (4/3)^0.5),}
-where \eqn{n} is length and \eqn{\sigma^2}{sigma^2} is variance of the time series.
+where \eqn{n} is the length and \eqn{\sigma^2}{sigma^2} is the variance of the time series.
 Robust difference-based Rice's estimator \insertCite{Rice_1984}{funtimes}
 is used to estimate \eqn{\sigma^2}{sigma^2}.}
 

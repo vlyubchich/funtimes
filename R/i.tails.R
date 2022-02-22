@@ -5,10 +5,10 @@
 #' see \insertCite{Chu_etal_2015_insurance;textual}{funtimes}
 #' and \insertCite{Lyubchich_Gel_2017_insurance;textual}{funtimes}. 
 #' 
-#' @details Sturges' formula is used to calculate number of intervals 
+#' @details Sturges' formula is used to calculate the number of intervals 
 #' (\eqn{k}) for \code{x0} \eqn{\ge} \code{d}, then interval width is derived. 
 #' The tails, \code{x0} \eqn{\ge} \code{d} and \code{x1} \eqn{\ge} \code{d}, 
-#' are divided into the intervals. Number of \code{x1}-values within each interval 
+#' are divided into intervals. The number of \code{x1}-values within each interval 
 #' is compared with the number of \code{x0}-values within the same interval 
 #' (this difference is reported as \code{Nk}).
 #' 

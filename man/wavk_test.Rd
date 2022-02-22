@@ -25,7 +25,7 @@ to specify the form, where \eqn{t} is specified within the function as a regular
 sequence on the interval (0,1]. See \code{Examples}.}
 
 \item{factor.length}{method to define the length of local windows (factors).
-Default option\cr \code{"user.defined"} allows to set only one value of the argument
+Default option\cr \code{"user.defined"} allows setting only one value of the argument
 \code{Window}. The option \code{"adaptive.selection"} sets \code{method = "boot"}
 and employs heuristic \eqn{m}-out-of-\eqn{n} subsampling algorithm
 \insertCite{Bickel_Sakov_2008}{funtimes} to select an optimal window from the set
@@ -68,7 +68,7 @@ or \eqn{p=} 0,1,...,\code{round(10*log10(length(x)))} are considered,
 depending on whether \code{ar.order} is defined or not
 (\code{x} is the time series).}
 
-\item{out}{logical value indicates whether full output should be shown.
+\item{out}{logical value indicates whether the full output should be shown.
 Default is \code{FALSE}.}
 }
 \value{
@@ -85,7 +85,7 @@ if \code{factor.length =} \code{"adaptive.selection"},
 test results for all considered windows.}
 }
 \description{
-Non-parametric test to detect (non-)monotonic parametric trends in time series
+Nonparametric test to detect (non-)monotonic parametric trends in time series
 \insertCite{@based on @Lyubchich_etal_2013_wavk}{funtimes}.
 }
 \details{

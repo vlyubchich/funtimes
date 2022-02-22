@@ -10,7 +10,7 @@
 #'
 #' @param y a vector that contains univariate time series observations. Missing values are 
 #' not allowed.
-#' @param a.order order of the autoregressive model which must be a nonnegative integer number.
+#' @param a.order order of the autoregressive model which must be a non-negative integer number.
 #' @param alpha significance level for testing hypothesis of no change point. Default value 
 #' is 0.05.
 #' @param crit.type method of obtaining critical values: "asymptotic" (default) or "bootstrap".

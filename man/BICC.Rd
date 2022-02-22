@@ -9,18 +9,18 @@ BICC(X, Alpha = NULL, Beta = NULL, Theta = 0.8, p, w, s)
 \arguments{
 \item{X}{a matrix of time series observed within a slide (time series in columns).}
 
-\item{Alpha}{lower limit of the time series domain,
+\item{Alpha}{lower limit of the time-series domain,
 passed to \code{\link{CSlideCluster}}.}
 
-\item{Beta}{upper limit of the time series domain, passed to \code{\link{CSlideCluster}}.}
+\item{Beta}{upper limit of the time-series domain passed to \code{\link{CSlideCluster}}.}
 
-\item{Theta}{connectivity parameter, passed to \code{\link{CSlideCluster}}.}
+\item{Theta}{connectivity parameter passed to \code{\link{CSlideCluster}}.}
 
-\item{p}{number of layers (time series observations) in each slide.}
+\item{p}{number of layers (time-series observations) in each slide.}
 
 \item{w}{number of slides in each window.}
 
-\item{s}{step to shift a window, calculated in number of slides. The recommended
+\item{s}{step to shift a window, calculated in the number of slides. The recommended
 values are 1 (overlapping windows) or equal to \code{w} (non-overlapping windows).}
 }
 \value{

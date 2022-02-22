@@ -8,7 +8,7 @@
 #' @details This function tests the null hypothesis of no trend 
 #' versus different alternatives.
 #' To set some other shape of trend as the null hypothesis, use \code{\link{wavk_test}}. 
-#' Note that \code{\link{wavk_test}} employs hybrid bootstrap, which is alternative 
+#' Note that \code{\link{wavk_test}} employs hybrid bootstrap, which is an alternative 
 #' to the sieve bootstrap employed by the current function.
 #' 
 #' 

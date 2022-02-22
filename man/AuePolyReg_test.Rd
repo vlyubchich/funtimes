@@ -17,7 +17,7 @@ AuePolyReg_test(
 \item{y}{a vector that contains univariate time series observations. Missing values are
 not allowed.}
 
-\item{a.order}{order of the autoregressive model which must be a nonnegative integer number.}
+\item{a.order}{order of the autoregressive model which must be a non-negative integer number.}
 
 \item{alpha}{significance level for testing hypothesis of no change point. Default value
 is 0.05.}

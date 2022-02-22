@@ -15,14 +15,14 @@
 #' bootstrapped series is used to obtain bootstrap-based \eqn{p}-values for the test 
 #' \insertCite{Lyubchich_etal_2020_changepoints}{funtimes}. 
 #' 
-#' In the current implementation, \eqn{p}-value is calculated using equation 4.10 of 
+#' In the current implementation, the \eqn{p}-value is calculated using equation 4.10 of 
 #' \insertCite{Davison_Hinkley_1997;textual}{funtimes}: \code{p.value} = (1 + n) / (\code{B} + 1),
 #' where n is number of bootstrapped statistics greater or equal to the observed statistic.
 #' 
 #' The test statistic corresponds to the maximal value of the modified CUSUM over
-#' all up to \code{m} combinations of hypothesized change points specified in \code{k}. The change 
+#' up to \code{m} combinations of hypothesized change points specified in \code{k}. The change 
 #' points that correspond to that maximum are reported in \code{estimate$khat},
-#' and their number is reported as \code{parameter}.
+#' and their number is reported as the \code{parameter}.
 #' 
 #'
 #' @param e vector of regression residuals (a stationary time series). 
@@ -38,7 +38,7 @@
 #' innovations are bootstrapped, without the smoothing).
 #' @param ksm.arg used only if \code{ksm = TRUE}. A list of arguments for kernel smoothing
 #' to be passed to \code{\link[stats]{density}} function. Default settings specify the 
-#' use of Gaussian kernel and the \code{"sj"} rule to choose the bandwidth.
+#' use of the Gaussian kernel and the \code{"sj"} rule to choose the bandwidth.
 #' @param shortboot if \code{TRUE}, then a heuristic
 #' is used to perform the test with a reduced number of bootstrap replicates.
 #' Specifically, \code{B/4} replicates are used, which may reduce computing time by

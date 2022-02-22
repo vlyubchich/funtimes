@@ -2,7 +2,7 @@
 % Please edit documentation in R/sync_test.R
 \name{sync_test}
 \alias{sync_test}
-\title{Time Series Trend Synchronism Test}
+\title{Time Series Trend Synchronicity Test}
 \usage{
 sync_test(
   formula,
@@ -34,13 +34,13 @@ window selection is applied as a default option (see `Details').}
 
 \item{q}{scalar from 0 to 1 to define the set of possible windows \code{T*q^j}
 and to automatically select an optimal window for each time series.
-Default is \eqn{3/4}. This argument is ignored if \code{Window} is set by user.}
+Default is \eqn{3/4}. This argument is ignored if the \code{Window} is set by the user.}
 
 \item{j}{numeric vector to define the set of possible windows \code{T*q^j}
 and to automatically select an optimal window for each time series.
-Default is \code{c(8:11)}. This argument is ignored if \code{Window} is set by user.}
+Default is \code{c(8:11)}. This argument is ignored if the \code{Window} is set by the user.}
 
-\item{ar.order}{order of autoregressive filter when \code{BIC = FALSE},
+\item{ar.order}{order of the autoregressive filter when \code{BIC = FALSE},
 or the maximal order for BIC-based filtering. Default is \code{round(10*log10(T))}.
 The \code{ar.order} can be a scalar or \eqn{N}-vector. If scalar, the same
 \code{ar.order} is applied to each time series. An \eqn{N}-vector specifies
@@ -73,7 +73,7 @@ asymptotic test results for all considered windows, that is, without adaptive
 selection of the local window.}
 }
 \description{
-Non-parametric test for synchronism of parametric trends in multiple time series
+Nonparametric test for synchronicity of parametric trends in multiple time series
 \insertCite{Lyubchich_Gel_2016_synchronism}{funtimes}.
 The method tests whether \eqn{N} observed time series exhibit the same trend
 of some pre-specified smooth parametric form.
@@ -114,7 +114,7 @@ plot.ts(Y)
     sync_test(Y ~ t, B = 500)
 }
 # Sample output:
-##	Non-parametric test for synchronism of parametric trends
+##	Nonparametric test for synchronism of parametric trends
 ##
 ##data:  Y 
 ##Test statistic = -0.0028999, p-value = 0.7
@@ -150,7 +150,7 @@ plot.ts(Y2)
 \dontrun{
     sync_test(Y2 ~ t, B = 500)}
 # Sample output:
-##	Non-parametric test for synchronism of parametric trends
+##	Nonparametric test for synchronism of parametric trends
 ##
 ##data:  Y2 
 ##Test statistic = 0.48579, p-value < 2.2e-16

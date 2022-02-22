@@ -13,14 +13,14 @@
 #' 
 #' 
 #' @inheritParams CSlideCluster
-#' @param Alpha lower limit of the time series domain, 
+#' @param Alpha lower limit of the time-series domain, 
 #' passed to \code{\link{CSlideCluster}}.
-#' @param Beta upper limit of the time series domain, passed to \code{\link{CSlideCluster}}.
-#' @param Delta closeness parameter, passed to \code{\link{CSlideCluster}}.
-#' @param Theta connectivity parameter, passed to \code{\link{CSlideCluster}}.
-#' @param p number of layers (time series observations) in each slide.
+#' @param Beta upper limit of the time-series domain passed to \code{\link{CSlideCluster}}.
+#' @param Delta closeness parameter passed to \code{\link{CSlideCluster}}.
+#' @param Theta connectivity parameter passed to \code{\link{CSlideCluster}}.
+#' @param p number of layers (time-series observations) in each slide.
 #' @param w number of slides in each window.
-#' @param s step to shift a window, calculated in number of slides. The recommended 
+#' @param s step to shift a window, calculated in the number of slides. The recommended 
 #' values are 1 (overlapping windows) or equal to \code{w} (non-overlapping windows).
 #' @param Epsilon a real value in \eqn{[0,1]} used to identify each pair of time series 
 #' that are clustered together over at least \code{w*Epsilon} slides within a window;  

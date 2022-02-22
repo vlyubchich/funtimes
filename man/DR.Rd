@@ -7,44 +7,44 @@
 DR(X, method, minPts = 3, theta = 0.9, B = 500, lb = -30, ub = 10)
 }
 \arguments{
-\item{X}{a \eqn{n\times k} matrix where columns are \eqn{k} objects to be clustered,
+\item{X}{an \eqn{n\times k} matrix where columns are \eqn{k} objects to be clustered,
 and each object contains n observations (objects could be a set of time series).}
 
 \item{method}{the clustering method to be used -- currently either
 \dQuote{TRUST} \insertCite{Ciampi_etal_2010}{funtimes}
-or \dQuote{DBSCAN} \insertCite{Ester_etal_1996}{funtimes}. If method is \code{DBSCAN},
+or \dQuote{DBSCAN} \insertCite{Ester_etal_1996}{funtimes}. If the method is \code{DBSCAN},
 then set \code{MinPts} and optimal \eqn{\epsilon} is selected using DR.
-If method is \code{TRUST}, then set \code{theta} and optimal \eqn{\delta}
+If the method is \code{TRUST}, then set \code{theta}, and optimal \eqn{\delta}
 is selected using DR.}
 
 \item{minPts}{the minimum number of samples in an \eqn{\epsilon}-neighborhood of
 a point to be considered as a core point. The \code{minPts} is to be used only
-with \code{DBSCAN} method. Default value is 3.}
+with the \code{DBSCAN} method. The default value is 3.}
 
 \item{theta}{connectivity parameter \eqn{\theta \in (0,1)}, which is to be used
-only with \code{TRUST} method. Default value is 0.9.}
+only with the \code{TRUST} method. The default value is 0.9.}
 
 \item{B}{number of random splits in calculating the
-Average Cluster Deviation (ACD). Default value is 500.}
+Average Cluster Deviation (ACD). The default value is 500.}
 
-\item{lb, ub}{end points for a range of search for the optimal parameter.}
+\item{lb, ub}{endpoints for a range of search for the optimal parameter.}
 }
 \value{
 A list containing the following components:
-\item{P_opt}{the value of optimal parameter. If method is \code{DBSCAN}, then
-\code{P_opt} is optimal \eqn{\epsilon}. If method is \code{TRUST},
+\item{P_opt}{the value of the optimal parameter. If the method is \code{DBSCAN}, then
+\code{P_opt} is optimal \eqn{\epsilon}. If the method is \code{TRUST},
 then \code{P_opt} is optimal \eqn{\delta}.}
 \item{ACD_matrix}{a matrix that returns \code{ACD} for different values of a
 tuning parameter.
-If method is \code{DBSCAN}, then the tuning parameter is \eqn{\epsilon}.
-If method is \code{TRUST}, then the tuning parameter is \eqn{\delta}.}
+If the method is \code{DBSCAN}, then the tuning parameter is \eqn{\epsilon}.
+If the method is \code{TRUST}, then the tuning parameter is \eqn{\delta}.}
 }
 \description{
 Downhill riding procedure for selecting optimal tuning parameters in clustering
 algorithms, using an (in)stability probe.
 }
 \details{
-Parameters \code{lb,ub} are end points for a range of search for the
+Parameters \code{lb,ub} are endpoints for the search for the
 optimal parameter. The parameter candidates are calculated in a way such that
 \eqn{P:=  1.1^x , x \in {lb,lb+0.5,lb+1.0,...,ub}}.
 Although the default range of search is sufficiently wide, in some cases

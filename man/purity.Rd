@@ -20,7 +20,7 @@ length(unique(clusters)))} rows and the following columns:
 \code{ClassLabels}, \code{ClusterLabels}, and \code{ClusterSize}.}
 }
 \description{
-Calculate purity of the clustering results. For example, see
+Calculate the purity of the clustering results. For example, see
 \insertCite{Schaeffer_etal_2016_trust;textual}{funtimes}.
 }
 \details{
@@ -35,10 +35,10 @@ found and divide by \eqn{N},
 where \eqn{N} = \code{length(classes)} = \code{length(clusters)}.
 
 If \eqn{\max_{j}|\omega_k\cap c_j|} is not unique for some \eqn{j},
-it is assigned to the class which second maximum is the smallest, to
+it is assigned to the class which the second maximum is the smallest, to
 maximize the \eqn{Purity} (see `Examples').
 
-Number of unique elements
+The number of unique elements
 in \code{classes} and \code{clusters} may differ.
 }
 \examples{

@@ -6,7 +6,7 @@
 #' \insertCite{Soliman_etal_2015_insurance;textual}{funtimes}, 
 #' and \insertCite{Lyubchich_Gel_2017_insurance;textual}{funtimes}.
 #' 
-#' @details Sturges' formula is used to calculate number of intervals (\eqn{k}) 
+#' @details Sturges' formula is used to calculate the number of intervals (\eqn{k}) 
 #' to split the upper \eqn{100(1 - q)}\% portion of \code{x0} and \code{x1} 
 #' (the right tails). Then, each tail is divided into equally-filled intervals 
 #' with a quantile step \eqn{d=(1 - q)/k}. \code{Pk} reports the difference between 

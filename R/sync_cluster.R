@@ -5,13 +5,13 @@
 #' \insertCite{Lyubchich_Gel_2016_synchronism,Ghahari_etal_2017_MBDCE}{funtimes}.
 #' 
 #' @details The \code{sync_cluster} function recursively clusters time series having 
-#' a pre-specified common parametric trend until there are no time series left. 
+#' a pre-specified common parametric trend until there is no time series left. 
 #' Starting with the given \eqn{N} time series, the \code{\link{sync_test}} function 
-#' is used to test for a common trend. If null hypothesis of common trend is not 
-#' rejected by \code{\link{sync_test}}, the time series are grouped together 
+#' is used to test for a common trend. If the null hypothesis of common trend is not 
+#' rejected by \code{\link{sync_test}}, the time series are grouped  
 #' (i.e., assigned to a cluster). Otherwise, the time series with the largest 
 #' contribution to the test statistics are temporarily removed (the number of time 
-#' series to remove depends on the \code{rate} of removal) and \code{\link{sync_test}} 
+#' series to remove depends on the \code{rate} of removal), and \code{\link{sync_test}} 
 #' is applied again. The contribution to the test statistic is assessed by the
 #' WAVK test statistic calculated for each time series.
 #' 
@@ -23,13 +23,13 @@
 #' Variable \eqn{t} should be used to specify the form 
 #' of the trend, where \eqn{t} is specified within the function automatically as a 
 #' regular sequence of length \eqn{T} on the interval (0,1]. See \code{Examples}.
-#' @param rate rate of removal of time series. Default is 1 (i.e., if hypothesis 
+#' @param rate rate of removal of time series. Default is 1 (i.e., if the hypothesis 
 #' of synchronism is rejected one time series is removed at a time to re-test the 
-#' remaining time series). Integer values above 1 are treated as number of time 
-#' series to be removed. Values from 0 to 1 are treated as a fraction of 
+#' remaining time series). Integer values above 1 are treated as the number of time 
+#' series to be removed. Values from 0 to 1 are treated as a fraction of the 
 #' time series to be removed.
-#' @param alpha significance level for testing hypothesis of a common trend 
-#' (using \code{\link{sync_test}}) of the parametric form specified in \code{formula}.
+#' @param alpha significance level for testing the hypothesis of a common trend 
+#' (using \code{\link{sync_test}}) of the parametric form specified in the \code{formula}.
 #' @param ... arguments to be passed to \code{\link{sync_test}}, for example, 
 #' number of bootstrap replications (\code{B}).
 #' 
