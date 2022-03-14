@@ -81,9 +81,9 @@ The distribution of test statistics \eqn{M_T} computed on each of those
 bootstrapped series is used to obtain bootstrap-based \eqn{p}-values for the test
 \insertCite{Lyubchich_etal_2020_changepoints}{funtimes}.
 
-In the current implementation, the \eqn{p}-value is calculated using equation 4.10 of
-\insertCite{Davison_Hinkley_1997;textual}{funtimes}: \code{p.value} = (1 + n) / (\code{B} + 1),
-where n is number of bootstrapped statistics greater or equal to the observed statistic.
+In the current implementation, the bootstrapped \eqn{p}-value is calculated using equation 4.10 of
+\insertCite{Davison_Hinkley_1997;textual}{funtimes}: \code{p.value} = (1 + \eqn{n}) / (\code{B} + 1),
+where \eqn{n} is number of bootstrapped statistics greater or equal to the observed statistic.
 
 The test statistic corresponds to the maximal value of the modified CUSUM over
 up to \code{m} combinations of hypothesized change points specified in \code{k}. The change
@@ -97,7 +97,7 @@ X <- rnorm(T, mean = 1, sd = 1)
 E <- rnorm(T, mean = 0, sd = 1)
 SizeOfChange <- 1
 TimeOfChange <- 50
-Y <- c(1 * X[1:TimeOfChange] + E[1:TimeOfChange], 
+Y <- c(1 * X[1:TimeOfChange] + E[1:TimeOfChange],
       (1 + SizeOfChange)*X[(TimeOfChange + 1):T] + E[(TimeOfChange + 1):T])
 ehat <- lm(Y ~ X)$resid
 mcusum_test(ehat, k = c(30, 50, 70))
