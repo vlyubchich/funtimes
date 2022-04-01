@@ -82,7 +82,7 @@
 #'
 #' # Example 2: Box & Jenkins time series of sales and a leading indicator, see ?BJsales
 #' D <- cbind(BJsales.lead, BJsales)
-#' causality_resVAR(D, cause = "BJsales.lead", lag.max = 5)
+#' causality_resVAR(D, cause = "BJsales.lead", lag.max = 5, B = 100)
 #' causality_resVAR(D, cause = "BJsales.lead", lag.restrict = 3, p = 5, B = 100)
 #' }
 #'
@@ -111,7 +111,7 @@ causality_resVAR <- function(y, p = NULL,
     n_test <- n - n_train
 
     # Estimate model on the training data to get the coefficient structure and
-    # estimate p if using information criterion
+    # estimate p if using an information criterion
     x <- VAR(y[1:n_train,], p = p, ...)
     if (is.null(p)) {
         ptrain <- x$p
@@ -150,7 +150,7 @@ causality_resVAR <- function(y, p = NULL,
     # Observed test statistics
     OBS <- caustests(efull, eres)
 
-    # Bootstrap
+    # Fast bootstrap (only the out-of-sample errors)
     BOOT <- #parallel::parSapply(cl, X = 1:B, FUN = function(b) {
         sapply(1:B, FUN = function(b) {
             # bootstrap prediction errors
@@ -192,16 +192,16 @@ causality_resVAR <- function(y, p = NULL,
                                  ,residuals = xres_cov
                                  ,Nt = n)
         names(yb) <- varnames
-        xb <- VAR(yb[1:n_train,], p = p, ...)
-        if (is.null(p)) {
-            ptrainb <- xb$p
-        } else {
-            ptrainb <- p
-        }
+        xb <- VAR(yb[1:n_train,], p = pfull, ...)
+        # if (is.null(p)) {
+        #     ptrainb <- xb$p
+        # } else {
+        #     ptrainb <- p
+        # }
         R2inv <- restrictions(xb, cause)
         FCST <- sapply(1:n_test - 1, function(i) { # i = 0
             # estimate full model, VAR or restricted VAR (depends on lag.restrict)
-            x <- VAR(yb[(1 + i):(n_train + i),], p = ptrainb, ...)
+            x <- VAR(yb[(1 + i):(n_train + i),], p = pfull, ...)
             ff <- predict(x, n.ahead = 1)$fcst[[dep]][1] # VAR predictions
             xres <- vars::restrict(x, method = "man", resmat = R2inv)
             fr <- predict(xres, n.ahead = 1)$fcst[[dep]][1] # VAR predictions
@@ -221,6 +221,6 @@ causality_resVAR <- function(y, p = NULL,
                                                   (sum(BOOT0["MSEcor",] <= OBS["MSEcor"]) + 1) / (B + 1),
                                                   stats::pt(OBS["MSEcor"], n_test - 1, lower.tail = TRUE)),
                                        row.names = c("stat_obs", "p_boot", "p_asympt")),
-                   p = ptrain)
+                   p = pfull)
     return(list(FAST = FAST, FullH0 = FullH0))
 }
