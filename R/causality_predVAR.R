@@ -77,16 +77,16 @@
 
 #' # Example 1: Canada time series (ts object)
 #' Canada <- vars::Canada
-#' causality_resVAR(Canada[,1:2], cause = "e", lag.max = 5, cl = cl)
-#' causality_resVAR(Canada[,1:2], cause = "e", lag.restrict = 3, cl = cl, lag.max = 15)
+#' causality_predVAR(Canada[,1:2], cause = "e", lag.max = 5, cl = cl)
+#' causality_predVAR(Canada[,1:2], cause = "e", lag.restrict = 3, cl = cl, lag.max = 15)
 #'
 #' # Example 2: Box & Jenkins time series of sales and a leading indicator, see ?BJsales
 #' D <- cbind(BJsales.lead, BJsales)
-#' causality_resVAR(D, cause = "BJsales.lead", lag.max = 5, B = 100)
-#' causality_resVAR(D, cause = "BJsales.lead", lag.restrict = 3, p = 5, B = 100)
+#' causality_predVAR(D, cause = "BJsales.lead", lag.max = 5, B = 100)
+#' causality_predVAR(D, cause = "BJsales.lead", lag.restrict = 3, p = 5, B = 100)
 #' }
 #'
-causality_resVAR <- function(y, p = NULL,
+causality_predVAR <- function(y, p = NULL,
                              cause = NULL,
                              B = 100,
                              test = 0.3,
