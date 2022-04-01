@@ -37,6 +37,22 @@
 #' Otherwise, \code{test} is rounded and \code{test} values are used as the testing set.
 #' Default is 0.3, which means that 30% of the sample are used for calculating
 #' out-of-sample errors. The testing set is always at the end of the time series.
+#' @param cl parameter to specify computer cluster for bootstrapping, passed to
+#' the package \code{parallel} (default is \code{1}, meaning no cluster is used).
+#' Possible values are:
+#' \itemize{
+#'   \item cluster object (list) produced by \link[parallel]{makeCluster}.
+#'   In this case, new cluster is not started nor stopped;
+#'   \item \code{NULL}. In this case, the function will detect
+#'   available cores (see \link[parallel]{detectCores}) and, if there are
+#'   multiple cores (\eqn{>1}), a cluster will be started with
+#'   \link[parallel]{makeCluster}. If started, the cluster will be stopped
+#'   after the computations are finished;
+#'   \item positive integer defining the number of cores to start a cluster.
+#'   If \code{cl = 1}, no attempt to create a cluster will be made.
+#'   If \code{cl > 1}, cluster will be started (using \link[parallel]{makeCluster})
+#'   and stopped afterwards (using \link[parallel]{stopCluster}).
+#' }
 #' @param ... other arguments passed to the function for VAR estimation.
 #' The arguments include \code{lag.restrict} that is used to remove a number of first lags
 #' in the cause variable from consideration (use restricted VAR to avoid testing for short-term causality);
@@ -87,12 +103,28 @@
 #' }
 #'
 causality_predVAR <- function(y, p = NULL,
-                             cause = NULL,
-                             B = 100,
-                             test = 0.3,
-                             # cl = NULL,
-                             ...)
+                              cause = NULL,
+                              B = 100,
+                              test = 0.3,
+                              cl = 1,
+                              ...)
 {
+    bootparallel <- FALSE
+    if (is.list(cl)) { #some other cluster supplied; use it but do not stop it
+        bootparallel <- TRUE
+        clStop <- FALSE
+    } else {
+        if (is.null(cl)) {
+            cores <- parallel::detectCores()
+        } else {
+            cores <- cl
+        }
+        if (cores > 1) { #specified or detected cores>1; start a cluster and later stop it
+            bootparallel <- TRUE
+            cl <- parallel::makeCluster(cores)
+            clStop <- TRUE
+        }
+    }
     varnames <- colnames(y)
     if (length(varnames) != 2) stop("y must have 2 columns")
     if (is.null(cause)) {
@@ -185,34 +217,66 @@ causality_predVAR <- function(y, p = NULL,
     # convert the matrix of coefficients into a list
     xres_coef <- lapply(1:(length(keep)/K), function(i) xres_coef[,keep[((i - 1)*K + 1):(i*K)]])
     xres_cov <- cov(residuals(xres))
-    BOOT0 <- #parallel::parSapply(cl, X = 1:B, FUN = function(b) {
-        sapply(1:B, FUN = function(b) {
-        yb <- mlVAR::simulateVAR(pars = xres_coef, lags = 1:pfull,
-                                 ,residuals = xres_cov
-                                 ,Nt = n)
-        names(yb) <- varnames
-        # xb <- VAR(yb[1:n_train,], p = pfull, ...)
-        # if (is.null(p)) {
-        #     ptrainb <- xb$p
-        # } else {
-        #     ptrainb <- p
-        # }
-        # R2inv <- restrictions(xb, cause)
-        FCST <- sapply(1:n_test - 1, function(i) { # i = 0
-            # estimate full model, VAR or restricted VAR (depends on lag.restrict)
-            x <- VAR(yb[(1 + i):(n_train + i),], p = pfull, ...)
-            ff <- predict(x, n.ahead = 1)$fcst[[dep]][1] # VAR predictions
-            xres <- vars::restrict(x, method = "man", resmat = R2inv)
-            fr <- predict(xres, n.ahead = 1)$fcst[[dep]][1] # VAR predictions
-            c(ff, fr)
+    if (bootparallel) {
+        BOOT0 <- parallel::parSapply(cl, X = 1:B, FUN = function(b) {
+            # sapply(1:B, FUN = function(b) {
+            yb <- mlVAR::simulateVAR(pars = xres_coef, lags = 1:pfull,
+                                     ,residuals = xres_cov
+                                     ,Nt = n)
+            names(yb) <- varnames
+            # xb <- VAR(yb[1:n_train,], p = pfull, ...)
+            # if (is.null(p)) {
+            #     ptrainb <- xb$p
+            # } else {
+            #     ptrainb <- p
+            # }
+            # R2inv <- restrictions(xb, cause)
+            FCST <- sapply(1:n_test - 1, function(i) { # i = 0
+                # estimate full model, VAR or restricted VAR (depends on lag.restrict)
+                x <- VAR(yb[(1 + i):(n_train + i),], p = pfull, ...)
+                ff <- predict(x, n.ahead = 1)$fcst[[dep]][1] # VAR predictions
+                xres <- vars::restrict(x, method = "man", resmat = R2inv)
+                fr <- predict(xres, n.ahead = 1)$fcst[[dep]][1] # VAR predictions
+                c(ff, fr)
+            })
+            # Forecast errors
+            efullb <- yb[(n_train + 1):n, dep] - FCST[1,]
+            eresb <- yb[(n_train + 1):n, dep] - FCST[2,]
+            # test statistics
+            caustests(efullb, eresb)
         })
-        # Forecast errors
-        efullb <- yb[(n_train + 1):n, dep] - FCST[1,]
-        eresb <- yb[(n_train + 1):n, dep] - FCST[2,]
-        # test statistics
-        caustests(efullb, eresb)
-    })
-
+        if (clStop) {
+            parallel::stopCluster(cl)
+        }
+    } else {
+        BOOT0 <- #parallel::parSapply(cl, X = 1:B, FUN = function(b) {
+            sapply(1:B, FUN = function(b) {
+                yb <- mlVAR::simulateVAR(pars = xres_coef, lags = 1:pfull,
+                                         ,residuals = xres_cov
+                                         ,Nt = n)
+                names(yb) <- varnames
+                # xb <- VAR(yb[1:n_train,], p = pfull, ...)
+                # if (is.null(p)) {
+                #     ptrainb <- xb$p
+                # } else {
+                #     ptrainb <- p
+                # }
+                # R2inv <- restrictions(xb, cause)
+                FCST <- sapply(1:n_test - 1, function(i) { # i = 0
+                    # estimate full model, VAR or restricted VAR (depends on lag.restrict)
+                    x <- VAR(yb[(1 + i):(n_train + i),], p = pfull, ...)
+                    ff <- predict(x, n.ahead = 1)$fcst[[dep]][1] # VAR predictions
+                    xres <- vars::restrict(x, method = "man", resmat = R2inv)
+                    fr <- predict(xres, n.ahead = 1)$fcst[[dep]][1] # VAR predictions
+                    c(ff, fr)
+                })
+                # Forecast errors
+                efullb <- yb[(n_train + 1):n, dep] - FCST[1,]
+                eresb <- yb[(n_train + 1):n, dep] - FCST[2,]
+                # test statistics
+                caustests(efullb, eresb)
+            })
+    }#end sequential bootstrap
     FullH0 <- list(result = data.frame(MSEt = c(OBS["MSEt"],
                                                 (sum(BOOT0["MSEt",] <= OBS["MSEt"]) + 1) / (B + 1),
                                                 stats::pt(OBS["MSEt"], n_test - 1, lower.tail = TRUE)),

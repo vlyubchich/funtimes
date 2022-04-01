@@ -4,7 +4,7 @@
 \alias{causality_predVAR}
 \title{Out-of-sample Tests of Granger Causality using (Restricted) Vector Autoregression}
 \usage{
-causality_predVAR(y, p = NULL, cause = NULL, B = 100, test = 0.3, ...)
+causality_predVAR(y, p = NULL, cause = NULL, B = 100, test = 0.3, cl = 1, ...)
 }
 \arguments{
 \item{y}{data frame or \code{ts} object for estimating VAR(\eqn{p}).}
@@ -24,6 +24,23 @@ the value is treated as proportion of the sample size to be used as the testing 
 Otherwise, \code{test} is rounded and \code{test} values are used as the testing set.
 Default is 0.3, which means that 30\% of the sample are used for calculating
 out-of-sample errors. The testing set is always at the end of the time series.}
+
+\item{cl}{parameter to specify computer cluster for bootstrapping, passed to
+the package \code{parallel} (default is \code{1}, meaning no cluster is used).
+Possible values are:
+\itemize{
+\item cluster object (list) produced by \link[parallel]{makeCluster}.
+In this case, new cluster is not started nor stopped;
+\item \code{NULL}. In this case, the function will detect
+available cores (see \link[parallel]{detectCores}) and, if there are
+multiple cores (\eqn{>1}), a cluster will be started with
+\link[parallel]{makeCluster}. If started, the cluster will be stopped
+after the computations are finished;
+\item positive integer defining the number of cores to start a cluster.
+If \code{cl = 1}, no attempt to create a cluster will be made.
+If \code{cl > 1}, cluster will be started (using \link[parallel]{makeCluster})
+and stopped afterwards (using \link[parallel]{stopCluster}).
+}}
 
 \item{...}{other arguments passed to the function for VAR estimation.
 The arguments include \code{lag.restrict} that is used to remove a number of first lags
