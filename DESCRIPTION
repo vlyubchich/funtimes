@@ -2,7 +2,7 @@ Package: funtimes
 Type: Package
 Title: Functions for Time Series Analysis
 Version: 8.3
-Date: 2022-03-13
+Date: 2022-04-01
 Authors@R: c(person("Vyacheslav", "Lyubchich", 
                     role = c("aut", "cre"),
                     comment = c(ORCID = "0000-0001-7936-4285"),

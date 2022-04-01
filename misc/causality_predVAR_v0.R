@@ -1,4 +1,4 @@
-#' Out-of-sample Tests of Granger Causality using (Restricted) Vector Autoregression
+#' Out-of-sample Tests of Granger Causality using Restricted Vector Autoregression
 #'
 #' Test for Granger causality using out-of-sample prediction errors from a vector
 #' autoregression (VAR), where the original VAR can be a restricted VAR (see Details).
@@ -65,41 +65,30 @@
 #'
 #' @author Vyacheslav Lyubchich
 #'
-#' @importFrom stats predict residuals
-#' @importFrom mlVAR simulateVAR
+#' @importFrom stats predict
 #' @export
 #' @examples
-#' \dontrun{
-#' cores <- parallel::detectCores()
-#' cl <- parallel::makeCluster(cores)
-#' loadedfunc <- lsf.str()
-#' parallel::clusterExport(cl, varlist = as.list(loadedfunc), envir = environment())
-
 #' # Example 1: Canada time series (ts object)
 #' Canada <- vars::Canada
-#' causality_predVAR(Canada[,1:2], cause = "e", lag.max = 5, cl = cl)
-#' causality_predVAR(Canada[,1:2], cause = "e", lag.restrict = 3, cl = cl, lag.max = 15)
+#' causality_resVAR(Canada[,1:2], cause = "e", lag.restrict = 3, lag.max = 10)
 #'
 #' # Example 2: Box & Jenkins time series of sales and a leading indicator, see ?BJsales
 #' D <- cbind(BJsales.lead, BJsales)
-#' causality_predVAR(D, cause = "BJsales.lead", lag.max = 5, B = 100)
-#' causality_predVAR(D, cause = "BJsales.lead", lag.restrict = 3, p = 5, B = 100)
-#' }
+#' causality_resVAR(D, cause = "BJsales.lead", lag.restrict = 3, lag.max = 10)
+#' causality_resVAR(D, cause = "BJsales.lead", lag.restrict = 3, p = 5, B = 100)
 #'
-causality_predVAR <- function(y, p = NULL,
+#'
+causality_resVAR <- function(y, p = NULL,
                              cause = NULL,
                              B = 100,
                              test = 0.3,
-                             # cl = NULL,
                              ...)
 {
     varnames <- colnames(y)
-    if (length(varnames) != 2) stop("y must have 2 columns")
     if (is.null(cause)) {
         cause <- varnames[1]
     }
     dep <- setdiff(varnames, cause)[1] # dependent variable
-    K <- 2L #length(varnames)
 
     # Define samples
     n <- nrow(y) # sample size
@@ -111,34 +100,31 @@ causality_predVAR <- function(y, p = NULL,
     n_test <- n - n_train
 
     # Estimate model on the training data to get the coefficient structure and
-    # estimate p if using an information criterion
+    # estimate p if using information criterion
     x <- VAR(y[1:n_train,], p = p, ...)
     if (is.null(p)) {
-        ptrain <- x$p
-    } else {
-        ptrain <- p
+        p <- x$p
     }
-    R2inv <- restrictions(x, cause)
 
-    # # Recreate matrix of restrictions and overlay new restrictions for causality testing
-    # co.names <- vars::Bcoef(x)
-    # k <- which(gsub("\\.l\\d+", "", colnames(co.names)) %in% cause) # select cause regressors
-    # l <- which(rownames(co.names) %in% cause) # select cause regressand
-    # R2inv <- matrix(1, ncol = ncol(co.names), nrow = nrow(co.names))
-    # R2inv[-l, k] <- 0 # select coef to be tested
-    # # If the model already has restriction, overlay with the new ones
-    # if (!is.null(x$restrictions)) {
-    #     xr <- x$restrictions
-    #     # match positions of variables
-    #     xr <- xr[rownames(co.names), colnames(co.names)]
-    #     # overlay
-    #     R2inv <- xr * R2inv
-    # }
+    # Recreate matrix of restrictions and overlay new restrictions for causality testing
+    co.names <- vars::Bcoef(x)
+    k <- which(gsub("\\.l\\d+", "", colnames(co.names)) %in% cause) # select cause regressors
+    l <- which(rownames(co.names) %in% cause) # select cause regressand
+    R2inv <- matrix(1, ncol = ncol(co.names), nrow = nrow(co.names))
+    R2inv[-l, k] <- 0 # select coef to be tested
+    # If the model already has restriction, overlay with the new ones
+    if (!is.null(x$restrictions)) {
+        xr <- x$restrictions
+        # match positions of variables
+        xr <- xr[rownames(co.names), colnames(co.names)]
+        # overlay
+        R2inv <- xr * R2inv
+    }
 
     # Get 1-step ahead forecasts from the models (recursive)
     FCST <- sapply(1:n_test - 1, function(i) { # i = 0
         # estimate full model, VAR or restricted VAR (depends on lag.restrict)
-        x <- VAR(y[(1 + i):(n_train + i),], p = ptrain, ...)
+        x <- VAR(y[(1 + i):(n_train + i),], p = p, ...)
         ff <- predict(x, n.ahead = 1)$fcst[[dep]][1] # VAR predictions
         xres <- vars::restrict(x, method = "man", resmat = R2inv)
         fr <- predict(xres, n.ahead = 1)$fcst[[dep]][1] # VAR predictions
@@ -147,10 +133,23 @@ causality_predVAR <- function(y, p = NULL,
     # Forecast errors
     efull <- y[(n_train + 1):n, dep] - FCST[1,]
     eres <- y[(n_train + 1):n, dep] - FCST[2,]
-    # Observed test statistics
-    OBS <- caustests(efull, eres)
 
-    # Fast bootstrap (only the out-of-sample errors)
+    # MSEt test
+    dt <- efull^2 - eres^2
+    mlmt <- lm(dt ~ 1)
+    MSEt <- summary(mlmt)$coefficients[3]
+
+    # MSEcor test
+    tmp1 <- efull - eres
+    tmp2 <- efull + eres
+    mlm <- lm(tmp1 ~ tmp2 - 1)
+    MSEcor <- summary(mlm)$coefficients[1]
+    # MSEcor <- stats::coef(mlm)
+
+    # Md test
+    Md <- mean(efull^2) - mean(eres^2)
+
+    # Bootstrap
     BOOT <- #parallel::parSapply(cl, X = 1:B, FUN = function(b) {
         sapply(1:B, FUN = function(b) {
             # bootstrap prediction errors
@@ -159,67 +158,32 @@ causality_predVAR <- function(y, p = NULL,
             # ind <- sample(n_test, replace = TRUE)
             eresb <- eres[ind]
             # get bootstrapped statistics
-            caustests(efullb, eresb)
+            dtb <- efullb^2 - eresb^2
+            mlmtb <- lm(dtb ~ 1)
+            tmp1b <- efullb - eresb
+            tmp2b <- efullb + eresb
+            mlmb <- lm(tmp1b ~ tmp2b - 1)
+            c(summary(mlmtb)$coefficients[3], stats::coef(mlmb), mean(efullb^2) - mean(eresb^2))
         })
-    FAST <- list(result = data.frame(MSEt = c(OBS["MSEt"],
-                                              (sum(BOOT["MSEt",] >= 0) + 1) / (B + 1),
-                                              stats::pt(OBS["MSEt"], n_test - 1, lower.tail = TRUE)),
-                                     MSEcor = c(OBS["MSEcor"],
-                                                (sum(BOOT["MSEcor",] >= 0) + 1) / (B + 1),
-                                                stats::pt(OBS["MSEcor"], n_test - 1, lower.tail = TRUE)),
-                                     row.names = c("stat_obs", "p_boot", "p_asympt")),
-                 p = ptrain)
+browser()
+# apply(BOOT, 1, hist)
+tmp <- BOOT[1,] - MSEt; hist(tmp)
+(sum(tmp <= MSEt) + 1)/(B+1)
 
-    # Bootstrap restricted model estimated on the full sample
-    x <- VAR(y, p = p, ...)
-    if (is.null(p)) {
-        pfull <- x$p
-    } else {
-        pfull <- p
-    }
-    R2inv <- restrictions(x, cause)
-    xres <- vars::restrict(x, method = "man", resmat = R2inv)
-    xres_coef <- vars::Bcoef(xres)
-    # disregard intercept and other coefficients, simulate just VAR
-    keep <- which(gsub("\\.l\\d+", "", colnames(xres_coef)) %in% varnames)
-    # convert the matrix of coefficients into a list
-    xres_coef <- lapply(1:(length(keep)/K), function(i) xres_coef[,keep[((i - 1)*K + 1):(i*K)]])
-    xres_cov <- cov(residuals(xres))
-    BOOT0 <- #parallel::parSapply(cl, X = 1:B, FUN = function(b) {
-        sapply(1:B, FUN = function(b) {
-        yb <- mlVAR::simulateVAR(pars = xres_coef, lags = 1:pfull,
-                                 ,residuals = xres_cov
-                                 ,Nt = n)
-        names(yb) <- varnames
-        # xb <- VAR(yb[1:n_train,], p = pfull, ...)
-        # if (is.null(p)) {
-        #     ptrainb <- xb$p
-        # } else {
-        #     ptrainb <- p
-        # }
-        # R2inv <- restrictions(xb, cause)
-        FCST <- sapply(1:n_test - 1, function(i) { # i = 0
-            # estimate full model, VAR or restricted VAR (depends on lag.restrict)
-            x <- VAR(yb[(1 + i):(n_train + i),], p = pfull, ...)
-            ff <- predict(x, n.ahead = 1)$fcst[[dep]][1] # VAR predictions
-            xres <- vars::restrict(x, method = "man", resmat = R2inv)
-            fr <- predict(xres, n.ahead = 1)$fcst[[dep]][1] # VAR predictions
-            c(ff, fr)
-        })
-        # Forecast errors
-        efullb <- yb[(n_train + 1):n, dep] - FCST[1,]
-        eresb <- yb[(n_train + 1):n, dep] - FCST[2,]
-        # test statistics
-        caustests(efullb, eresb)
-    })
+    # list(MSEt = MSEt, MSEt_p = (sum(BOOT[1,] >= 0) + 1) / (B + 1),
+    #      MSEt_p_asympt = stats::pt(MSEt, mlmt$df, lower.tail = TRUE),
+    #      MSEcor = MSEcor, MSEcor_p = (sum(BOOT[2,] >= 0) + 1) / (B + 1),
+    #      MSEcor_p_asympt = stats::pt(summary(mlm)$coefficients[3], mlm$df, lower.tail = TRUE),
+    #      Md = Md, Md_p = (sum(BOOT[3,] >= 0) + 1) / (B + 1),
+    #      p = p)
+    list(result = data.frame(MSEt = c(MSEt,
+                                      (sum(BOOT[1,] >= 0) + 1) / (B + 1),
+                                      stats::pt(MSEt, mlmt$df, lower.tail = TRUE)),
+                             MSEcor = c(MSEcor,
+                                        (sum(BOOT[2,] >= 0) + 1) / (B + 1),
+                                        stats::pt(summary(mlm)$coefficients[3], mlm$df, lower.tail = TRUE)),
+                             Md = c(Md, (sum(BOOT[3,] >= 0) + 1) / (B + 1), NA),
+                             row.names = c("stat_obs", "p_boot", "p_asympt")),
+         p = p)
 
-    FullH0 <- list(result = data.frame(MSEt = c(OBS["MSEt"],
-                                                (sum(BOOT0["MSEt",] <= OBS["MSEt"]) + 1) / (B + 1),
-                                                stats::pt(OBS["MSEt"], n_test - 1, lower.tail = TRUE)),
-                                       MSEcor = c(OBS["MSEcor"],
-                                                  (sum(BOOT0["MSEcor",] <= OBS["MSEcor"]) + 1) / (B + 1),
-                                                  stats::pt(OBS["MSEcor"], n_test - 1, lower.tail = TRUE)),
-                                       row.names = c("stat_obs", "p_boot", "p_asympt")),
-                   p = pfull)
-    return(list(FAST = FAST, FullH0 = FullH0))
 }
