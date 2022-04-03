@@ -84,37 +84,24 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' # Initiate a local cluster (can skip this step and omit the argument cl from the call)
-#' cores <- parallel::detectCores()
-#' cl <- parallel::makeCluster(cores)
-#' # to make parallel computations reproducible
-#' parallel::clusterSetRNGStream(cl, 123)
-#'
 #' # Example 1: Canada time series (ts object)
 #' Canada <- vars::Canada
-#' causality_pred(Canada[,1:2], cause = "e", lag.max = 5, cl = cl)
-#' causality_pred(Canada[,1:2], cause = "e", lag.restrict = 3, cl = cl, lag.max = 15)
+#' causality_pred(Canada[,1:2], cause = "e", lag.max = 5)
+#' causality_pred(Canada[,1:2], cause = "e", lag.restrict = 3, lag.max = 15)
 #'
-#' # Example 2: Box & Jenkins time series of sales and a leading indicator, see ?BJsales
+#' # Example 2 (run in parallel): Box & Jenkins time series
+#' # of sales and a leading indicator, see ?BJsales
+#'
+#' # Initiate a local cluster
+#' cores <- parallel::detectCores()
+#' cl <- parallel::makeCluster(cores)
+#' parallel::clusterSetRNGStream(cl, 123) # to make parallel computations reproducible
+#'
 #' D <- cbind(BJsales.lead, BJsales)
-#' causality_pred(D, cause = "BJsales.lead", lag.max = 5, B = 100)
-#' causality_pred(D, cause = "BJsales.lead", lag.restrict = 3, p = 5, B = 100)
-#'
-#' y <- vars::Canada[, c("e","prod")]
-#' p = 3; cause = NULL; B = 10; test = 0.3; cl = 1L; lag.max = NULL; k = 2; lag.restrict = 2
-#'
+#' causality_pred(D, cause = "BJsales.lead", lag.max = 5, B = 1000, cl = cl)
+#' causality_pred(D, cause = "BJsales.lead", lag.restrict = 3, p = 5, B = 1000, cl = cl)
 #' }
 #'
-
-if (FALSE) {
-    Rprof(tmp <- tempfile())
-    for(i in 1:3) {causality_pred(Canada[,1:2], cause = "e", lag.restrict = 3, lag.max = 10)}
-    Rprof()
-    summaryRprof(tmp)
-    x = summaryRprof(tmp)$by.total
-
-}
-
 causality_pred <- function(y, p = NULL,
                            cause = NULL,
                            B = 100L,
@@ -199,9 +186,7 @@ causality_pred <- function(y, p = NULL,
         lagX <- embed(y[,cause], p + 1)[, -1, drop = FALSE]
     }
     lagY <- embed(y[,dep], p + 1)
-    Dyx <- data.frame(cbind(lagY, lagX))
-    Dy <- data.frame(lagY)
-    n_actual <- nrow(Dy)
+    n_actual <- nrow(lagY)
     # m_yx <- stats::lm(X1 ~ ., data = Dyx[1:(n_train - p),])
     # m_yx <- stats::lm.fit(x = cbind(1, lagY[1:(n_train - p), -1], lagX[1:(n_train - p), ]),
     #                     y = lagY[1:(n_train - p), 1])
@@ -209,11 +194,16 @@ causality_pred <- function(y, p = NULL,
     # Get 1-step ahead forecasts from the models (recursive)
     FCST <- sapply(1:n_test - 1, function(i) { # i = 0
         # estimate full and restricted models
-        m_yx <- stats::lm(X1 ~ ., data = Dyx[(1 + i):(n_train - p + i),])
-        m_y <- stats::lm(X1 ~ ., data = Dy[(1 + i):(n_train - p + i),])
+        m_yx <- stats::lm.fit(x = cbind(1,
+                                        lagY[(1 + i):(n_train - p + i), -1, drop = FALSE],
+                                        lagX[(1 + i):(n_train - p + i), , drop = FALSE]),
+                              y = lagY[(1 + i):(n_train - p + i), 1, drop = FALSE])
+        m_y <- stats::lm.fit(x = cbind(1,
+                                       lagY[(1 + i):(n_train - p + i), -1, drop = FALSE]),
+                             y = lagY[(1 + i):(n_train - p + i), 1, drop = FALSE])
         # get predictions
-        c(predict(m_yx, newdata = Dyx[(n_train - p + i + 1),]),
-          predict(m_y, newdata = Dy[(n_train - p + i + 1),]))
+        c(m_yx$coefficients %*% c(1, lagY[(n_train - p + i + 1), -1], lagX[(n_train - p + i + 1), ]),
+          m_y$coefficients %*% c(1, lagY[(n_train - p + i + 1), -1]))
     })
     # Forecast errors
     efull <- y[(n_train + 1):n, dep] - FCST[1,]
@@ -243,20 +233,25 @@ causality_pred <- function(y, p = NULL,
                  p = p)
 
     # Bootstrap restricted model estimated on the full sample
-    m_y <- stats::lm(X1 ~ ., data = Dy)
+    m_y <- stats::lm.fit(x = lagY[,-1, drop = FALSE],
+                         y = lagY[, 1, drop = FALSE])
     m_y_fit <- m_y$fitted.values
     m_y_res <- m_y$residuals
     if (bootparallel) {
         BOOT0 <- parallel::parSapply(cl, X = 1:B, FUN = function(b) {
-            m_y_res_boot <- sample(m_y_res, replace = TRUE)
-            dy_boot <- m_y_fit + m_y_res_boot
+            dy_boot <- m_y_fit + sample(m_y_res, replace = TRUE)
             FCST <- sapply(1:n_test - 1, function(i) { # i = 0
                 # estimate full and restricted models
-                m_yx <- stats::lm(dy_boot[(1 + i):(n_train - p + i)] ~ ., data = Dyx[(1 + i):(n_train - p + i), -1])
-                m_y <- stats::lm(dy_boot[(1 + i):(n_train - p + i)] ~ ., data = Dy[(1 + i):(n_train - p + i), -1])
+                m_yx <- stats::lm.fit(x = cbind(1,
+                                                lagY[(1 + i):(n_train - p + i), -1, drop = FALSE],
+                                                lagX[(1 + i):(n_train - p + i), , drop = FALSE]),
+                                      y = dy_boot[(1 + i):(n_train - p + i)])
+                m_y <- stats::lm.fit(x = cbind(1,
+                                               lagY[(1 + i):(n_train - p + i), -1, drop = FALSE]),
+                                     y = dy_boot[(1 + i):(n_train - p + i)])
                 # get predictions
-                c(predict(m_yx, newdata = Dyx[(n_train - p + i + 1),]),
-                  predict(m_y, newdata = Dy[(n_train - p + i + 1),]))
+                c(m_yx$coefficients %*% c(1, lagY[(n_train - p + i + 1), -1], lagX[(n_train - p + i + 1), ]),
+                  m_y$coefficients %*% c(1, lagY[(n_train - p + i + 1), -1]))
             })
             # Forecast errors
             efullb <- dy_boot[(n_train + 1):n - p] - FCST[1,]
@@ -273,11 +268,16 @@ causality_pred <- function(y, p = NULL,
                 dy_boot <- m_y_fit + sample(m_y_res, replace = TRUE)
                 FCST <- sapply(1:n_test - 1, function(i) { # i = 0
                     # estimate full and restricted models
-                    m_yx <- stats::lm(dy_boot[(1 + i):(n_train - p + i)] ~ ., data = Dyx[(1 + i):(n_train - p + i), -1])
-                    m_y <- stats::lm(dy_boot[(1 + i):(n_train - p + i)] ~ ., data = Dy[(1 + i):(n_train - p + i), -1])
+                    m_yx <- stats::lm.fit(x = cbind(1,
+                                                    lagY[(1 + i):(n_train - p + i), -1, drop = FALSE],
+                                                    lagX[(1 + i):(n_train - p + i), , drop = FALSE]),
+                                          y = dy_boot[(1 + i):(n_train - p + i)])
+                    m_y <- stats::lm.fit(x = cbind(1,
+                                                   lagY[(1 + i):(n_train - p + i), -1, drop = FALSE]),
+                                         y = dy_boot[(1 + i):(n_train - p + i)])
                     # get predictions
-                    c(predict(m_yx, newdata = Dyx[(n_train - p + i + 1),]),
-                      predict(m_y, newdata = Dy[(n_train - p + i + 1),]))
+                    c(m_yx$coefficients %*% c(1, lagY[(n_train - p + i + 1), -1], lagX[(n_train - p + i + 1), ]),
+                      m_y$coefficients %*% c(1, lagY[(n_train - p + i + 1), -1]))
                 })
                 # Forecast errors
                 efullb <- dy_boot[(n_train + 1):n - p] - FCST[1,]
