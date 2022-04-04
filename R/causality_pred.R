@@ -157,7 +157,7 @@ causality_pred <- function(y, p = NULL,
         } else {
             lagX <- embed(y[,cause], lag.max + 1)[, -1, drop = FALSE]
         }
-        lagY <-  embed(y[,dep], lag.max + 1)
+        lagY <- embed(y[,dep], lag.max + 1)
         # Information criterion for the model
         # (use rows 1:(n_train - lag.max) to use training set only)
         IC <- sapply(1:ncol(lagX), function(s) {
@@ -239,7 +239,7 @@ causality_pred <- function(y, p = NULL,
     m_y_res <- m_y$residuals
     if (bootparallel) {
         BOOT0 <- parallel::parSapply(cl, X = 1:B, FUN = function(b) {
-            dy_boot <- m_y_fit + sample(m_y_res, replace = TRUE)
+            dy_boot <- m_y_fit + sample(m_y_res, replace = TRUE) * rnorm(n_actual)
             FCST <- sapply(1:n_test - 1, function(i) { # i = 0
                 # estimate full and restricted models
                 m_yx <- stats::lm.fit(x = cbind(1,
@@ -265,7 +265,7 @@ causality_pred <- function(y, p = NULL,
     } else {
         BOOT0 <- #parallel::parSapply(cl, X = 1:B, FUN = function(b) {
             sapply(1:B, FUN = function(b) {
-                dy_boot <- m_y_fit + sample(m_y_res, replace = TRUE)
+                dy_boot <- m_y_fit + sample(m_y_res, replace = TRUE) * rnorm(n_actual)
                 FCST <- sapply(1:n_test - 1, function(i) { # i = 0
                     # estimate full and restricted models
                     m_yx <- stats::lm.fit(x = cbind(1,
