@@ -1,78 +1,82 @@
 #' Out-of-sample Tests of Granger Causality
 #'
-#' Test for Granger causality using out-of-sample prediction errors from a vector
-#' autoregression (VAR), where the original VAR can be a restricted VAR (see Details).
-#' The tests include the MSE-t approach \insertCite{McCracken_2007}{funtimes},
-#' MSE-correlation test as in Chapter 9.3 of \insertCite{Granger_Newbold_2016;textual}{funtimes},
-#' and difference of squared VAR prediction errors (Md statistic) when not using the cause
-#' variable and with the cause variable.
-#' Bootstrap is used to empirically derive distributions of the statistics.
+#' Test for Granger causality using out-of-sample prediction errors from an
+#' autoregression (AR) model, where some of the near-contemporaneous lags can be removed:
+#' \deqn{Y_t = \sum_{i=1}^p\alpha_iY_{t-i} + \sum_{i=lag.restrict+1}^p\beta_iX_{t-i} + e_t,}
+#' where \eqn{Y_t} is the dependent variable,
+#' \eqn{X_t} is the cause variable,
+#' \eqn{p} is the AR order,
+#' \eqn{lag.restrict} is the number of restricted first lags (see the argument \code{lag.restrict}).
+#'
+#' The tests include the MSE-t approach \insertCite{McCracken_2007}{funtimes} and
+#' MSE-correlation test as in Chapter 9.3 of \insertCite{Granger_Newbold_2016;textual}{funtimes}.
+#' The bootstrap is used to empirically derive distributions of the statistics.
 #'
 #'
-#' @details The arguments specified in \code{...} are passed to the \code{\link[vars]{VAR}} function.
-#' Additionally, \code{lag.restrict} can be specified to remove short-term lags from
-#' consideration (\code{lag.restrict} is not an option in the original package \code{vars}).
-#' Note that if \code{p} is specified, \code{lag.restrict} must be smaller
-#' than \code{p} otherwise the default \code{lag.restrict = 0} will be used.
-#' If \code{lag.max} is specified instead of \code{p}, VAR orders
-#' \code{lag.restrict} + 1, \dots, \code{lag.max} will be considered using the training data
-#' and the order \eqn{p} will be automatically selected according to the information criterion
-#' (by default, AIC).
+#' @details
+#' Two versions of the bootstrap are used to derive the empirical distributions of the test statistics.
+#' In the original version, residuals of a restricted model under the null hypothesis of no Granger
+#' causality are bootstrapped to generate new data under the null. Then the full and restricted
+#' models are re-estimated on the bootstrapped data to obtain new (bootstrapped) forecast errors.
+#' In the fast bootstrap version, just the paired residuals from the full and restricted models are
+#' bootstrapped.
 #'
 #' In the current implementation, the bootstrapped \eqn{p}-value is calculated using equation 4.10 of
 #' \insertCite{Davison_Hinkley_1997;textual}{funtimes}: \code{p.value} = (1 + \eqn{n}) / (\code{B} + 1),
-#' where \eqn{n} is number of bootstrapped statistics greater or equal to 0.
+#' where \eqn{n} is the number of bootstrapped statistics smaller or equal to the observed statistic.
+#' In the fast bootstrap, \eqn{n} is the number of bootstrapped statistics greater or equal to 0.
 #'
+#' This function allows using different orders \eqn{p} when testing the Granger causation
+#' of \eqn{X} to \eqn{Y} and from \eqn{Y} to \eqn{X}
+#' (need to run the function twice, with different argument \code{cause}).
+#' To use the symmetric vector autoregression (VAR), use the function \code{\link{causality_predVAR}}.
 #'
-#' @param y data frame or \code{ts} object for estimating VAR(\eqn{p}).
-#' @param p an integer specifying the order \eqn{p} in VAR.
-#' By default (if \code{p} is not specified),
-#' \eqn{p} is selected based on the information criterion
-#' \code{ic} (see \code{...} arguments; default \code{ic} is AIC).
+#' @param y matrix, data frame, or \code{ts} object with two columns
+#' (an explanatory and the dependent time-series variable). Missing values are not allowed.
 #' @param cause name of the cause variable. If not specified, the first variable in
-#' \code{y} is treated as the cause, and second -- as the dependent variable.
-#' @param B number of bootstrap replications. Default is 100.
+#' \code{y} is treated as the cause and the second is treated as the dependent variable.
+#' @param p an integer specifying the order \eqn{p} of autoregressive dependence
+#' (same \eqn{p} used for both explanatory and dependent variables).
+#' By default (if \code{p} is not specified); the user must specify \code{p} or \code{lag.max}.
+#' If \code{lag.max} is specified, the argument \code{p} is ignored.
+#' @param lag.restrict integer for the number of short-term lags in the cause variable
+#' to remove from consideration (default is zero, meaning no lags are removed).
+#' This setting does not affect the dependent variable lags that are always present.
+#' @param lag.max integer for the highest lag order to explore.
+#' The order is then selected using the Akaike information criterion (AIC; default),
+#' see the argument \code{k} to change the criterion.
+#' @param k numeric specifying the weight of the equivalent degrees of freedom part
+#' in the AIC formula. Default \code{k = 2} corresponds to the traditional AIC.
+#' Use \code{k = log(n)} to use the Bayesian information criterion instead
+#' (see \code{\link[stats]{extractAIC}}).
+#' @param B number of bootstrap replications. Default is 500.
 #' @param test a numeric value specifying the size of the testing set. If \code{test} < 1,
-#' the value is treated as proportion of the sample size to be used as the testing set.
+#' the value is treated as a proportion of the sample size to be used as the testing set.
 #' Otherwise, \code{test} is rounded and \code{test} values are used as the testing set.
-#' Default is 0.3, which means that 30% of the sample are used for calculating
+#' Default is 0.3, which means that 30% of the sample is used for calculating
 #' out-of-sample errors. The testing set is always at the end of the time series.
-#' @param cl parameter to specify computer cluster for bootstrapping, passed to
-#' the package \code{parallel} (default is \code{1}, meaning no cluster is used).
+#' @param cl parameter to specify computer cluster for bootstrapping passed to
+#' the package \code{parallel} (default \code{cl = 1}, means no cluster is used).
 #' Possible values are:
 #' \itemize{
 #'   \item cluster object (list) produced by \link[parallel]{makeCluster}.
-#'   In this case, new cluster is not started nor stopped;
+#'   In this case, a new cluster is not started nor stopped;
 #'   \item \code{NULL}. In this case, the function will detect
 #'   available cores (see \link[parallel]{detectCores}) and, if there are
 #'   multiple cores (\eqn{>1}), a cluster will be started with
 #'   \link[parallel]{makeCluster}. If started, the cluster will be stopped
 #'   after the computations are finished;
 #'   \item positive integer defining the number of cores to start a cluster.
-#'   If \code{cl = 1}, no attempt to create a cluster will be made.
-#'   If \code{cl > 1}, cluster will be started (using \link[parallel]{makeCluster})
-#'   and stopped afterwards (using \link[parallel]{stopCluster}).
+#'   If \code{cl = 1} (default), no attempt to create a cluster will be made.
+#'   If \code{cl} > 1, a cluster will be started (using \link[parallel]{makeCluster})
+#'   and stopped afterward (using \link[parallel]{stopCluster}).
 #' }
-#' @param ... other arguments passed to the function for VAR estimation.
-#' The arguments include \code{lag.restrict} that is used to remove a number of first lags
-#' in the cause variable from consideration (use restricted VAR to avoid testing for short-term causality);
-#' default \code{lag.restrict = 0L}, i.e., no restrictions.
-#' Other possible arguments are as in the \code{\link[vars]{VAR}} function.
-#' Also see Details and Examples.
 #'
-#'
-#' @return A list containing the following elements:
-#' \item{MSEt}{observed value of the MSEt statistic.}
-#' \item{MSEt_p}{bootstrapped \eqn{p}-value of the MSEt test.}
-#' \item{MSEt_p_asympt}{asymptotic \eqn{p}-value of the MSEt test,
-#' based on the left tail of the t distribution.}
-#' \item{MSEcor}{observed value of the MSEcor statistic.}
-#' \item{MSEcor_p}{bootstrapped \eqn{p}-value of the MSEcor test.}
-#' \item{MSEcor_p_asympt}{asymptotic \eqn{p}-value of the MSEcor test,
-#' based on the left tail of the t distribution.}
-#' \item{Md}{observed value of the Md statistic.}
-#' \item{Md_p}{bootstrapped \eqn{p}-value of the Md test.}
-#' \item{p}{order \eqn{p} of the VAR(\eqn{p}) model.}
+#' @return Two lists (one for the fast bootstrap,
+#' another for the bootstrap under the null hypothesis) each containing the following elements:
+#' \item{result}{a table with the observed values of the test statistics and \eqn{p}-values.}
+#' \item{cause}{the cause variable.}
+#' \item{p}{the AR order used.}
 #'
 #' @references
 #' \insertAllCited{}
@@ -81,6 +85,7 @@
 #'
 #' @author Vyacheslav Lyubchich
 #'
+#' @seealso \code{\link{causality_predVAR}}
 #' @export
 #' @examples
 #' \dontrun{
@@ -89,7 +94,8 @@
 #' causality_pred(Canada[,1:2], cause = "e", lag.max = 5)
 #' causality_pred(Canada[,1:2], cause = "e", lag.restrict = 3, lag.max = 15)
 #'
-#' # Example 2 (run in parallel): Box & Jenkins time series
+#' # Example 2 (run in parallel, initiate the cluster manually):
+#' # Box & Jenkins time series
 #' # of sales and a leading indicator, see ?BJsales
 #'
 #' # Initiate a local cluster
@@ -100,16 +106,17 @@
 #' D <- cbind(BJsales.lead, BJsales)
 #' causality_pred(D, cause = "BJsales.lead", lag.max = 5, B = 1000, cl = cl)
 #' causality_pred(D, cause = "BJsales.lead", lag.restrict = 3, p = 5, B = 1000, cl = cl)
+#' parallel::stopCluster(cl)
 #' }
 #'
-causality_pred <- function(y, p = NULL,
-                           cause = NULL,
-                           B = 100L,
-                           test = 0.3,
-                           cl = 1L,
+causality_pred <- function(y, cause = NULL,
+                           p = NULL,
+                           lag.restrict = 0L,
                            lag.max = NULL,
                            k = 2,
-                           lag.restrict = 0L)
+                           B = 500L,
+                           test = 0.3,
+                           cl = 1L)
 {
     bootparallel <- FALSE
     if (is.list(cl)) { #some other cluster supplied; use it but do not stop it
@@ -222,13 +229,11 @@ causality_pred <- function(y, p = NULL,
             # get bootstrapped statistics
             caustests(efullb, eresb)
         })
-    FAST <- list(result = data.frame(MSEt = c(OBS["MSEt"],
-                                              (sum(BOOT["MSEt",] >= 0) + 1) / (B + 1),
-                                              stats::pt(OBS["MSEt"], n_test - 1, lower.tail = TRUE)),
+    Fast <- list(result = data.frame(MSEt = c(OBS["MSEt"],
+                                              (sum(BOOT["MSEt",] >= 0) + 1) / (B + 1)),
                                      MSEcor = c(OBS["MSEcor"],
-                                                (sum(BOOT["MSEcor",] >= 0) + 1) / (B + 1),
-                                                stats::pt(OBS["MSEcor"], n_test - 1, lower.tail = TRUE)),
-                                     row.names = c("stat_obs", "p_boot", "p_asympt")),
+                                                (sum(BOOT["MSEcor",] >= 0) + 1) / (B + 1)),
+                                     row.names = c("stat_obs", "p_boot")),
                  cause = cause,
                  p = p)
 
@@ -239,7 +244,7 @@ causality_pred <- function(y, p = NULL,
     m_y_res <- m_y$residuals
     if (bootparallel) {
         BOOT0 <- parallel::parSapply(cl, X = 1:B, FUN = function(b) {
-            dy_boot <- m_y_fit + sample(m_y_res, replace = TRUE) * rnorm(n_actual)
+            dy_boot <- m_y_fit + sample(m_y_res, replace = TRUE)
             FCST <- sapply(1:n_test - 1, function(i) { # i = 0
                 # estimate full and restricted models
                 m_yx <- stats::lm.fit(x = cbind(1,
@@ -265,7 +270,7 @@ causality_pred <- function(y, p = NULL,
     } else {
         BOOT0 <- #parallel::parSapply(cl, X = 1:B, FUN = function(b) {
             sapply(1:B, FUN = function(b) {
-                dy_boot <- m_y_fit + sample(m_y_res, replace = TRUE) * rnorm(n_actual)
+                dy_boot <- m_y_fit + sample(m_y_res, replace = TRUE)
                 FCST <- sapply(1:n_test - 1, function(i) { # i = 0
                     # estimate full and restricted models
                     m_yx <- stats::lm.fit(x = cbind(1,
@@ -287,13 +292,11 @@ causality_pred <- function(y, p = NULL,
             })
     } # end sequential bootstrap
     FullH0 <- list(result = data.frame(MSEt = c(OBS["MSEt"],
-                                                (sum(BOOT0["MSEt",] <= OBS["MSEt"]) + 1) / (B + 1),
-                                                stats::pt(OBS["MSEt"], n_test - 1, lower.tail = TRUE)),
+                                                (sum(BOOT0["MSEt",] <= OBS["MSEt"]) + 1) / (B + 1)),
                                        MSEcor = c(OBS["MSEcor"],
-                                                  (sum(BOOT0["MSEcor",] <= OBS["MSEcor"]) + 1) / (B + 1),
-                                                  stats::pt(OBS["MSEcor"], n_test - 1, lower.tail = TRUE)),
-                                       row.names = c("stat_obs", "p_boot", "p_asympt")),
+                                                  (sum(BOOT0["MSEcor",] <= OBS["MSEcor"]) + 1) / (B + 1)),
+                                       row.names = c("stat_obs", "p_boot")),
                    cause = cause,
                    p = p)
-    return(list(FAST = FAST, FullH0 = FullH0))
+    return(list(Fast = Fast, FullH0 = FullH0))
 }

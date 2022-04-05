@@ -21,12 +21,11 @@ caustests <- function(efull, eres) {
     # MSEt test
     dt <- efull^2 - eres^2
     mlmt <- lm(dt ~ 1)
-    MSEt <- summary(mlmt)$coefficients[3]
     # MSEcor test (or MSEreg)
     tmp1 <- efull - eres
     tmp2 <- efull + eres
     mlm <- lm(tmp1 ~ tmp2 - 1)
-    MSEcor <- summary(mlm)$coefficients[3]
     # output
-    c(MSEt = MSEt, MSEcor = MSEcor)
+    c(MSEt = summary(mlmt)$coefficients[3],
+      MSEcor = summary(mlm)$coefficients[3])
 }
