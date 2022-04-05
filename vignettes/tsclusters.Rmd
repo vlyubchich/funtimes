@@ -23,7 +23,7 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#",
 
 # Introduction
 
-In this tutorial, two unsupervised clustering algorithms from the `funtimes` library are used to identify clusters of Australia's sea level time series.
+In this tutorial, two unsupervised clustering algorithms from the `funtimes` package are used to identify clusters of Australia's sea level time series.
 
 ## Loading libraries
 
@@ -39,12 +39,19 @@ library(reshape2)
 
 # Data
 
-The daily sea level data are available from 1993-2012 for 17 locations. The data are obtained from @Maharaj_etal_2019 using the following link <http://www.tsclustering.homepage.pt/index.php?p=3>. Download `Application7_3.zip` folder, where the `Aus Sea Levels 17.xlsx` file contains the sea level records. Annual average is taken to convert the temporal resolution.
+The daily sea level data are available from 1993 to 2012 for 17 locations. The data are obtained from @Maharaj_etal_2019 using the following link <http://www.tsclustering.homepage.pt/index.php?p=3>. Download `Application7_3.zip` folder, where the `Aus Sea Levels 17.xlsx` file contains the sea level records. Annual average is taken to convert the temporal resolution.
 
-```{r}
-d_org <- readxl::read_xlsx("Aus_Sea_Levels_17.xlsx", skip = 1, n_max = 7300, col_types = rep("numeric", 20))
+```{r, eval=FALSE}
+d_org <- readxl::read_xlsx("Aus_Sea_Levels_17.xlsx", skip = 1, n_max = 7300)
 # yearly average
-d <- data.frame(aggregate(d_org[, 4:20], list(d_org$Year), FUN = 'mean', na.rm = TRUE)[, -1], row.names = unique(d_org$Year))
+d <- data.frame(aggregate(d_org[, 4:20], list(d_org$Year), 
+                          FUN = 'mean', na.rm = TRUE)[, -1], 
+                row.names = unique(d_org$Year))
+```
+
+```{r, echo=FALSE}
+# saveRDS(d, "Aus_Sea_Levels_17.rds")
+d <- readRDS("Aus_Sea_Levels_17.rds")
 ```
 
 ## Plotting time series
@@ -70,12 +77,12 @@ Clus_sync <- sync_cluster(d ~ t, Window = 3, B = 100)
 Clus_sync
 ```
 
-Total 13 locations are clustered with a common linear trend, while the remaining four are not tied to any of the location with a common trend.
+Total `r sum(Clus_sync$cluster != 0)` locations are clustered with a common linear trend, while the remaining `r sum(Clus_sync$cluster == 0)` are not tied to any other location and form so-called noise cluster.
 
-Below is the plot of clustered time series of sea level:
+Below is the plot of the clustered time series of sea level, where `Cluster 0` indicates the noise cluster without any common linear trend, while `Cluster 1` shows the time series of locations with a common linear trend:
 
 ```{r}
-for(i in 0:max(Clus_sync$cluster)) {
+for (i in 0:max(Clus_sync$cluster)) {
   assign(paste('py', i, sep = ''),
          ggplot(melt(t(d[, Clus_sync$cluster == i]))) +
            geom_line(aes(x = Var2,y = value,color = Var1),size = 1) +
@@ -88,12 +95,12 @@ for(i in 0:max(Clus_sync$cluster)) {
 grid.arrange(py0, py1)
 ```
 
-Here, `Cluster 0` indicates the locations which are not tied to the locations with a common linear trend, while `Cluster 1` shows the time series of locations with a common linear trend.
-
 
 # Clustering time series using a spatiotemporal approach
 
-The `BICC` function applies an unsupervised spatiotemporal clustering algorithm, TRUST, from @Ciampi_etal_2010. It utilizes both the `CSlideCluster` and `CWindowCluster` functions for clustering. There are few critical parameters to be considered before implementing the `BICC` function. The parameter `p` indicates the number of layers (i.e., number of observations in a time series) within each slide, while window `w` is the number consecutive slides. The size of slide and window are set manually. The slide `s` refers to the number of steps required to shift the window.
+The `BICC` function applies an unsupervised spatiotemporal clustering algorithm, TRUST, from @Ciampi_etal_2010. The algorithm has a few tuning parameters, and the `BICC` function automatically selects two of those (`Delta` and `Epsilon`; for manual setting of all the parameters, use the lower-level functions `CSlideCluster` and `CWindowCluster`). 
+First, the time series are clustered within small slides; the length of the slides is defined with the parameter `p` (i.e., number of time-series observations in each slide). 
+Then, slides are aggregated into windows (each window contains `w` consecutive slides), and slide-level cluster assignments are used to cluster the time series at the window level. When defining the windows, the user can also set the step `s`, which is the number of steps used to shift the window (if `s = w`, the windows do not overlap).
 
 ```{r}
 Clus_BICC <- BICC(as.matrix(d), p = 5, w = 4, s = 4)
@@ -102,10 +109,9 @@ Clus_BICC
 
 The algorithm detected only one cluster.
 
-# Citation {.unnumbered}
+# Citation {-}
 
 This vignette belongs to R package `funtimes`. If you wish to cite this page, please cite the package:
-
 ```{r}
 citation("funtimes")
 ```
