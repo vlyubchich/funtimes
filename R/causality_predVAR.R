@@ -82,9 +82,9 @@
 #'
 causality_predVAR <- function(y, p = NULL,
                               cause = NULL,
-                              B = 500,
+                              B = 500L,
                               test = 0.3,
-                              cl = 1,
+                              cl = 1L,
                               ...)
 {
     bootparallel <- FALSE

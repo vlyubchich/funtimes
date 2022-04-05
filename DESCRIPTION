@@ -17,7 +17,7 @@ Authors@R: c(person("Vyacheslav", "Lyubchich",
              person("Ethan D.", "Schaeffer", role = "ctb"),
              person("Srishti", "Vishwakarma", role = "ctb"),
              person("Xingyu", "Wang", role = "ctb"))
-Depends: R (>= 3.0.0)
+Depends: R (>= 3.5.0)
 License: GPL (>= 2)
 Imports: dbscan, Jmisc, Kendall, lmtest, mlVAR, parallel, Rdpack, sandwich, vars
 Suggests: covid19us, Ecdat, ggplot2, gridExtra, knitr, patchwork, randomcoloR, readxl, reshape2, rmarkdown

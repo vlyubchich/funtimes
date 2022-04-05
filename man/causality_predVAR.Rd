@@ -4,7 +4,15 @@
 \alias{causality_predVAR}
 \title{Out-of-sample Tests of Granger Causality using (Restricted) Vector Autoregression}
 \usage{
-causality_predVAR(y, p = NULL, cause = NULL, B = 500, test = 0.3, cl = 1, ...)
+causality_predVAR(
+  y,
+  p = NULL,
+  cause = NULL,
+  B = 500L,
+  test = 0.3,
+  cl = 1L,
+  ...
+)
 }
 \arguments{
 \item{y}{data frame or \code{ts} object for estimating VAR(\eqn{p}).}

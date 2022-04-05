@@ -19,6 +19,11 @@ library(funtimes)
 -   Combine functions for tail comparison into one, without dots.
 -   Replace BIC argument in AR estimation with penalty, to easily switch to AIC or another penalty.
 
+## CRAN version 8.3
+
+- Added functions for out-of-sample Granger causality testing (based on prediction errors), with an option to restrict (disregard) near-contemporaneous lags: `causality_pred` and `causality_predVAR`.
+
+
 ## CRAN version 8.2
 
 - Removed dependency on the package `TDA` by omitting the TDA-based clustering function `TopoCBN`.
