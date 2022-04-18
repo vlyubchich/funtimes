@@ -35,16 +35,26 @@
 #' (an explanatory and the dependent time-series variable). Missing values are not allowed.
 #' @param cause name of the cause variable. If not specified, the first variable in
 #' \code{y} is treated as the cause and the second is treated as the dependent variable.
-#' @param p an integer specifying the order \eqn{p} of autoregressive dependence
-#' (same \eqn{p} used for both explanatory and dependent variables).
-#' By default (if \code{p} is not specified); the user must specify \code{p} or \code{lag.max}.
+#' @param p a vector of one or two positive integers specifying the order \eqn{p} of
+#' autoregressive dependence. The input of length one is recycled, then \code{p[1]} is used for
+#' the dependent variable and \code{p[2]} is used for the cause variable.
+#' The user must specify \code{p} or \code{lag.max}.
 #' If \code{lag.max} is specified, the argument \code{p} is ignored.
+#' @param p.free logical value indicating whether the autoregressive orders for the
+#' dependent and cause variables should be selected independently.
+#' The default \code{p.free = FALSE} means the same autoregressive order is
+#' selected for both variables. Note that if \code{p.free = TRUE} and \code{lag.max} is specified,
+#' then \code{lag.max[1] * (lag.max[2] - lag.restrict)} models are compared,
+#' which might be slow depending on the maximal lags and sample size.
 #' @param lag.restrict integer for the number of short-term lags in the cause variable
 #' to remove from consideration (default is zero, meaning no lags are removed).
 #' This setting does not affect the dependent variable lags that are always present.
-#' @param lag.max integer for the highest lag order to explore.
+#' @param lag.max a vector of one or two positive integers for the highest lag orders to explore.
+#' The input of length one is recycled, then \code{lag.max[1]} used for
+#' the dependent variable and \code{lag.max[2]} is used for the cause variable.
 #' The order is then selected using the Akaike information criterion (AIC; default),
 #' see the argument \code{k} to change the criterion.
+#' \code{lag.max} of length 2 automatically sets \code{p.free = TRUE}.
 #' @param k numeric specifying the weight of the equivalent degrees of freedom part
 #' in the AIC formula. Default \code{k = 2} corresponds to the traditional AIC.
 #' Use \code{k = log(n)} to use the Bayesian information criterion instead
@@ -91,8 +101,8 @@
 #' \dontrun{
 #' # Example 1: Canada time series (ts object)
 #' Canada <- vars::Canada
-#' causality_pred(Canada[,1:2], cause = "e", lag.max = 5)
-#' causality_pred(Canada[,1:2], cause = "e", lag.restrict = 3, lag.max = 15)
+#' causality_pred(Canada[,1:2], cause = "e", lag.max = 5, p.free = TRUE)
+#' causality_pred(Canada[,1:2], cause = "e", lag.restrict = 3, lag.max = 15, p.free = TRUE)
 #'
 #' # Example 2 (run in parallel, initiate the cluster manually):
 #' # Box & Jenkins time series
@@ -111,6 +121,7 @@
 #'
 causality_pred <- function(y, cause = NULL,
                            p = NULL,
+                           p.free = FALSE,
                            lag.restrict = 0L,
                            lag.max = NULL,
                            k = 2,
@@ -118,6 +129,12 @@ causality_pred <- function(y, cause = NULL,
                            test = 0.3,
                            cl = 1L)
 {
+    if (!is.null(lag.max) && any(lag.max < 1L)) {
+        stop("lag.max must be positive integers.")
+    }
+    if (!is.null(p) && any(p < 1L)) {
+        stop("p must be positive integers.")
+    }
     bootparallel <- FALSE
     if (is.list(cl)) { #some other cluster supplied; use it but do not stop it
         bootparallel <- TRUE
@@ -155,44 +172,78 @@ causality_pred <- function(y, cause = NULL,
         stop("Please specify p or lag.max.")
     }
     if (!is.null(lag.max)) { # then select p
-        if (lag.restrict >= lag.max) {
+        if (length(lag.max) == 2) {
+            p.free = TRUE
+        } else {
+            lag.max <- c(lag.max, lag.max)
+        }
+        maxl <- max(lag.max)
+        if (lag.restrict >= lag.max[2]) {
             warning("lag.restrict >= lag.max. Using lag.restrict = 0 instead.")
             lag.restrict <- 0
         }
         if (lag.restrict > 0) {
-            lagX <- embed(y[,cause], lag.max + 1)[, -c(1:(lag.restrict + 1)), drop = FALSE]
+            lagX <- embed(y[,cause], maxl + 1)[, -c(1:(lag.restrict + 1)), drop = FALSE]
         } else {
-            lagX <- embed(y[,cause], lag.max + 1)[, -1, drop = FALSE]
+            lagX <- embed(y[,cause], maxl + 1)[, -1, drop = FALSE]
         }
-        lagY <- embed(y[,dep], lag.max + 1)
+        lagY <- embed(y[,dep], maxl + 1)
         # Information criterion for the model
         # (use rows 1:(n_train - lag.max) to use training set only)
-        IC <- sapply(1:ncol(lagX), function(s) {
-            fit <- stats::lm.fit(x = cbind(1,
-                                           lagY[, 2:(s + lag.restrict + 1)],
-                                           lagX[, 1:s, drop = FALSE]),
-                                 y = lagY[, 1])
-            # see stats:::extractAIC.lm; but omit the scale option
-            nfit <- length(fit$residuals)
-            edf <- nfit - fit$df.residual
-            RSS <- sum(fit$residuals^2, na.rm = TRUE) # stats:::deviance.lm(fit)
-            dev <- nfit * log(RSS/nfit)
-            dev + k * edf
-        })
-        p <- which.min(IC) + lag.restrict
+        if (p.free) {
+            best.ic <- Inf
+            for (p1 in 1:lag.max[1]) {
+                for (p2 in (lag.restrict + 1):lag.max[2]) {
+                    fit <- stats::lm.fit(x = cbind(1,
+                                                   lagY[, 2:(p1 + 1)],
+                                                   lagX[, 1:(p2 - lag.restrict), drop = FALSE]),
+                                         y = lagY[, 1])
+                    # see stats:::extractAIC.lm; but omit the scale option
+                    nfit <- length(fit$residuals)
+                    edf <- nfit - fit$df.residual
+                    RSS <- sum(fit$residuals^2, na.rm = TRUE) # stats:::deviance.lm(fit)
+                    dev <- nfit * log(RSS/nfit)
+                    fit.ic <- dev + k * edf
+                    if (fit.ic < best.ic) {
+                        best.ic <- fit.ic
+                        p <- c(p1, p2)
+                    }
+                }
+            }
+        } else {
+            IC <- sapply((lag.restrict + 1):lag.max[2], function(s) {
+                fit <- stats::lm.fit(x = cbind(1,
+                                               lagY[, 2:(s + 1)],
+                                               lagX[, 1:(s - lag.restrict), drop = FALSE]),
+                                     y = lagY[, 1])
+                # see stats:::extractAIC.lm; but omit the scale option
+                nfit <- length(fit$residuals)
+                edf <- nfit - fit$df.residual
+                RSS <- sum(fit$residuals^2, na.rm = TRUE) # stats:::deviance.lm(fit)
+                dev <- nfit * log(RSS/nfit)
+                dev + k * edf
+            })
+            p <- which.min(IC) + lag.restrict
+        }
     } # finish selection of p
+    if (length(p) == 2) {
+        p.free = TRUE
+    } else {
+        p <- c(p, p)
+    }
+    maxp <- max(p)
 
     # Estimate model and get predictions on the testing set
-    if (lag.restrict >= p) {
+    if (lag.restrict >= p[2]) {
         warning("lag.restrict >= p. Using lag.restrict = 0 instead.")
         lag.restrict <- 0
     }
     if (lag.restrict > 0) {
-        lagX <- embed(y[,cause], p + 1)[, -c(1:(lag.restrict + 1)), drop = FALSE]
+        lagX <- embed(y[,cause], maxp + 1)[, -c(1:(lag.restrict + 1)), drop = FALSE]
     } else {
-        lagX <- embed(y[,cause], p + 1)[, -1, drop = FALSE]
+        lagX <- embed(y[,cause], maxp + 1)[, -1, drop = FALSE]
     }
-    lagY <- embed(y[,dep], p + 1)
+    lagY <- embed(y[,dep], maxp + 1)
     n_actual <- nrow(lagY)
     # m_yx <- stats::lm(X1 ~ ., data = Dyx[1:(n_train - p),])
     # m_yx <- stats::lm.fit(x = cbind(1, lagY[1:(n_train - p), -1], lagX[1:(n_train - p), ]),
@@ -202,15 +253,15 @@ causality_pred <- function(y, cause = NULL,
     FCST <- sapply(1:n_test - 1, function(i) { # i = 0
         # estimate full and restricted models
         m_yx <- stats::lm.fit(x = cbind(1,
-                                        lagY[(1 + i):(n_train - p + i), -1, drop = FALSE],
-                                        lagX[(1 + i):(n_train - p + i), , drop = FALSE]),
-                              y = lagY[(1 + i):(n_train - p + i), 1, drop = FALSE])
+                                        lagY[(1 + i):(n_train - maxp + i), 2:(p[1] + 1), drop = FALSE],
+                                        lagX[(1 + i):(n_train - maxp + i), 1:(p[2] - lag.restrict), drop = FALSE]),
+                              y = lagY[(1 + i):(n_train - maxp + i), 1, drop = FALSE])
         m_y <- stats::lm.fit(x = cbind(1,
-                                       lagY[(1 + i):(n_train - p + i), -1, drop = FALSE]),
-                             y = lagY[(1 + i):(n_train - p + i), 1, drop = FALSE])
+                                       lagY[(1 + i):(n_train - maxp + i), 2:(p[1] + 1), drop = FALSE]),
+                             y = lagY[(1 + i):(n_train - maxp + i), 1, drop = FALSE])
         # get predictions
-        c(m_yx$coefficients %*% c(1, lagY[(n_train - p + i + 1), -1], lagX[(n_train - p + i + 1), ]),
-          m_y$coefficients %*% c(1, lagY[(n_train - p + i + 1), -1]))
+        c(m_yx$coefficients %*% c(1, lagY[(n_train - maxp + i + 1), 2:(p[1] + 1)], lagX[(n_train - maxp + i + 1), 1:(p[2] - lag.restrict)]),
+          m_y$coefficients %*% c(1, lagY[(n_train - maxp + i + 1), 2:(p[1] + 1)]))
     })
     # Forecast errors
     efull <- y[(n_train + 1):n, dep] - FCST[1,]
@@ -238,7 +289,7 @@ causality_pred <- function(y, cause = NULL,
                  p = p)
 
     # Bootstrap restricted model estimated on the full sample
-    m_y <- stats::lm.fit(x = lagY[,-1, drop = FALSE],
+    m_y <- stats::lm.fit(x = lagY[, 2:(p[1] + 1), drop = FALSE],
                          y = lagY[, 1, drop = FALSE])
     m_y_fit <- m_y$fitted.values
     m_y_res <- m_y$residuals
@@ -248,19 +299,19 @@ causality_pred <- function(y, cause = NULL,
             FCST <- sapply(1:n_test - 1, function(i) { # i = 0
                 # estimate full and restricted models
                 m_yx <- stats::lm.fit(x = cbind(1,
-                                                lagY[(1 + i):(n_train - p + i), -1, drop = FALSE],
-                                                lagX[(1 + i):(n_train - p + i), , drop = FALSE]),
-                                      y = dy_boot[(1 + i):(n_train - p + i)])
+                                                lagY[(1 + i):(n_train - maxp + i), 2:(p[1] + 1), drop = FALSE],
+                                                lagX[(1 + i):(n_train - maxp + i), 1:(p[2] - lag.restrict), drop = FALSE]),
+                                      y = dy_boot[(1 + i):(n_train - maxp + i)])
                 m_y <- stats::lm.fit(x = cbind(1,
-                                               lagY[(1 + i):(n_train - p + i), -1, drop = FALSE]),
-                                     y = dy_boot[(1 + i):(n_train - p + i)])
+                                               lagY[(1 + i):(n_train - maxp + i), 2:(p[1] + 1), drop = FALSE]),
+                                     y = dy_boot[(1 + i):(n_train - maxp + i)])
                 # get predictions
-                c(m_yx$coefficients %*% c(1, lagY[(n_train - p + i + 1), -1], lagX[(n_train - p + i + 1), ]),
-                  m_y$coefficients %*% c(1, lagY[(n_train - p + i + 1), -1]))
+                c(m_yx$coefficients %*% c(1, lagY[(n_train - maxp + i + 1), 2:(p[1] + 1)], lagX[(n_train - maxp + i + 1), 1:(p[2] - lag.restrict)]),
+                  m_y$coefficients %*% c(1, lagY[(n_train - maxp + i + 1), 2:(p[1] + 1)]))
             })
             # Forecast errors
-            efullb <- dy_boot[(n_train + 1):n - p] - FCST[1,]
-            eresb <- dy_boot[(n_train + 1):n - p] - FCST[2,]
+            efullb <- dy_boot[(n_train + 1):n - maxp] - FCST[1,]
+            eresb <- dy_boot[(n_train + 1):n - maxp] - FCST[2,]
             # test statistics
             caustests(efullb, eresb)
         })
@@ -274,19 +325,19 @@ causality_pred <- function(y, cause = NULL,
                 FCST <- sapply(1:n_test - 1, function(i) { # i = 0
                     # estimate full and restricted models
                     m_yx <- stats::lm.fit(x = cbind(1,
-                                                    lagY[(1 + i):(n_train - p + i), -1, drop = FALSE],
-                                                    lagX[(1 + i):(n_train - p + i), , drop = FALSE]),
-                                          y = dy_boot[(1 + i):(n_train - p + i)])
+                                                    lagY[(1 + i):(n_train - maxp + i), 2:(p[1] + 1), drop = FALSE],
+                                                    lagX[(1 + i):(n_train - maxp + i), 1:(p[2] - lag.restrict), drop = FALSE]),
+                                          y = dy_boot[(1 + i):(n_train - maxp + i)])
                     m_y <- stats::lm.fit(x = cbind(1,
-                                                   lagY[(1 + i):(n_train - p + i), -1, drop = FALSE]),
-                                         y = dy_boot[(1 + i):(n_train - p + i)])
+                                                   lagY[(1 + i):(n_train - maxp + i), 2:(p[1] + 1), drop = FALSE]),
+                                         y = dy_boot[(1 + i):(n_train - maxp + i)])
                     # get predictions
-                    c(m_yx$coefficients %*% c(1, lagY[(n_train - p + i + 1), -1], lagX[(n_train - p + i + 1), ]),
-                      m_y$coefficients %*% c(1, lagY[(n_train - p + i + 1), -1]))
+                    c(m_yx$coefficients %*% c(1, lagY[(n_train - maxp + i + 1), 2:(p[1] + 1)], lagX[(n_train - maxp + i + 1), 1:(p[2] - lag.restrict)]),
+                      m_y$coefficients %*% c(1, lagY[(n_train - maxp + i + 1), 2:(p[1] + 1)]))
                 })
                 # Forecast errors
-                efullb <- dy_boot[(n_train + 1):n - p] - FCST[1,]
-                eresb <- dy_boot[(n_train + 1):n - p] - FCST[2,]
+                efullb <- dy_boot[(n_train + 1):n - maxp] - FCST[1,]
+                eresb <- dy_boot[(n_train + 1):n - maxp] - FCST[2,]
                 # test statistics
                 caustests(efullb, eresb)
             })
