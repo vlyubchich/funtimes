@@ -8,6 +8,7 @@ causality_pred(
   y,
   cause = NULL,
   p = NULL,
+  p.free = FALSE,
   lag.restrict = 0L,
   lag.max = NULL,
   k = 2,
@@ -23,18 +24,29 @@ causality_pred(
 \item{cause}{name of the cause variable. If not specified, the first variable in
 \code{y} is treated as the cause and the second is treated as the dependent variable.}
 
-\item{p}{an integer specifying the order \eqn{p} of autoregressive dependence
-(same \eqn{p} used for both explanatory and dependent variables).
-By default (if \code{p} is not specified); the user must specify \code{p} or \code{lag.max}.
+\item{p}{a vector of one or two positive integers specifying the order \eqn{p} of
+autoregressive dependence. The input of length one is recycled, then \code{p[1]} is used for
+the dependent variable and \code{p[2]} is used for the cause variable.
+The user must specify \code{p} or \code{lag.max}.
 If \code{lag.max} is specified, the argument \code{p} is ignored.}
+
+\item{p.free}{logical value indicating whether the autoregressive orders for the
+dependent and cause variables should be selected independently.
+The default \code{p.free = FALSE} means the same autoregressive order is
+selected for both variables. Note that if \code{p.free = TRUE} and \code{lag.max} is specified,
+then \code{lag.max[1] * (lag.max[2] - lag.restrict)} models are compared,
+which might be slow depending on the maximal lags and sample size.}
 
 \item{lag.restrict}{integer for the number of short-term lags in the cause variable
 to remove from consideration (default is zero, meaning no lags are removed).
 This setting does not affect the dependent variable lags that are always present.}
 
-\item{lag.max}{integer for the highest lag order to explore.
+\item{lag.max}{a vector of one or two positive integers for the highest lag orders to explore.
+The input of length one is recycled, then \code{lag.max[1]} used for
+the dependent variable and \code{lag.max[2]} is used for the cause variable.
 The order is then selected using the Akaike information criterion (AIC; default),
-see the argument \code{k} to change the criterion.}
+see the argument \code{k} to change the criterion.
+\code{lag.max} of length 2 automatically sets \code{p.free = TRUE}.}
 
 \item{k}{numeric specifying the weight of the equivalent degrees of freedom part
 in the AIC formula. Default \code{k = 2} corresponds to the traditional AIC.
@@ -108,8 +120,8 @@ To use the symmetric vector autoregression (VAR), use the function \code{\link{c
 \dontrun{
 # Example 1: Canada time series (ts object)
 Canada <- vars::Canada
-causality_pred(Canada[,1:2], cause = "e", lag.max = 5)
-causality_pred(Canada[,1:2], cause = "e", lag.restrict = 3, lag.max = 15)
+causality_pred(Canada[,1:2], cause = "e", lag.max = 5, p.free = TRUE)
+causality_pred(Canada[,1:2], cause = "e", lag.restrict = 3, lag.max = 15, p.free = TRUE)
 
 # Example 2 (run in parallel, initiate the cluster manually):
 # Box & Jenkins time series
