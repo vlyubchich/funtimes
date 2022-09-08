@@ -25,8 +25,8 @@ A list with following components:
 \item{Tn}{test statistic based on artificial ANOVA and defined
 by \insertCite{Wang_VanKeilegom_2007;textual}{funtimes}
 as a difference of mean square for treatments (MST) and mean square for errors (MSE):
-\deqn{T_n= MST - MSE =\frac{k_{n}}{n-1} \sum_{t=1}^T 
-\biggl(\overline{V}_{t.}-\overline{V}_{..}\biggr)^2 - 
+\deqn{T_n= MST - MSE =\frac{k_{n}}{n-1} \sum_{t=1}^T
+\biggl(\overline{V}_{t.}-\overline{V}_{..}\biggr)^2 -
 \frac{1}{n(k_{n}-1)} \sum_{t=1}^n \sum_{j=1}^{k_{n}}\biggl(V_{tj}-\overline{V}_{t.}\biggr)^2,}
 where \eqn{\{V_{t1}, \ldots, V_{tk_n}\}=\{Z_j: j\in W_{t}\}}, \eqn{W_t} is a
 local window, \eqn{\overline{V}_{t.}} and \eqn{\overline{V}_{..}} are the mean
@@ -34,7 +34,7 @@ of the \eqn{t}th group and the grand mean, respectively.}
 
 \item{Tns}{standardized version of \code{Tn} according to
 Theorem 3.1 by \insertCite{Wang_VanKeilegom_2007;textual}{funtimes}:
-\deqn{T_{ns} = \left( \frac{n}{k_n} \right)^{\frac{1}{2}}T_n \bigg/  
+\deqn{T_{ns} = \left( \frac{n}{k_n} \right)^{\frac{1}{2}}T_n \bigg/
 \left(\frac{4}{3}\right)^{\frac{1}{2}} \sigma^2,}{Tns = Tn*(n/kn)^0.5 / (sigma^2 * (4/3)^0.5),}
 where \eqn{n} is the length and \eqn{\sigma^2}{sigma^2} is the variance of the time series.
 Robust difference-based Rice's estimator \insertCite{Rice_1984}{funtimes}

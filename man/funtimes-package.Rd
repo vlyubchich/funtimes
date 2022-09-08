@@ -44,6 +44,7 @@ For a list of defunct (removed) functions, use \code{?'funtimes-defunct'}
 Authors:
 \itemize{
   \item Yulia R. Gel
+  \item Srishti Vishwakarma
 }
 
 Other contributors:
@@ -55,7 +56,6 @@ Other contributors:
   \item Palina Niamkova [contributor]
   \item Dorcas Ofori-Boateng [contributor]
   \item Ethan D. Schaeffer [contributor]
-  \item Srishti Vishwakarma [contributor]
   \item Xingyu Wang [contributor]
 }
 

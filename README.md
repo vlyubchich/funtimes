@@ -18,6 +18,7 @@ library(funtimes)
 
 -   Combine functions for tail comparison into one, without dots.
 -   Replace BIC argument in AR estimation with penalty, to easily switch to AIC or another penalty.
+-   Remove dependence on Jmisc.
 
 ## CRAN version 8.3
 
