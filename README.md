@@ -1,7 +1,7 @@
 # funtimes: Functions for Time Series Analysis
 
 [![CRAN status](https://www.r-pkg.org/badges/version/funtimes)](https://CRAN.R-project.org/package=funtimes)
-[![R-CMD-check](https://github.com/tidyverse/vlyubchich/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tidyverse/vlyubchich/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/vlyubchich/funtimes/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/vlyubchich/funtimes/actions/workflows/R-CMD-check.yaml)
 
 This is the version of the package under development. To use the most recent stable version from CRAN, run
 ```r
