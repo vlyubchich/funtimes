@@ -1,90 +1,90 @@
 #' Time Series Trend Synchronicity Test
-#' 
+#'
 #' Nonparametric test for synchronicity of parametric trends in multiple time series
-#' \insertCite{Lyubchich_Gel_2016_synchronism}{funtimes}. 
-#' The method tests whether \eqn{N} observed time series exhibit the same trend 
+#' \insertCite{Lyubchich_Gel_2016_synchronism}{funtimes}.
+#' The method tests whether \eqn{N} observed time series exhibit the same trend
 #' of some pre-specified smooth parametric form.
-#' 
-#' @details Arguments \code{Window}, \code{j}, and \code{q} are used to set windows 
-#' for the local regression. Current version of the function assumes two options: 
-#' (1) user specifies one fixed window for each time series using the argument 
-#' \code{Window} (if \code{Window} is set, \code{j} and \code{q} are ignored), 
-#' and (2) user specifies a set of windows by \code{j} and \code{q} to apply 
-#' this set to each time series and to select an optimal window using a heuristic 
+#'
+#' @details Arguments \code{Window}, \code{j}, and \code{q} are used to set windows
+#' for the local regression. Current version of the function assumes two options:
+#' (1) user specifies one fixed window for each time series using the argument
+#' \code{Window} (if \code{Window} is set, \code{j} and \code{q} are ignored),
+#' and (2) user specifies a set of windows by \code{j} and \code{q} to apply
+#' this set to each time series and to select an optimal window using a heuristic
 #' \eqn{m}-out-of-\eqn{n} subsampling algorithm \insertCite{Bickel_Sakov_2008}{funtimes}.
-#' The option of selecting windows automatically for some of the time series, 
-#' while for other time series the window is fixed, is not available yet. 
-#' If none of these three arguments is set, default \code{j} and \code{q} are used. 
-#' Values \code{T*q^j} are mapped to the largest previous integer, then only 
+#' The option of selecting windows automatically for some of the time series,
+#' while for other time series the window is fixed, is not available yet.
+#' If none of these three arguments is set, default \code{j} and \code{q} are used.
+#' Values \code{T*q^j} are mapped to the largest previous integer, then only
 #' those greater than 2 are used.
-#' 
-#' See more details in \insertCite{Lyubchich_Gel_2016_synchronism;textual}{funtimes} 
+#'
+#' See more details in \insertCite{Lyubchich_Gel_2016_synchronism;textual}{funtimes}
 #' and \insertCite{Lyubchich_2016_trends;textual}{funtimes}.
-#' 
-#' 
-#' @param formula an object of class "\code{\link[stats]{formula}}", 
-#' specifying the form of the common parametric time trend to be tested 
-#' in a \eqn{T} by \eqn{N} matrix of time series 
-#' (time series in columns). Variable \eqn{t} should be used to specify the form of 
-#' the trend, where \eqn{t} is specified within the function as a regular sequence 
+#'
+#'
+#' @param formula an object of class "\code{\link[stats]{formula}}",
+#' specifying the form of the common parametric time trend to be tested
+#' in a \eqn{T} by \eqn{N} matrix of time series
+#' (time series in columns). Variable \eqn{t} should be used to specify the form of
+#' the trend, where \eqn{t} is specified within the function as a regular sequence
 #' on the interval (0,1]. See `Examples'.
-#' @param Window scalar or \eqn{N}-vector with lengths of the local windows (factors). 
-#' If only one value is set, the same \code{Window} is applied to each time series. 
-#' An \eqn{N}-vector gives a specific window for each time series. 
-#' If \code{Window} is not specified, an automatic algorithm for optimal 
+#' @param Window scalar or \eqn{N}-vector with lengths of the local windows (factors).
+#' If only one value is set, the same \code{Window} is applied to each time series.
+#' An \eqn{N}-vector gives a specific window for each time series.
+#' If \code{Window} is not specified, an automatic algorithm for optimal
 #' window selection is applied as a default option (see `Details').
-#' @param q scalar from 0 to 1 to define the set of possible windows \code{T*q^j} 
-#' and to automatically select an optimal window for each time series. 
+#' @param q scalar from 0 to 1 to define the set of possible windows \code{T*q^j}
+#' and to automatically select an optimal window for each time series.
 #' Default is \eqn{3/4}. This argument is ignored if the \code{Window} is set by the user.
-#' @param j numeric vector to define the set of possible windows \code{T*q^j} 
-#' and to automatically select an optimal window for each time series. 
+#' @param j numeric vector to define the set of possible windows \code{T*q^j}
+#' and to automatically select an optimal window for each time series.
 #' Default is \code{c(8:11)}. This argument is ignored if the \code{Window} is set by the user.
-#' @param ar.order order of the autoregressive filter when \code{BIC = FALSE}, 
-#' or the maximal order for BIC-based filtering. Default is \code{round(10*log10(T))}. 
-#' The \code{ar.order} can be a scalar or \eqn{N}-vector. If scalar, the same 
-#' \code{ar.order} is applied to each time series. An \eqn{N}-vector specifies 
+#' @param ar.order order of the autoregressive filter when \code{ic = "none"},
+#' or the maximal order for IC-based filtering. Default is \code{round(10*log10(T))}.
+#' The \code{ar.order} can be a scalar or \eqn{N}-vector. If scalar, the same
+#' \code{ar.order} is applied to each time series. An \eqn{N}-vector specifies
 #' a separate \code{ar.order} for each time series.
 #' @inheritParams wavk_test
 #' @inheritParams ARest
-#' 
-#' 
+#'
+#'
 #' @return A list of class \code{"htest"} containing the following components:
 #' \item{method}{name of the method.}
 #' \item{data.name}{name of the data.}
 #' \item{statistic}{value of the test statistic.}
 #' \item{p.value}{\eqn{p}-value of the test.}
 #' \item{alternative}{alternative hypothesis.}
-#' \item{estimate}{list with elements \code{common_trend_estimates}, 
-#' \code{ar_order_used}, \code{Window_used}, \code{wavk_obs}, and 
-#' \code{all_considered_windows}. The latter is a table with bootstrap and 
-#' asymptotic test results for all considered windows, that is, without adaptive 
+#' \item{estimate}{list with elements \code{common_trend_estimates},
+#' \code{ar_order_used}, \code{Window_used}, \code{wavk_obs}, and
+#' \code{all_considered_windows}. The latter is a table with bootstrap and
+#' asymptotic test results for all considered windows, that is, without adaptive
 #' selection of the local window.}
-#' 
+#'
 #' @references
 #' \insertAllCited{}
-#' 
-#' @seealso \code{\link[stats]{ar}}, \code{\link{HVK}}, \code{\link{WAVK}}, 
+#'
+#' @seealso \code{\link[stats]{ar}}, \code{\link{HVK}}, \code{\link{WAVK}},
 #' \code{\link{wavk_test}}
-#' 
+#'
 #' @keywords htest trend ts synchrony
-#' 
+#'
 #' @author Yulia R. Gel, Vyacheslav Lyubchich, Ethan Schaeffer, Xingyu Wang
-#' 
+#'
 #' @export
 #' @examples
 #' #Fix seed for reproducible simulations:
 #' set.seed(1)
-#' 
-#' # Simulate two autoregressive time series of length n without trend 
-#' #(i.e., with zero or constant trend) 
+#'
+#' # Simulate two autoregressive time series of length n without trend
+#' #(i.e., with zero or constant trend)
 #' # and arrange the series into a matrix:
 #' n <- 200
 #' y1 <- arima.sim(n = n, list(order = c(1, 0, 0), ar = c(0.6)))
 #' y2 <- arima.sim(n = n, list(order = c(1, 0, 0), ar = c(-0.2)))
 #' Y <- cbind(y1, y2)
 #' plot.ts(Y)
-#' 
-#' 
+#'
+#'
 #' #Test H0 of a common linear trend:
 #' \dontrun{
 #'     sync_test(Y ~ t, B = 500)
@@ -92,7 +92,7 @@
 #' # Sample output:
 #' ##	Nonparametric test for synchronism of parametric trends
 #' ##
-#' ##data:  Y 
+#' ##data:  Y
 #' ##Test statistic = -0.0028999, p-value = 0.7
 #' ##alternative hypothesis: common trend is not of the form Y ~ t.
 #' ##sample estimates:
@@ -118,7 +118,7 @@
 #' ##
 #' ##$wavk_obs
 #' ##[1]  0.05827148 -0.06117136
-#' 
+#'
 #' # Add a time series y3 with a different linear trend and re-apply the test:
 #' y3 <- 1 + 3*((1:n)/n) + arima.sim(n = n, list(order = c(1, 0, 0), ar = c(-0.2)))
 #' Y2 <- cbind(Y, y3)
@@ -128,7 +128,7 @@
 #' # Sample output:
 #' ##	Nonparametric test for synchronism of parametric trends
 #' ##
-#' ##data:  Y2 
+#' ##data:  Y2
 #' ##Test statistic = 0.48579, p-value < 2.2e-16
 #' ##alternative hypothesis: common trend is not of the form Y2 ~ t.
 #' ##sample estimates:
@@ -154,16 +154,16 @@
 #' ##
 #' ##$wavk_obs
 #' ##[1]  0.08941797 -0.07985614  0.34672734
-#' 
+#'
 #' #Other hypothesized trend forms can be specified, for example:
 #' \dontrun{
 #'     sync_test(Y ~ 1) #constant trend
 #'     sync_test(Y ~ poly(t, 2)) #quadratic trend
 #'     sync_test(Y ~ poly(t, 3)) #cubic trend
 #' }
-#' 
-sync_test <- function(formula, B = 1000, Window = NULL, q = NULL, j = NULL, 
-                      ar.order = NULL, ar.method = "HVK", BIC = TRUE)
+#'
+sync_test <- function(formula, B = 1000, Window = NULL, q = NULL, j = NULL,
+                      ar.order = NULL, ar.method = "HVK", ic = "BIC")
 {
     frml <- deparse(substitute(formula))
     splt <- strsplit(frml, "~")[[1]]
@@ -209,7 +209,7 @@ sync_test <- function(formula, B = 1000, Window = NULL, q = NULL, j = NULL,
         if (length(kn) == 0) {
             stop("set proper q and/or j.")
         }
-    } 
+    }
     if (!is.null(ar.order)) { #if user set ar.order
         maxARorder <- ar.order
         if (length(ar.order) == 1) {
@@ -223,7 +223,7 @@ sync_test <- function(formula, B = 1000, Window = NULL, q = NULL, j = NULL,
     #allocate space:
     if (!UseOneWindowPerTS) {
         s <- array(NA, dim = c(length(kn), B, K))
-        wavk_obs_all <- matrix(NA, length(kn), K)        
+        wavk_obs_all <- matrix(NA, length(kn), K)
     }
     wavk_boot_opt <- array(NA, c(B, K))
     wavk_obs <- rep(NA, K)
@@ -237,12 +237,12 @@ sync_test <- function(formula, B = 1000, Window = NULL, q = NULL, j = NULL,
     TrendCoeff <- summary(mod)$coefficients
     U <- demean(X - mod$fitted) #detrended time series
     for (k in 1:K) {
-        pheta <- ARest(U[,k], ar.order = ar.order, ar.method = ar.method, BIC = BIC)
+        pheta <- ARest(U[,k], ar.order = ar.order, ar.method = ar.method, ic = ic)
         OutputARorder[1, k] <- length(pheta)
         if (length(pheta) > 0) {
             tmp <- filter(X[,k], pheta, sides = 1)
             tmp2 <- filter(mod$fitted, pheta, sides = 1)
-            Z <- (X[(length(pheta) + 1):n, k] - tmp[length(pheta):(n - 1)]) - 
+            Z <- (X[(length(pheta) + 1):n, k] - tmp[length(pheta):(n - 1)]) -
                 (mod$fitted[(length(pheta) + 1):n] - tmp2[length(pheta):(n - 1)])
         } else {
             Z <- U[,k]
@@ -286,47 +286,47 @@ sync_test <- function(formula, B = 1000, Window = NULL, q = NULL, j = NULL,
         p.value.boot.all <- 2 * crit.boot
         p.value.boot.all[crit.boot > 0.5] <- 2 * (1 - crit.boot[crit.boot > 0.5])
         #Asymptotic results
-        StAssStandard <- ST*sqrt(n)/sqrt(4*sum(sigma^4)/3) 
+        StAssStandard <- ST*sqrt(n)/sqrt(4*sum(sigma^4)/3)
         crit.ass <- pnorm(StAssStandard, mean = 0, sd = 1)
         p.value.ass <- crit.ass * 2
         p.value.ass[crit.ass > 0.5] <- (1 - crit.ass[crit.ass > 0.5]) * 2
         #
-        ESTIMATE <- list(TrendCoeff, OutputARorder, OutputWindow, 
+        ESTIMATE <- list(TrendCoeff, OutputARorder, OutputWindow,
                          cbind(kn, ST, p.value.boot.all, p.value.ass), wavk_obs)
-        names(ESTIMATE) <- list("common_trend_estimates", "ar.order_used", 
+        names(ESTIMATE) <- list("common_trend_estimates", "ar.order_used",
                                 "Window_used", "all_considered_windows", "wavk_obs")
-        dimnames(ESTIMATE[[4]]) <- list(rep("", NROW(ESTIMATE[[4]])), 
+        dimnames(ESTIMATE[[4]]) <- list(rep("", NROW(ESTIMATE[[4]])),
                                         c("Window", "Statistic", "p-value", "Asympt. p-value"))
     } else {
         p.value.boot.all <- P.VALUE
         ST <- sum(wavk_obs)
         #Asymptotic results
-        StAssStandard <- ST*sqrt(n)/sqrt(4*sum(sigma^4)/3) 
+        StAssStandard <- ST*sqrt(n)/sqrt(4*sum(sigma^4)/3)
         crit.ass <- pnorm(StAssStandard, mean = 0, sd = 1)
         p.value.ass <- crit.ass * 2
         p.value.ass[crit.ass > 0.5] <- (1 - crit.ass[crit.ass > 0.5]) * 2
         #
         if (ONEwindow) {
-            ESTIMATE <- list(TrendCoeff, OutputARorder, OutputWindow, 
+            ESTIMATE <- list(TrendCoeff, OutputARorder, OutputWindow,
                              cbind(Window[1], ST, p.value.boot.all, p.value.ass), wavk_obs)
-            names(ESTIMATE) <- list("common_trend_estimates", "ar.order_used", 
+            names(ESTIMATE) <- list("common_trend_estimates", "ar.order_used",
                                     "Window_used", "all_considered_windows", "wavk_obs")
-            dimnames(ESTIMATE[[4]]) <- list(rep("", NROW(ESTIMATE[[4]])), 
+            dimnames(ESTIMATE[[4]]) <- list(rep("", NROW(ESTIMATE[[4]])),
                                             c("Window", "Statistic", "p-value", "Asympt. p-value"))
         } else {
-            ESTIMATE <- list(TrendCoeff, OutputARorder, OutputWindow, 
+            ESTIMATE <- list(TrendCoeff, OutputARorder, OutputWindow,
                              cbind(ST, p.value.boot.all, p.value.ass), wavk_obs)
-            names(ESTIMATE) <- list("common_trend_estimates", "ar.order_used", 
+            names(ESTIMATE) <- list("common_trend_estimates", "ar.order_used",
                                     "Window_used", "all_considered_windows", "wavk_obs")
-            dimnames(ESTIMATE[[4]]) <- list(rep("", NROW(ESTIMATE[[4]])), 
+            dimnames(ESTIMATE[[4]]) <- list(rep("", NROW(ESTIMATE[[4]])),
                                             c("Statistic", "p-value", "Asympt. p-value"))
         }
     }
-    
-    METHOD <- "Nonparametric test for synchronism of parametric trends"   
+
+    METHOD <- "Nonparametric test for synchronism of parametric trends"
     names(STATISTIC) <- "Test statistic"
     ALTERNATIVE <- paste("common trend is not of the form ", frml, ".", sep = "")
-    structure(list(method = METHOD, data.name = DNAME, statistic = STATISTIC,  
-                   p.value = P.VALUE,  alternative = ALTERNATIVE, estimate = ESTIMATE), 
-              class = "htest") 
+    structure(list(method = METHOD, data.name = DNAME, statistic = STATISTIC,
+                   p.value = P.VALUE,  alternative = ALTERNATIVE, estimate = ESTIMATE),
+              class = "htest")
 }

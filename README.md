@@ -17,17 +17,20 @@ library(funtimes)
 ## Future work
 
 -   Combine functions for tail comparison into one, without dots.
--   Replace BIC argument in AR estimation with penalty, to easily switch to AIC or another penalty.
 -   Remove dependence on Jmisc.
 
-## CRAN version 8.3
+## CRAN version 9.1
 
-- Added functions for out-of-sample Granger causality testing (based on prediction errors), with an option to restrict (disregard) near-contemporaneous lags: `causality_pred` and `causality_predVAR`.
+-   Replace the `BIC` argument in AR estimation with `ic`, to easily switch to AIC. 
+The directly affected functions are `notrend_test()`, `sync_test()`, and `wavk_test()`.
 
+## CRAN version 9.0
+
+- Added functions for out-of-sample Granger causality testing (based on prediction errors), with an option to restrict (disregard) near-contemporaneous lags: `causality_pred()` and `causality_predVAR()`.
 
 ## CRAN version 8.2
 
-- Removed dependency on the package `TDA` by omitting the TDA-based clustering function `TopoCBN`.
+- Removed dependency on the package `TDA` by omitting the TDA-based clustering function `TopoCBN()`.
 - Added a vignette on clusters of time series.
 
 ## CRAN version 8.1
@@ -37,8 +40,8 @@ library(funtimes)
 ## CRAN version 8.0
 
 -   Deprecated functions (with dots) marked as defunct. <!-- https://devguide.ropensci.org/evolution.html  -->
--   New functions: `AuePolyReg_test`, `ccf_boot`, `cumsumCPA_test`, `GombayCPA_test`, and `TopoCBN`.
--   Fixed a bug in `beales` thanks to an email from Dave Lorenz.
+-   New functions: `AuePolyReg_test()`, `ccf_boot()`, `cumsumCPA_test()`, `GombayCPA_test()`, and `TopoCBN()`.
+-   Fixed a bug in `beales()` thanks to an email from Dave Lorenz.
 
 ## CRAN version 7.0
 
@@ -46,7 +49,7 @@ library(funtimes)
 -   Add vignettes for Beale's estimator and trend tests.
 -   Add a package overview section in the documentation.
 -   Format R code according to R style diagnostics (such as whitespaces).
--   Improve computational efficiency of `purity` function, inspired by Brian Simmons's suggestions from 2019-06-12 about handling zero-cases when all matches have been found.
+-   Improve computational efficiency of `purity()` function, inspired by Brian Simmons's suggestions from 2019-06-12 about handling zero cases when all matches have been found.
 
 ## CRAN version 6.1 and below
 

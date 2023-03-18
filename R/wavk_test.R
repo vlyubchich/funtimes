@@ -1,42 +1,42 @@
 #' WAVK Trend Test
-#' 
+#'
 #' Nonparametric test to detect (non-)monotonic parametric trends in time series
 #' \insertCite{@based on @Lyubchich_etal_2013_wavk}{funtimes}.
-#' 
-#' @details See more details in \insertCite{Lyubchich_Gel_2016_synchronism;textual}{funtimes} 
+#'
+#' @details See more details in \insertCite{Lyubchich_Gel_2016_synchronism;textual}{funtimes}
 #' and \insertCite{Lyubchich_2016_trends;textual}{funtimes}.
-#' 
-#' 
-#' @param formula an object of class "\code{\link[stats]{formula}}", specifying the 
-#' form of the parametric time trend to be tested. Variable \eqn{t} should be used 
-#' to specify the form, where \eqn{t} is specified within the function as a regular 
+#'
+#'
+#' @param formula an object of class "\code{\link[stats]{formula}}", specifying the
+#' form of the parametric time trend to be tested. Variable \eqn{t} should be used
+#' to specify the form, where \eqn{t} is specified within the function as a regular
 #' sequence on the interval (0,1]. See \code{Examples}.
-#' @param factor.length method to define the length of local windows (factors). 
-#' Default option\cr \code{"user.defined"} allows setting only one value of the argument 
-#' \code{Window}. The option \code{"adaptive.selection"} sets \code{method = "boot"} 
-#' and employs heuristic \eqn{m}-out-of-\eqn{n} subsampling algorithm 
-#' \insertCite{Bickel_Sakov_2008}{funtimes} to select an optimal window from the set 
-#' of possible windows \code{length(x)*q^j} whose values are mapped to the largest 
+#' @param factor.length method to define the length of local windows (factors).
+#' Default option\cr \code{"user.defined"} allows setting only one value of the argument
+#' \code{Window}. The option \code{"adaptive.selection"} sets \code{method = "boot"}
+#' and employs heuristic \eqn{m}-out-of-\eqn{n} subsampling algorithm
+#' \insertCite{Bickel_Sakov_2008}{funtimes} to select an optimal window from the set
+#' of possible windows \code{length(x)*q^j} whose values are mapped to the largest
 #' previous integer and greater than 2. Vector \code{x} is the time series tested.
-#' @param Window length of the local window (factor), default is 
-#' \code{round(0.1*length(x))}, where \code{x} is the time series tested. 
+#' @param Window length of the local window (factor), default is
+#' \code{round(0.1*length(x))}, where \code{x} is the time series tested.
 #' This argument is ignored if\cr \code{factor.length = "adaptive.selection"}.
-#' @param q scalar from 0 to 1 to define the set of possible windows when 
-#' \code{factor.length =} \code{"adaptive.selection"}. Default is \eqn{3/4}. 
+#' @param q scalar from 0 to 1 to define the set of possible windows when
+#' \code{factor.length =} \code{"adaptive.selection"}. Default is \eqn{3/4}.
 #' This argument is ignored if\cr \code{factor.length =} \code{"user.defined"}.
-#' @param j numeric vector to define the set of possible windows when 
-#' \code{factor.length =} \code{"adaptive.selection"}. Default is \code{c(8:11)}. 
+#' @param j numeric vector to define the set of possible windows when
+#' \code{factor.length =} \code{"adaptive.selection"}. Default is \code{c(8:11)}.
 #' This argument is ignored if\cr \code{factor.length = "user.defined"}.
-#' @param B number of bootstrap simulations to obtain empirical critical values. 
+#' @param B number of bootstrap simulations to obtain empirical critical values.
 #' Default is 1000.
-#' @param method method of obtaining critical values: from asymptotical (\code{"asympt"}) 
-#' or bootstrap (\code{"boot"}) distribution. 
+#' @param method method of obtaining critical values: from asymptotical (\code{"asympt"})
+#' or bootstrap (\code{"boot"}) distribution.
 #' If \code{factor.length =} \code{"adaptive.selection"} the option \code{"boot"} is used.
 #' @inheritParams ARest
-#' @param out logical value indicates whether the full output should be shown. 
+#' @param out logical value indicates whether the full output should be shown.
 #' Default is \code{FALSE}.
-#' 
-#' 
+#'
+#'
 #' @return A list with class \code{"htest"} containing the following components:
 #' \item{method}{name of the method.}
 #' \item{data.name}{name of the data.}
@@ -44,63 +44,63 @@
 #' \item{p.value}{\eqn{p}-value of the test.}
 #' \item{alternative}{alternative hypothesis.}
 #' \item{parameter}{window that was used.}
-#' \item{estimate}{list with the following elements: estimated trend coefficients; 
-#' user-defined or BIC-selected AR order; estimated AR coefficients; and, 
-#' if \code{factor.length =} \code{"adaptive.selection"}, 
+#' \item{estimate}{list with the following elements: estimated trend coefficients;
+#' user-defined or IC-selected AR order; estimated AR coefficients; and,
+#' if \code{factor.length =} \code{"adaptive.selection"},
 #' test results for all considered windows.}
-#' 
+#'
 #' @references
 #' \insertAllCited{}
-#' 
-#' @seealso \code{\link[stats]{ar}}, \code{\link{HVK}}, \code{\link{WAVK}}, 
+#'
+#' @seealso \code{\link[stats]{ar}}, \code{\link{HVK}}, \code{\link{WAVK}},
 #' \code{\link{sync_test}}, \code{vignette("trendtests", package = "funtimes")}
-#' 
+#'
 #' @keywords htest ts trend
-#' 
+#'
 #' @author Yulia R. Gel, Vyacheslav Lyubchich, Ethan Schaeffer
-#' 
+#'
 #' @export
 #' @examples
 #' # Fix seed for reproducible simulations:
 #' set.seed(1)
-#' 
+#'
 #' #Simulate autoregressive time series of length n with smooth quadratic trend:
 #' n <- 100
 #' tsTrend <- 1 + 2*(1:n/n) + 4*(1:n/n)^2
 #' tsNoise <- arima.sim(n = n, list(order = c(2, 0, 0), ar = c(-0.7, -0.1)))
 #' U <- tsTrend + tsNoise
 #' plot.ts(U)
-#' 
+#'
 #' #Test H0 of a linear trend, with m-out-of-n selection of the local window:
 #' \dontrun{
 #'     wavk_test(U ~ t, factor.length = "adaptive.selection")}
 #' # Sample output:
 #' ##	Trend test by Wang, Akritas, and Van Keilegom (bootstrap p-values)
 #' ##
-#' ##data:  U 
+#' ##data:  U
 #' ##WAVK test statistic = 5.3964, adaptively selected window = 4, p-value < 2.2e-16
 #' ##alternative hypothesis: trend is not of the form U ~ t.
-#' 
-#' #Test H0 of a quadratic trend, with m-out-of-n selection of the local window 
+#'
+#' #Test H0 of a quadratic trend, with m-out-of-n selection of the local window
 #' #and output of all results:
 #' \dontrun{
 #'     wavk_test(U ~ poly(t, 2), factor.length = "adaptive.selection", out = TRUE)}
 #' # Sample output:
 #' ##	Trend test by Wang, Akritas, and Van Keilegom (bootstrap p-values)
 #' ##
-#' ##data:  U 
+#' ##data:  U
 #' ##WAVK test statistic = 0.40083, adaptively selected window = 4, p-value = 0.576
 #' ##alternative hypothesis: trend is not of the form U ~ poly(t, 2).
 #' ##sample estimates:
 #' ##$trend_coefficients
-#' ##(Intercept) poly(t, 2)1 poly(t, 2)2 
-#' ##   3.408530   17.681422    2.597213 
+#' ##(Intercept) poly(t, 2)1 poly(t, 2)2
+#' ##   3.408530   17.681422    2.597213
 #' ##
 #' ##$AR_order
 #' ##[1] 1
 #' ##
 #' ##$AR_coefficients
-#' ##         phi_1 
+#' ##         phi_1
 #' ##[1] -0.7406163
 #' ##
 #' ##$all_considered_windows
@@ -109,25 +109,25 @@
 #' ##      5     0.06098625   0.760
 #' ##      7    -0.57115451   0.738
 #' ##     10    -1.02982929   0.360
-#' 
+#'
 #' # Test H0 of no trend (constant trend) using asymptotic distribution of statistic.
 #' wavk_test(U ~ 1, method = "asympt")
 #' # Sample output:
 #' ##	Trend test by Wang, Akritas, and Van Keilegom (asymptotic p-values)
 #' ##
-#' ##data:  U 
+#' ##data:  U
 #' ##WAVK test statistic = 25.999, user-defined window = 10, p-value < 2.2e-16
 #' ##alternative hypothesis: trend is not of the form U ~ 1.
-#' 
-wavk_test <- function(formula, factor.length = c("user.defined", "adaptive.selection"), 
-                      Window = NULL, q = 3/4, j = c(8:11), B = 1000, method = c("boot", "asympt"), 
-                      ar.order = NULL, ar.method = "HVK", BIC = TRUE, out = FALSE)
+#'
+wavk_test <- function(formula, factor.length = c("user.defined", "adaptive.selection"),
+                      Window = NULL, q = 3/4, j = c(8:11), B = 1000, method = c("boot", "asympt"),
+                      ar.order = NULL, ar.method = "HVK", ic = "BIC", out = FALSE)
 {
     ### Perform various checks.
     frml <- deparse(substitute(formula))
     splt <- strsplit(frml, "~")[[1]]
     DNAME <- splt[1]
-    x <- lm(formula = as.formula(paste0(DNAME, "~ 1"), env = parent.frame(n = 4)), 
+    x <- lm(formula = as.formula(paste0(DNAME, "~ 1"), env = parent.frame(n = 4)),
             method = "model.frame")[,1]
     if (is.null(Window)) {
         Window = round(0.1*length(x))
@@ -187,12 +187,12 @@ wavk_test <- function(formula, factor.length = c("user.defined", "adaptive.selec
     TrendCoeff <- mod$coefficients
     TS <- as.vector(mod$residuals)
     ALTERNATIVE <- paste("trend is not of the form ", frml, ".", sep = "")
-    pheta <- ARest(TS, ar.order = ar.order, ar.method = ar.method, BIC = BIC)
+    pheta <- ARest(TS, ar.order = ar.order, ar.method = ar.method, ic = ic)
     if (length(pheta) > 0) {
         names(pheta) <- paste(rep("phi_", length(pheta)), c(1:length(pheta)), sep = "")
         tmp <- filter(x, pheta, sides = 1)
         tmp2 <- filter(mod$fitted.values, pheta, sides = 1)
-        Z <- (x[(length(pheta) + 1):n] - tmp[length(pheta):(n - 1)]) - 
+        Z <- (x[(length(pheta) + 1):n] - tmp[length(pheta):(n - 1)]) -
             (mod$fitted.values[(length(pheta) + 1):n] - tmp2[length(pheta):(n - 1)])
     } else {
         Z <- TS
@@ -244,19 +244,19 @@ wavk_test <- function(formula, factor.length = c("user.defined", "adaptive.selec
                 ESTIMATE <- c(ESTIMATE, NA)
                 names(ESTIMATE) <- c(tmp, "all_considered_windows")
                 ESTIMATE[[length(ESTIMATE)]] <- cbind(kn, result)
-                dimnames(ESTIMATE[[length(ESTIMATE)]]) <- list(rep("", length(kn)), 
+                dimnames(ESTIMATE[[length(ESTIMATE)]]) <- list(rep("", length(kn)),
                                                                c("Window", "WAVK-statistic", "p-value"))
             }
         }
     }
     names(STATISTIC) <- "WAVK test statistic"
     if (out) {
-        structure(list(method = METHOD, data.name = DNAME, statistic = STATISTIC, 
-                       p.value = P.VALUE, alternative = ALTERNATIVE, 
-                       parameter = PARAMETER, estimate = ESTIMATE), class = "htest") 
+        structure(list(method = METHOD, data.name = DNAME, statistic = STATISTIC,
+                       p.value = P.VALUE, alternative = ALTERNATIVE,
+                       parameter = PARAMETER, estimate = ESTIMATE), class = "htest")
     } else {
-        structure(list(method = METHOD, data.name = DNAME, statistic = STATISTIC, 
-                       p.value = P.VALUE, alternative = ALTERNATIVE, 
-                       parameter = PARAMETER), class = "htest") 
+        structure(list(method = METHOD, data.name = DNAME, statistic = STATISTIC,
+                       p.value = P.VALUE, alternative = ALTERNATIVE,
+                       parameter = PARAMETER), class = "htest")
     }
 }
