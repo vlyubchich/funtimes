@@ -14,7 +14,7 @@ wavk_test(
   method = c("boot", "asympt"),
   ar.order = NULL,
   ar.method = "HVK",
-  BIC = TRUE,
+  ic = "BIC",
   out = FALSE
 )
 }
@@ -51,8 +51,8 @@ Default is 1000.}
 or bootstrap (\code{"boot"}) distribution.
 If \code{factor.length =} \code{"adaptive.selection"} the option \code{"boot"} is used.}
 
-\item{ar.order}{order of autoregressive model when \code{BIC = FALSE}, or
-the maximal order for BIC-based filtering. Default is
+\item{ar.order}{order of the autoregressive model when \code{ic = "none"}, or
+the maximal order for IC-based filtering. Default is
 \code{round(10*log10(length(x)))}, where \code{x} is the time series.}
 
 \item{ar.method}{method of estimating autoregression coefficients.
@@ -61,12 +61,10 @@ Default \code{"HVK"} delivers robust difference-based estimates by
 options of \command{ar} function can be used, such as \code{"burg"},
 \code{"ols"}, \code{"mle"}, and \code{"yw"}.}
 
-\item{BIC}{logical value indicates whether the order of autoregressive
-filter should be selected by Bayesian information criterion (BIC).
-If \code{TRUE} (default), models of orders \eqn{p=} 0,1,...,\code{ar.order}
-or \eqn{p=} 0,1,...,\code{round(10*log10(length(x)))} are considered,
-depending on whether \code{ar.order} is defined or not
-(\code{x} is the time series).}
+\item{ic}{information criterion used to select the order of autoregressive filter (AIC of BIC),
+considering models of orders \eqn{p=} 0,1,...,\code{ar.order}.
+If \code{ic = "none"}, the AR(\eqn{p}) model with \eqn{p=} \code{ar.order} is used,
+without order selection.}
 
 \item{out}{logical value indicates whether the full output should be shown.
 Default is \code{FALSE}.}
@@ -80,7 +78,7 @@ A list with class \code{"htest"} containing the following components:
 \item{alternative}{alternative hypothesis.}
 \item{parameter}{window that was used.}
 \item{estimate}{list with the following elements: estimated trend coefficients;
-user-defined or BIC-selected AR order; estimated AR coefficients; and,
+user-defined or IC-selected AR order; estimated AR coefficients; and,
 if \code{factor.length =} \code{"adaptive.selection"},
 test results for all considered windows.}
 }
@@ -109,30 +107,30 @@ plot.ts(U)
 # Sample output:
 ##	Trend test by Wang, Akritas, and Van Keilegom (bootstrap p-values)
 ##
-##data:  U 
+##data:  U
 ##WAVK test statistic = 5.3964, adaptively selected window = 4, p-value < 2.2e-16
 ##alternative hypothesis: trend is not of the form U ~ t.
 
-#Test H0 of a quadratic trend, with m-out-of-n selection of the local window 
+#Test H0 of a quadratic trend, with m-out-of-n selection of the local window
 #and output of all results:
 \dontrun{
     wavk_test(U ~ poly(t, 2), factor.length = "adaptive.selection", out = TRUE)}
 # Sample output:
 ##	Trend test by Wang, Akritas, and Van Keilegom (bootstrap p-values)
 ##
-##data:  U 
+##data:  U
 ##WAVK test statistic = 0.40083, adaptively selected window = 4, p-value = 0.576
 ##alternative hypothesis: trend is not of the form U ~ poly(t, 2).
 ##sample estimates:
 ##$trend_coefficients
-##(Intercept) poly(t, 2)1 poly(t, 2)2 
-##   3.408530   17.681422    2.597213 
+##(Intercept) poly(t, 2)1 poly(t, 2)2
+##   3.408530   17.681422    2.597213
 ##
 ##$AR_order
 ##[1] 1
 ##
 ##$AR_coefficients
-##         phi_1 
+##         phi_1
 ##[1] -0.7406163
 ##
 ##$all_considered_windows
@@ -147,7 +145,7 @@ wavk_test(U ~ 1, method = "asympt")
 # Sample output:
 ##	Trend test by Wang, Akritas, and Van Keilegom (asymptotic p-values)
 ##
-##data:  U 
+##data:  U
 ##WAVK test statistic = 25.999, user-defined window = 10, p-value < 2.2e-16
 ##alternative hypothesis: trend is not of the form U ~ 1.
 

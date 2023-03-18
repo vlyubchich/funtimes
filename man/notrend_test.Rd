@@ -10,7 +10,7 @@ notrend_test(
   test = c("t", "MK", "WAVK"),
   ar.method = "HVK",
   ar.order = NULL,
-  BIC = TRUE,
+  ic = "BIC",
   factor.length = c("user.defined", "adaptive.selection"),
   Window = NULL,
   q = 3/4,
@@ -33,16 +33,14 @@ Default \code{"HVK"} delivers robust difference-based estimates by
 options of \command{ar} function can be used, such as \code{"burg"},
 \code{"ols"}, \code{"mle"}, and \code{"yw"}.}
 
-\item{ar.order}{order of autoregressive model when \code{BIC = FALSE}, or
-the maximal order for BIC-based filtering. Default is
+\item{ar.order}{order of the autoregressive model when \code{ic = "none"}, or
+the maximal order for IC-based filtering. Default is
 \code{round(10*log10(length(x)))}, where \code{x} is the time series.}
 
-\item{BIC}{logical value indicates whether the order of autoregressive
-filter should be selected by Bayesian information criterion (BIC).
-If \code{TRUE} (default), models of orders \eqn{p=} 0,1,...,\code{ar.order}
-or \eqn{p=} 0,1,...,\code{round(10*log10(length(x)))} are considered,
-depending on whether \code{ar.order} is defined or not
-(\code{x} is the time series).}
+\item{ic}{information criterion used to select the order of autoregressive filter (AIC of BIC),
+considering models of orders \eqn{p=} 0,1,...,\code{ar.order}.
+If \code{ic = "none"}, the AR(\eqn{p}) model with \eqn{p=} \code{ar.order} is used,
+without order selection.}
 
 \item{factor.length}{method to define the length of local windows (factors).
 Used only if \code{test = "WAVK"}. Default option \code{"user.defined"} allows
@@ -103,13 +101,13 @@ tsTrend <- 1 + 2*(1:n/n)
 tsNoise <- arima.sim(n = n, list(order = c(2, 0, 0), ar = c(0.5, -0.1)))
 U <- tsTrend + tsNoise
 plot.ts(U)
-    
+
 #Use t-test
 notrend_test(U)
-    
+
 #Use Mann--Kendall test and Yule-Walker estimates of the AR parameters
 notrend_test(U, test = "MK", ar.method = "yw")
-    
+
 #Use WAVK test for the H0 of no trend, with m-out-of-n selection of the local window:
 notrend_test(U, test = "WAVK", factor.length = "adaptive.selection")
 # Sample output:
@@ -123,8 +121,8 @@ notrend_test(U, test = "WAVK", factor.length = "adaptive.selection")
 ##[1] 1
 ##
 ##$AR_coefficients
-##    phi_1 
-##0.4041848 
+##    phi_1
+##0.4041848
 }
 
 }

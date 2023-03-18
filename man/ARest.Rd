@@ -4,13 +4,13 @@
 \alias{ARest}
 \title{Estimation of Autoregressive (AR) Parameters}
 \usage{
-ARest(x, ar.order = NULL, ar.method = "HVK", BIC = TRUE)
+ARest(x, ar.order = NULL, ar.method = "HVK", ic = c("BIC", "AIC", "none"))
 }
 \arguments{
 \item{x}{a vector containing a univariate time series. Missing values are not allowed.}
 
-\item{ar.order}{order of autoregressive model when \code{BIC = FALSE}, or
-the maximal order for BIC-based filtering. Default is
+\item{ar.order}{order of the autoregressive model when \code{ic = "none"}, or
+the maximal order for IC-based filtering. Default is
 \code{round(10*log10(length(x)))}, where \code{x} is the time series.}
 
 \item{ar.method}{method of estimating autoregression coefficients.
@@ -19,12 +19,10 @@ Default \code{"HVK"} delivers robust difference-based estimates by
 options of \command{ar} function can be used, such as \code{"burg"},
 \code{"ols"}, \code{"mle"}, and \code{"yw"}.}
 
-\item{BIC}{logical value indicates whether the order of autoregressive
-filter should be selected by Bayesian information criterion (BIC).
-If \code{TRUE} (default), models of orders \eqn{p=} 0,1,...,\code{ar.order}
-or \eqn{p=} 0,1,...,\code{round(10*log10(length(x)))} are considered,
-depending on whether \code{ar.order} is defined or not
-(\code{x} is the time series).}
+\item{ic}{information criterion used to select the order of autoregressive filter (AIC of BIC),
+considering models of orders \eqn{p=} 0,1,...,\code{ar.order}.
+If \code{ic = "none"}, the AR(\eqn{p}) model with \eqn{p=} \code{ar.order} is used,
+without order selection.}
 }
 \value{
 A vector of estimated AR coefficients. Returns \code{numeric(0)} if
@@ -35,13 +33,15 @@ Estimate parameters \eqn{\phi} of autoregressive time series model
 \deqn{X_t = \sum_{i=1}^p\phi_iX_{t-i} + e_t,}
 by default using robust difference-based estimator and Bayesian information
 criterion (BIC) to select the order \eqn{p}. This function is employed
-for time series filtering in functions \code{\link{sync_test}}
+for time series filtering in the functions \code{\link{notrend_test}}, \code{\link{sync_test}},
 and \code{\link{wavk_test}}.
 }
 \details{
-The same formula for BIC is used consistently for all methods:
-\deqn{BIC=n\ln(\hat{\sigma}^2) + k\ln(n),}
-where \eqn{n} = \code{length(x)}, \eqn{k=p+1}.
+The formula for information criteria used consistently for all methods:
+\deqn{IC=n\ln(\hat{\sigma}^2) + (p + 1)k,}
+where \eqn{n} = \code{length(x)},
+\eqn{p} is the autoregressive order (\eqn{p + 1} is the number of model parameters),
+and \eqn{k} is the penalty (\eqn{k = \ln(n)} in BIC, and \eqn{k = 2} in AIC).
 }
 \examples{
 # Simulate a time series Y:
@@ -59,7 +59,7 @@ ARest(Y, ar.method = "burg") # Burg
 }
 \seealso{
 \code{\link[stats]{ar}}, \code{\link{HVK}},
-\code{\link{sync_test}}, \code{\link{wavk_test}}
+\code{\link{notrend_test}}, \code{\link{sync_test}}, \code{\link{wavk_test}}
 }
 \author{
 Vyacheslav Lyubchich

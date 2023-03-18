@@ -24,6 +24,6 @@ Suggests: covid19us, Ecdat, ggplot2, gridExtra, knitr, patchwork, randomcoloR, r
 Description: Nonparametric estimators and tests for time series analysis. The functions use bootstrap techniques and robust nonparametric difference-based estimators to test for the presence of possibly non-monotonic trends and for synchronicity of trends in multiple time series.
 RdMacros: Rdpack
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Encoding: UTF-8
 VignetteBuilder: knitr, rmarkdown

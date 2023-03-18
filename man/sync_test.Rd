@@ -12,7 +12,7 @@ sync_test(
   j = NULL,
   ar.order = NULL,
   ar.method = "HVK",
-  BIC = TRUE
+  ic = "BIC"
 )
 }
 \arguments{
@@ -40,8 +40,8 @@ Default is \eqn{3/4}. This argument is ignored if the \code{Window} is set by th
 and to automatically select an optimal window for each time series.
 Default is \code{c(8:11)}. This argument is ignored if the \code{Window} is set by the user.}
 
-\item{ar.order}{order of the autoregressive filter when \code{BIC = FALSE},
-or the maximal order for BIC-based filtering. Default is \code{round(10*log10(T))}.
+\item{ar.order}{order of the autoregressive filter when \code{ic = "none"},
+or the maximal order for IC-based filtering. Default is \code{round(10*log10(T))}.
 The \code{ar.order} can be a scalar or \eqn{N}-vector. If scalar, the same
 \code{ar.order} is applied to each time series. An \eqn{N}-vector specifies
 a separate \code{ar.order} for each time series.}
@@ -52,12 +52,10 @@ Default \code{"HVK"} delivers robust difference-based estimates by
 options of \command{ar} function can be used, such as \code{"burg"},
 \code{"ols"}, \code{"mle"}, and \code{"yw"}.}
 
-\item{BIC}{logical value indicates whether the order of autoregressive
-filter should be selected by Bayesian information criterion (BIC).
-If \code{TRUE} (default), models of orders \eqn{p=} 0,1,...,\code{ar.order}
-or \eqn{p=} 0,1,...,\code{round(10*log10(length(x)))} are considered,
-depending on whether \code{ar.order} is defined or not
-(\code{x} is the time series).}
+\item{ic}{information criterion used to select the order of autoregressive filter (AIC of BIC),
+considering models of orders \eqn{p=} 0,1,...,\code{ar.order}.
+If \code{ic = "none"}, the AR(\eqn{p}) model with \eqn{p=} \code{ar.order} is used,
+without order selection.}
 }
 \value{
 A list of class \code{"htest"} containing the following components:
@@ -99,8 +97,8 @@ and \insertCite{Lyubchich_2016_trends;textual}{funtimes}.
 #Fix seed for reproducible simulations:
 set.seed(1)
 
-# Simulate two autoregressive time series of length n without trend 
-#(i.e., with zero or constant trend) 
+# Simulate two autoregressive time series of length n without trend
+#(i.e., with zero or constant trend)
 # and arrange the series into a matrix:
 n <- 200
 y1 <- arima.sim(n = n, list(order = c(1, 0, 0), ar = c(0.6)))
@@ -116,7 +114,7 @@ plot.ts(Y)
 # Sample output:
 ##	Nonparametric test for synchronism of parametric trends
 ##
-##data:  Y 
+##data:  Y
 ##Test statistic = -0.0028999, p-value = 0.7
 ##alternative hypothesis: common trend is not of the form Y ~ t.
 ##sample estimates:
@@ -152,7 +150,7 @@ plot.ts(Y2)
 # Sample output:
 ##	Nonparametric test for synchronism of parametric trends
 ##
-##data:  Y2 
+##data:  Y2
 ##Test statistic = 0.48579, p-value < 2.2e-16
 ##alternative hypothesis: common trend is not of the form Y2 ~ t.
 ##sample estimates:
