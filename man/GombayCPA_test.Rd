@@ -70,7 +70,7 @@ result13  #=== One change at phi values ===#
 
 #Example 2:
 
-#From the package 'Ecdat' consider a time series with annual world number of victims of 
+#From the package 'Ecdat' consider a time series with annual world number of victims of
 #terrorism in the US from 1970 till 2016:
 c.data = Ecdat::terrorism['nkill.us']
 nkill.us.ts <- ts(c.data, start = 1970, end = 2016)
@@ -83,9 +83,9 @@ year = 1970 + 31
 print(year)
 plot(nkill.us.ts)
 
-#In both cases we find that the change point is located at the position 31 or 32. We can 
+#In both cases we find that the change point is located at the position 31 or 32. We can
 # examine it further by checking the value of this position (using: nkill.us.ts[32]) as well as
-# by plotting the graph (using: plot(nkill.us.ts)). The detected change point corresponds to 
+# by plotting the graph (using: plot(nkill.us.ts)). The detected change point corresponds to
 #the year of 2001, when the 9/11 attack happened.
 }
 

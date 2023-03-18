@@ -235,7 +235,7 @@ sync_test <- function(formula, B = 1000, Window = NULL, q = NULL, j = NULL,
     AveragedProcess <- apply(X, 1, mean)
     mod <- lm(as.formula(paste("AveragedProcess", sh, sep = "~"))) #common trend
     TrendCoeff <- summary(mod)$coefficients
-    U <- demean(X - mod$fitted) #detrended time series
+    U <- scale(X - mod$fitted, center = TRUE, scale = FALSE) # detrended time series
     for (k in 1:K) {
         pheta <- ARest(U[,k], ar.order = ar.order, ar.method = ar.method, ic = ic)
         OutputARorder[1, k] <- length(pheta)
