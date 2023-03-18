@@ -2,7 +2,7 @@
 % Please edit documentation in R/ccf_boot.R
 \name{ccf_boot}
 \alias{ccf_boot}
-\title{Cross-Correlation Function of Time Series with Sieve Bootstrap p-values}
+\title{Cross-Correlation of Autocorrelated Time Series}
 \usage{
 ccf_boot(
   x,
@@ -11,6 +11,8 @@ ccf_boot(
   plot = c("Pearson", "Spearman", "none"),
   level = 0.95,
   B = 1000,
+  smooth = FALSE,
+  cl = 1L,
   ...
 )
 }
@@ -32,6 +34,32 @@ given in the output, regardless of the \code{plot} setting.}
 \item{B}{number of bootstrap simulations to obtain empirical critical values.
 Default is 1000.}
 
+\item{smooth}{logical value indicating whether the bootstrap confidence bands
+should be smoothed across lags.
+Default is \code{FALSE} meaning no smoothing.
+Note that the smoothing is implemented purely for the look,
+after the confidence bands are calculated;
+it is different from the
+smoothing methods that can be applied to adjust bootstrap performance
+\insertCite{DeAngelis_Young_1992}{funtimes}.}
+
+\item{cl}{parameter to specify computer cluster for bootstrapping passed to
+the package \code{parallel} (default \code{cl = 1}, means no cluster is used).
+Possible values are:
+\itemize{
+\item cluster object (list) produced by \link[parallel]{makeCluster}.
+In this case, a new cluster is not started nor stopped;
+\item \code{NULL}. In this case, the function will detect
+available cores (see \link[parallel]{detectCores}) and, if there are
+multiple cores (\eqn{>1}), a cluster will be started with
+\link[parallel]{makeCluster}. If started, the cluster will be stopped
+after the computations are finished;
+\item positive integer defining the number of cores to start a cluster.
+If \code{cl = 1} (default), no attempt to create a cluster will be made.
+If \code{cl} > 1, a cluster will be started (using \link[parallel]{makeCluster})
+and stopped afterward (using \link[parallel]{stopCluster}).
+}}
+
 \item{...}{other parameters passed to the function \code{\link{ARest}} to control
 how autoregressive dependencies are estimated. The same set of parameters is used
 separately on \code{x} and \code{y}.}
@@ -39,12 +67,10 @@ separately on \code{x} and \code{y}.}
 \value{
 A data frame with the following columns:
 \item{Lag}{lags for which the following values were obtained.}
-\item{rP}{observed Pearson correlations.}
-\item{pP}{bootstrap p-value for Pearson correlations.}
-\item{lowerP, upperP}{lower and upper quantiles (for the confidence level set by \code{level}) of the bootstrapped Pearson correlations.}
-\item{rS}{observed Spearman correlations.}
-\item{pS}{bootstrap p-value for Spearman correlations.}
-\item{lowerS, upperS}{lower and upper quantiles (for the confidence level set by \code{level}) of the bootstrapped Spearman correlations.}
+\item{r_P}{observed Pearson correlations.}
+\item{lower_P, upper_P}{lower and upper confidence bounds (for the confidence level set by \code{level}) for Pearson correlations.}
+\item{r_S}{observed Spearman correlations.}
+\item{lower_S, upper_S}{lower and upper confidence bounds (for the confidence level set by \code{level}) for Spearman correlations.}
 }
 \description{
 Account for possible autocorrelation of time series when assessing the statistical significance
@@ -53,7 +79,7 @@ of the time series with the same autoregressive dependence, under the null hypot
 two time series under investigation being uncorrelated. The significance of cross-correlation
 coefficients is assessed based on the distribution of their bootstrapped counterparts.
 Both Pearson and Spearman types of coefficients are obtained, but a plot is provided for
-only one type, with significant correlations shown using filled circles.
+only one type, with significant correlations shown using filled circles (see Examples).
 }
 \examples{
 \dontrun{
@@ -64,9 +90,13 @@ set.seed(1)
 # Simulate independent normal time series of same lengths
 x <- rnorm(100)
 y <- rnorm(100)
-ccf(x, y) # default CCF with parametric confidence band
-tmp <- ccf_boot(x, y) # CCF with bootstrap
-tmp$rP; tmp$rS # can always extract results for both Pearson and Spearman correlations
+# Default CCF with parametric confidence band
+ccf(x, y)
+# CCF with bootstrap
+tmp <- ccf_boot(x, y)
+# One can extract results for both Pearson and Spearman correlations
+tmp$rP
+tmp$rS
 
 # Example 2
 # Simulated ts objects of different lengths and starts (incomplete overlap)
@@ -74,24 +104,27 @@ x <- arima.sim(list(order = c(1, 0, 0), ar = 0.5), n = 30)
 x <- ts(x, start = 2001)
 y <- arima.sim(list(order = c(2, 0, 0), ar = c(0.5, 0.2)), n = 40)
 y <- ts(y, start = 2020)
-ts.plot(x, y, col = 1:2, lty = 1:2) # show how x and y are aligned
+# Show how x and y are aligned
+ts.plot(x, y, col = 1:2, lty = 1:2)
+# The usual CCF
 ccf(x, y)
-ccf_boot(x, y, plot = "Spearman") # CCF with bootstrap
-# Notice that only +-7 lags can be calculated in both cases because of the small 
-# overlap of the time series. If save these time series as plain vectors, the time
-# information would be lost, and time series will be misaligned. 
+# CCF with bootstrap confidence intervals
+ccf_boot(x, y, plot = "Spearman")
+# Notice that only +-7 lags can be calculated in both cases because of the small
+# overlap of the time series. If we save these time series as plain vectors, the time
+# information would be lost, and the time series will be misaligned.
 ccf(as.numeric(x), as.numeric(y))
 
 # Example 3
 # Box & Jenkins time series of sales and a leading indicator, see ?BJsales
 plot.ts(cbind(BJsales.lead, BJsales))
-# Each of the BJ time series looks as having a stochastic linear trend, so apply differences:
+# Each of the BJ time series looks as having a stochastic linear trend, so apply differences
 plot.ts(cbind(diff(BJsales.lead), diff(BJsales)))
-# Get cross-correlation of the differenced series:
+# Get cross-correlation of the differenced series
 ccf_boot(diff(BJsales.lead), diff(BJsales), plot = "Spearman")
-# The leading indicator "stands out" with significant correlations at negative lags, 
+# The leading indicator "stands out" with significant correlations at negative lags,
 # showing it can be used to predict the sales 2-3 time steps ahead (that is,
-# diff(BJsales.lead) at times t-2 and t-3 is strongly correlated with diff(BJsales) at 
+# diff(BJsales.lead) at times t-2 and t-3 is strongly correlated with diff(BJsales) at
 # current time t).
 }
 

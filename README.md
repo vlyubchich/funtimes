@@ -26,6 +26,9 @@ library(funtimes)
 The directly affected functions are `notrend_test()`, `sync_test()`, and `wavk_test()`.
 - The functions `i.tails()` and `q.tails()` marked defunct and renamed as `tails_i` and `tails_q`.
 - Remove dependence on the package `Jmisc`.
+- The function `ccf_boot()` now has the parallel option, thanks to suggestions from Erika Koontz and Benjamin Malmgren. 
+The function also switched to using normal bootstrap intervals to improve their symmetry. 
+Optional smoothing was added for extra smoothness, which prompted to omit $p$-value calculation.
 
 ## CRAN version 9.0
 
