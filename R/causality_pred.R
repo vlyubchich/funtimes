@@ -79,9 +79,9 @@
 #' }
 #'
 #' @return A list containing the following elements:
-#' \item{result}{a table with the observed values of the test statistics and \eqn{p}-values.}
+#' \item{stat}{a table with the observed values of the test statistics and \eqn{p}-values.}
 #' \item{cause}{the cause variable.}
-#' \item{p}{the AR order used.}
+#' \item{p}{the AR orders used for the dependent variable (\code{p[1]}) and for the cause variable (\code{p[2]}).}
 #'
 #' @references
 #' \insertAllCited{}
@@ -262,8 +262,9 @@ causality_pred <- function(y,
     # Observed test statistics
     OBS <- caustests(efull, eres) # caustests <- funtimes:::caustests
 
-    # Bootstrap restricted model estimated on the full sample
-    m_y <- stats::lm.fit(x = lagY[, 2:(p[1] + 1), drop = FALSE],
+    # Bootstrap restricted model estimated on the full sample (Attanasio et al. 2016)
+    m_y <- stats::lm.fit(x = cbind(1,
+                                   lagY[, 2:(p[1] + 1), drop = FALSE]),
                          y = lagY[, 1, drop = FALSE])
     m_y_fit <- m_y$fitted.values
     m_y_res <- m_y$residuals
@@ -293,38 +294,37 @@ causality_pred <- function(y,
             parallel::stopCluster(cl)
         }
     } else {
-        BOOT0 <- #parallel::parSapply(cl, X = 1:B, FUN = function(b) {
-            sapply(1:B, FUN = function(b) {
-                dy_boot <- m_y_fit + sample(m_y_res, replace = TRUE)
-                FCST <- sapply(1:n_test - 1, function(i) { # i = 0
-                    # estimate full and restricted models
-                    m_yx <- stats::lm.fit(x = cbind(1,
-                                                    lagY[1:(n_train - maxp + i), 2:(p[1] + 1), drop = FALSE],
-                                                    lagX[1:(n_train - maxp + i), 1:(p[2] - lag.restrict), drop = FALSE]),
-                                          y = dy_boot[1:(n_train - maxp + i)])
-                    m_y <- stats::lm.fit(x = cbind(1,
-                                                   lagY[1:(n_train - maxp + i), 2:(p[1] + 1), drop = FALSE]),
-                                         y = dy_boot[1:(n_train - maxp + i)])
-                    # get predictions
-                    c(m_yx$coefficients %*% c(1, lagY[(n_train - maxp + i + 1), 2:(p[1] + 1)], lagX[(n_train - maxp + i + 1), 1:(p[2] - lag.restrict)]),
-                      m_y$coefficients %*% c(1, lagY[(n_train - maxp + i + 1), 2:(p[1] + 1)]))
-                })
-                # Forecast errors
-                efullb <- dy_boot[(n_train + 1):n - maxp] - FCST[1,]
-                eresb <- dy_boot[(n_train + 1):n - maxp] - FCST[2,]
-                # test statistics
-                caustests(efullb, eresb)
+        BOOT0 <- sapply(1:B, FUN = function(b) {
+            dy_boot <- m_y_fit + sample(m_y_res, replace = TRUE)
+            FCST <- sapply(1:n_test - 1, function(i) { # i = 0
+                # estimate full and restricted models
+                m_yx <- stats::lm.fit(x = cbind(1,
+                                                lagY[1:(n_train - maxp + i), 2:(p[1] + 1), drop = FALSE],
+                                                lagX[1:(n_train - maxp + i), 1:(p[2] - lag.restrict), drop = FALSE]),
+                                      y = dy_boot[1:(n_train - maxp + i)])
+                m_y <- stats::lm.fit(x = cbind(1,
+                                               lagY[1:(n_train - maxp + i), 2:(p[1] + 1), drop = FALSE]),
+                                     y = dy_boot[1:(n_train - maxp + i)])
+                # get predictions
+                c(m_yx$coefficients %*% c(1, lagY[(n_train - maxp + i + 1), 2:(p[1] + 1)], lagX[(n_train - maxp + i + 1), 1:(p[2] - lag.restrict)]),
+                  m_y$coefficients %*% c(1, lagY[(n_train - maxp + i + 1), 2:(p[1] + 1)]))
             })
+            # Forecast errors
+            efullb <- dy_boot[(n_train + 1):n - maxp] - FCST[1,]
+            eresb <- dy_boot[(n_train + 1):n - maxp] - FCST[2,]
+            # test statistics
+            caustests(efullb, eresb)
+        })
     } # end sequential bootstrap
-    list(result = data.frame(MSEt = c(OBS["MSEt"],
-                                      (sum(BOOT0["MSEt",] <= OBS["MSEt"]) + 1) / (B + 1)),
-                             MSEcor = c(OBS["MSEcor"],
-                                        (sum(BOOT0["MSEcor",] <= OBS["MSEcor"]) + 1) / (B + 1)),
-                             OOSF = c(OBS["OOSF"],
-                                      (sum(BOOT0["OOSF",] >= OBS["OOSF"]) + 1) / (B + 1)),
-                             EN = c(OBS["EN"],
-                                    (sum(BOOT0["EN",] >= OBS["EN"]) + 1) / (B + 1)),
-                             row.names = c("stat_obs", "p_boot")),
+    list(stat = data.frame(MSEt = c(OBS["MSEt"],
+                                    (sum(BOOT0["MSEt",] <= OBS["MSEt"]) + 1) / (B + 1)),
+                           MSEcor = c(OBS["MSEcor"],
+                                      (sum(BOOT0["MSEcor",] <= OBS["MSEcor"]) + 1) / (B + 1)),
+                           OOSF = c(OBS["OOSF"],
+                                    (sum(BOOT0["OOSF",] >= OBS["OOSF"]) + 1) / (B + 1)),
+                           EN = c(OBS["EN"],
+                                  (sum(BOOT0["EN",] >= OBS["EN"]) + 1) / (B + 1)),
+                           row.names = c("stat_obs", "p_boot")),
          cause = cause,
          p = p)
 }

@@ -80,9 +80,9 @@ and stopped afterward (using \link[parallel]{stopCluster}).
 }
 \value{
 A list containing the following elements:
-\item{result}{a table with the observed values of the test statistics and \eqn{p}-values.}
+\item{stat}{a table with the observed values of the test statistics and \eqn{p}-values.}
 \item{cause}{the cause variable.}
-\item{p}{the AR order used.}
+\item{p}{the AR orders used for the dependent variable (\code{p[1]}) and for the cause variable (\code{p[2]}).}
 }
 \description{
 Test for Granger causality using out-of-sample prediction errors from an
