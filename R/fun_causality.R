@@ -25,7 +25,15 @@ caustests <- function(efull, eres) {
     tmp1 <- efull - eres
     tmp2 <- efull + eres
     mlm <- lm(tmp1 ~ tmp2 - 1)
+    # ENC-NEW from (3) in Clark and McCracken (2001)
+    P <- length(efull)
+    L2full <- sum(efull^2)
+    EN <- P * sum(eres^2 - eres * efull) / L2full
+    # OOS-F from (3) in McCracken (2007)
+    OOSF <- -P * sum(dt) / L2full
     # output
     c(MSEt = summary(mlmt)$coefficients[3],
-      MSEcor = summary(mlm)$coefficients[3])
+      MSEcor = summary(mlm)$coefficients[3],
+      OOSF = OOSF,
+      EN = EN)
 }

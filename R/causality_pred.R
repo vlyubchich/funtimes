@@ -228,11 +228,10 @@ causality_pred <- function(y,
         p <- rep(p[1], 2)
     }
     maxp <- max(p)
-    # end Part 1
 
-    # Estimate model and get predictions on the testing set
+    # Part 2: Estimate model and get predictions on the testing set ----
     if (lag.restrict >= p[2]) {
-        warning("lag.restrict >= p. Using lag.restrict = 0 instead.")
+        warning("lag.restrict >= p or p[2]. Using lag.restrict = 0 instead.")
         lag.restrict <- 0
     }
     if (lag.restrict > 0) {
@@ -324,6 +323,10 @@ causality_pred <- function(y,
                                       (sum(BOOT0["MSEt",] <= OBS["MSEt"]) + 1) / (B + 1)),
                              MSEcor = c(OBS["MSEcor"],
                                         (sum(BOOT0["MSEcor",] <= OBS["MSEcor"]) + 1) / (B + 1)),
+                             OOSF = c(OBS["OOSF"],
+                                      (sum(BOOT0["OOSF",] >= OBS["OOSF"]) + 1) / (B + 1)),
+                             EN = c(OBS["EN"],
+                                    (sum(BOOT0["EN",] >= OBS["EN"]) + 1) / (B + 1)),
                              row.names = c("stat_obs", "p_boot")),
          cause = cause,
          p = p)
