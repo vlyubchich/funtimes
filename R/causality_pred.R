@@ -241,20 +241,17 @@ causality_pred <- function(y,
     }
     lagY <- embed(y[,dep], maxp + 1)
     n_actual <- nrow(lagY)
-    # m_yx <- stats::lm(X1 ~ ., data = Dyx[1:(n_train - p),])
-    # m_yx <- stats::lm.fit(x = cbind(1, lagY[1:(n_train - p), -1], lagX[1:(n_train - p), ]),
-    #                     y = lagY[1:(n_train - p), 1])
 
     # Get 1-step ahead forecasts from the models (recursive)
     FCST <- sapply(1:n_test - 1, function(i) { # i = 0
         # estimate full and restricted models
         m_yx <- stats::lm.fit(x = cbind(1,
-                                        lagY[(1 + i):(n_train - maxp + i), 2:(p[1] + 1), drop = FALSE],
-                                        lagX[(1 + i):(n_train - maxp + i), 1:(p[2] - lag.restrict), drop = FALSE]),
-                              y = lagY[(1 + i):(n_train - maxp + i), 1, drop = FALSE])
+                                        lagY[1:(n_train - maxp + i), 2:(p[1] + 1), drop = FALSE],
+                                        lagX[1:(n_train - maxp + i), 1:(p[2] - lag.restrict), drop = FALSE]),
+                              y = lagY[1:(n_train - maxp + i), 1, drop = FALSE])
         m_y <- stats::lm.fit(x = cbind(1,
-                                       lagY[(1 + i):(n_train - maxp + i), 2:(p[1] + 1), drop = FALSE]),
-                             y = lagY[(1 + i):(n_train - maxp + i), 1, drop = FALSE])
+                                       lagY[1:(n_train - maxp + i), 2:(p[1] + 1), drop = FALSE]),
+                             y = lagY[1:(n_train - maxp + i), 1, drop = FALSE])
         # get predictions
         c(m_yx$coefficients %*% c(1, lagY[(n_train - maxp + i + 1), 2:(p[1] + 1)], lagX[(n_train - maxp + i + 1), 1:(p[2] - lag.restrict)]),
           m_y$coefficients %*% c(1, lagY[(n_train - maxp + i + 1), 2:(p[1] + 1)]))
@@ -276,12 +273,12 @@ causality_pred <- function(y,
             FCST <- sapply(1:n_test - 1, function(i) { # i = 0
                 # estimate full and restricted models
                 m_yx <- stats::lm.fit(x = cbind(1,
-                                                lagY[(1 + i):(n_train - maxp + i), 2:(p[1] + 1), drop = FALSE],
-                                                lagX[(1 + i):(n_train - maxp + i), 1:(p[2] - lag.restrict), drop = FALSE]),
-                                      y = dy_boot[(1 + i):(n_train - maxp + i)])
+                                                lagY[1:(n_train - maxp + i), 2:(p[1] + 1), drop = FALSE],
+                                                lagX[1:(n_train - maxp + i), 1:(p[2] - lag.restrict), drop = FALSE]),
+                                      y = dy_boot[1:(n_train - maxp + i)])
                 m_y <- stats::lm.fit(x = cbind(1,
-                                               lagY[(1 + i):(n_train - maxp + i), 2:(p[1] + 1), drop = FALSE]),
-                                     y = dy_boot[(1 + i):(n_train - maxp + i)])
+                                               lagY[1:(n_train - maxp + i), 2:(p[1] + 1), drop = FALSE]),
+                                     y = dy_boot[1:(n_train - maxp + i)])
                 # get predictions
                 c(m_yx$coefficients %*% c(1, lagY[(n_train - maxp + i + 1), 2:(p[1] + 1)], lagX[(n_train - maxp + i + 1), 1:(p[2] - lag.restrict)]),
                   m_y$coefficients %*% c(1, lagY[(n_train - maxp + i + 1), 2:(p[1] + 1)]))
@@ -302,12 +299,12 @@ causality_pred <- function(y,
                 FCST <- sapply(1:n_test - 1, function(i) { # i = 0
                     # estimate full and restricted models
                     m_yx <- stats::lm.fit(x = cbind(1,
-                                                    lagY[(1 + i):(n_train - maxp + i), 2:(p[1] + 1), drop = FALSE],
-                                                    lagX[(1 + i):(n_train - maxp + i), 1:(p[2] - lag.restrict), drop = FALSE]),
-                                          y = dy_boot[(1 + i):(n_train - maxp + i)])
+                                                    lagY[1:(n_train - maxp + i), 2:(p[1] + 1), drop = FALSE],
+                                                    lagX[1:(n_train - maxp + i), 1:(p[2] - lag.restrict), drop = FALSE]),
+                                          y = dy_boot[1:(n_train - maxp + i)])
                     m_y <- stats::lm.fit(x = cbind(1,
-                                                   lagY[(1 + i):(n_train - maxp + i), 2:(p[1] + 1), drop = FALSE]),
-                                         y = dy_boot[(1 + i):(n_train - maxp + i)])
+                                                   lagY[1:(n_train - maxp + i), 2:(p[1] + 1), drop = FALSE]),
+                                         y = dy_boot[1:(n_train - maxp + i)])
                     # get predictions
                     c(m_yx$coefficients %*% c(1, lagY[(n_train - maxp + i + 1), 2:(p[1] + 1)], lagX[(n_train - maxp + i + 1), 1:(p[2] - lag.restrict)]),
                       m_y$coefficients %*% c(1, lagY[(n_train - maxp + i + 1), 2:(p[1] + 1)]))
