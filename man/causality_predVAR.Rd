@@ -23,13 +23,13 @@ By default (if \code{p} is not specified),
 \code{ic} (see \code{...} arguments; default \code{ic} is AIC).}
 
 \item{cause}{name of the cause variable. If not specified, the first variable in
-\code{y} is treated as the cause and the second is treated as the dependent variable.}
+\code{y} is treated as the dependent variable and the second is treated as the cause.}
 
 \item{B}{number of bootstrap replications. Default is 500.}
 
 \item{test}{a numeric value specifying the size of the testing set. If \code{test} < 1,
 the value is treated as a proportion of the sample size to be used as the testing set.
-Otherwise, \code{test} is rounded and \code{test} values are used as the testing set.
+Otherwise, \code{test} is treated as the number of the most recent values to be used as the testing set.
 Default is 0.3, which means that 30\% of the sample is used for calculating
 out-of-sample errors. The testing set is always at the end of the time series.}
 

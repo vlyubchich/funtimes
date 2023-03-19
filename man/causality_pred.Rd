@@ -19,10 +19,10 @@ causality_pred(
 }
 \arguments{
 \item{y}{matrix, data frame, or \code{ts} object with two columns
-(an explanatory and the dependent time-series variable). Missing values are not allowed.}
+(a dependent and an explanatory time-series variable). Missing values are not allowed.}
 
 \item{cause}{name of the cause variable. If not specified, the first variable in
-\code{y} is treated as the cause and the second is treated as the dependent variable.}
+\code{y} is treated as the dependent variable and the second is treated as the cause.}
 
 \item{p}{a vector of one or two positive integers specifying the order \eqn{p} of
 autoregressive dependence. The input of length one is recycled, then \code{p[1]} is used for
@@ -48,7 +48,7 @@ The order is then selected using the Akaike information criterion (AIC; default)
 see the argument \code{k} to change the criterion.
 \code{lag.max} of length 2 automatically sets \code{p.free = TRUE}.}
 
-\item{k}{numeric specifying the weight of the equivalent degrees of freedom part
+\item{k}{numeric scalar specifying the weight of the equivalent degrees of freedom part
 in the AIC formula. Default \code{k = 2} corresponds to the traditional AIC.
 Use \code{k = log(n)} to use the Bayesian information criterion instead
 (see \code{\link[stats]{extractAIC}}).}
@@ -57,7 +57,7 @@ Use \code{k = log(n)} to use the Bayesian information criterion instead
 
 \item{test}{a numeric value specifying the size of the testing set. If \code{test} < 1,
 the value is treated as a proportion of the sample size to be used as the testing set.
-Otherwise, \code{test} is rounded and \code{test} values are used as the testing set.
+Otherwise, \code{test} is treated as the number of the most recent values to be used as the testing set.
 Default is 0.3, which means that 30\% of the sample is used for calculating
 out-of-sample errors. The testing set is always at the end of the time series.}
 
@@ -79,8 +79,7 @@ and stopped afterward (using \link[parallel]{stopCluster}).
 }}
 }
 \value{
-Two lists (one for the fast bootstrap,
-another for the bootstrap under the null hypothesis) each containing the following elements:
+A list containing the following elements:
 \item{result}{a table with the observed values of the test statistics and \eqn{p}-values.}
 \item{cause}{the cause variable.}
 \item{p}{the AR order used.}
@@ -88,10 +87,10 @@ another for the bootstrap under the null hypothesis) each containing the followi
 \description{
 Test for Granger causality using out-of-sample prediction errors from an
 autoregression (AR) model, where some of the near-contemporaneous lags can be removed:
-\deqn{Y_t = \sum_{i=1}^p\alpha_iY_{t-i} + \sum_{i=lag.restrict+1}^p\beta_iX_{t-i} + e_t,}
+\deqn{Y_t = \sum_{i=1}^{p1}\alpha_iY_{t-i} + \sum_{i=lag.restrict+1}^{p2}\beta_iX_{t-i} + e_t,}
 where \eqn{Y_t} is the dependent variable,
 \eqn{X_t} is the cause variable,
-\eqn{p} is the AR order,
+\eqn{p1} and \eqn{p2} are the AR orders (if \code{p.free = FALSE}, \eqn{p1 = p2}),
 \eqn{lag.restrict} is the number of restricted first lags (see the argument \code{lag.restrict}).
 }
 \details{
@@ -99,21 +98,17 @@ The tests include the MSE-t approach \insertCite{McCracken_2007}{funtimes} and
 MSE-correlation test as in Chapter 9.3 of \insertCite{Granger_Newbold_2016;textual}{funtimes}.
 The bootstrap is used to empirically derive distributions of the statistics.
 
-Two versions of the bootstrap are used to derive the empirical distributions of the test statistics.
-In the original version, residuals of a restricted model under the null hypothesis of no Granger
-causality are bootstrapped to generate new data under the null. Then the full and restricted
+In the implemented bootstrapping, residuals of the restricted model under the null hypothesis of no Granger
+causality are bootstrapped to generate new data under the null hypothesis. Then, the full and restricted
 models are re-estimated on the bootstrapped data to obtain new (bootstrapped) forecast errors.
-In the fast bootstrap version, just the paired residuals from the full and restricted models are
-bootstrapped.
 
-In the current implementation, the bootstrapped \eqn{p}-value is calculated using equation 4.10 of
+In the current implementation, the bootstrapped \eqn{p}-value is calculated using Equation 4.10 in
 \insertCite{Davison_Hinkley_1997;textual}{funtimes}: \code{p.value} = (1 + \eqn{n}) / (\code{B} + 1),
 where \eqn{n} is the number of bootstrapped statistics smaller or equal to the observed statistic.
-In the fast bootstrap, \eqn{n} is the number of bootstrapped statistics greater or equal to 0.
 
-This function allows using different orders \eqn{p} when testing the Granger causation
-of \eqn{X} to \eqn{Y} and from \eqn{Y} to \eqn{X}
-(need to run the function twice, with different argument \code{cause}).
+This function tests the Granger causation
+of \eqn{X} to \eqn{Y} or from \eqn{Y} to \eqn{X}
+(to test in both directions, need to run the function twice, with different argument \code{cause}).
 To use the symmetric vector autoregression (VAR), use the function \code{\link{causality_predVAR}}.
 }
 \examples{

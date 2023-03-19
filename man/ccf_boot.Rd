@@ -36,12 +36,7 @@ Default is 1000.}
 
 \item{smooth}{logical value indicating whether the bootstrap confidence bands
 should be smoothed across lags.
-Default is \code{FALSE} meaning no smoothing.
-Note that the smoothing is implemented purely for the look,
-after the confidence bands are calculated;
-it is different from the
-smoothing methods that can be applied to adjust bootstrap performance
-\insertCite{DeAngelis_Young_1992}{funtimes}.}
+Default is \code{FALSE} meaning no smoothing.}
 
 \item{cl}{parameter to specify computer cluster for bootstrapping passed to
 the package \code{parallel} (default \code{cl = 1}, means no cluster is used).
@@ -80,6 +75,15 @@ two time series under investigation being uncorrelated. The significance of cros
 coefficients is assessed based on the distribution of their bootstrapped counterparts.
 Both Pearson and Spearman types of coefficients are obtained, but a plot is provided for
 only one type, with significant correlations shown using filled circles (see Examples).
+}
+\details{
+Note that the smoothing of confidence bands is implemented purely for the look.
+This smoothing is different from the
+smoothing methods that can be applied to adjust bootstrap performance
+\insertCite{DeAngelis_Young_1992}{funtimes}.
+For correlations close to the significance bounds, the setting of \code{smooth} might
+affect the decision on the statistical significance.
+In this case, it is recommended to keep \code{smooth = FALSE} and set a higher \code{B}.
 }
 \examples{
 \dontrun{

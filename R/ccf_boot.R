@@ -8,6 +8,14 @@
 #' Both Pearson and Spearman types of coefficients are obtained, but a plot is provided for
 #' only one type, with significant correlations shown using filled circles (see Examples).
 #'
+#' @details
+#' Note that the smoothing of confidence bands is implemented purely for the look.
+#' This smoothing is different from the
+#' smoothing methods that can be applied to adjust bootstrap performance
+#' \insertCite{DeAngelis_Young_1992}{funtimes}.
+#' For correlations close to the significance bounds, the setting of \code{smooth} might
+#' affect the decision on the statistical significance.
+#' In this case, it is recommended to keep \code{smooth = FALSE} and set a higher \code{B}.
 #'
 #' @param x,y univariate numeric time-series objects or numeric vectors for which to
 #' compute cross-correlation. Different time attributes in \code{ts} objects are
@@ -24,11 +32,6 @@
 #' @param smooth logical value indicating whether the bootstrap confidence bands
 #' should be smoothed across lags.
 #' Default is \code{FALSE} meaning no smoothing.
-#' Note that the smoothing is implemented purely for the look,
-#' after the confidence bands are calculated;
-#' it is different from the
-#' smoothing methods that can be applied to adjust bootstrap performance
-#' \insertCite{DeAngelis_Young_1992}{funtimes}.
 #' @inheritParams causality_pred
 #' @param ... other parameters passed to the function \code{\link{ARest}} to control
 #' how autoregressive dependencies are estimated. The same set of parameters is used

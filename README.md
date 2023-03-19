@@ -29,6 +29,9 @@ The directly affected functions are `notrend_test()`, `sync_test()`, and `wavk_t
 - The function `ccf_boot()` now has the parallel option, thanks to suggestions from Erika Koontz and Benjamin Malmgren. 
 The function also switched to using normal bootstrap intervals to improve their symmetry. 
 Optional smoothing was added for extra smoothness, which prompted to omit $p$-value calculation.
+- In the function `causality_pred()`, remove the fast bootstrap of paired out-of-sample errors as under-performing;
+make sure the AR-order selection is done on the training set;
+
 
 ## CRAN version 9.0
 
