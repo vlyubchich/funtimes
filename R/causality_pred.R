@@ -99,16 +99,20 @@
 #' causality_pred(Canada[,1:2], cause = "e", lag.max = 5, p.free = TRUE)
 #' causality_pred(Canada[,1:2], cause = "e", lag.restrict = 3, lag.max = 15, p.free = TRUE)
 #'
-#' # Example 2 (run in parallel, initiate the cluster manually):
+#' # Example 2 (run in parallel, initiate the cluster automatically)
 #' # Box & Jenkins time series
 #' # of sales and a leading indicator, see ?BJsales
+#'
+#' D <- cbind(BJsales.lead, BJsales)
+#' causality_pred(D, cause = "BJsales.lead", lag.max = 5, B = 1000, cl = NULL)
+#'
+#' # Example 3 (run in parallel, initiate the cluster manually)
 #'
 #' # Initiate a local cluster
 #' cores <- parallel::detectCores()
 #' cl <- parallel::makeCluster(cores)
 #' parallel::clusterSetRNGStream(cl, 123) # to make parallel computations reproducible
 #'
-#' D <- cbind(BJsales.lead, BJsales)
 #' causality_pred(D, cause = "BJsales.lead", lag.max = 5, B = 1000, cl = cl)
 #' causality_pred(D, cause = "BJsales.lead", lag.restrict = 3, p = 5, B = 1000, cl = cl)
 #' parallel::stopCluster(cl)

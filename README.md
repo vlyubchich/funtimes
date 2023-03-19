@@ -31,7 +31,8 @@ The function also switched to using normal bootstrap intervals to improve their 
 Optional smoothing was added for extra smoothness, which prompted to omit $p$-value calculation.
 - In the function `causality_pred()`, remove the fast bootstrap of paired out-of-sample errors as under-performing;
 make sure the AR-order selection is done on the training set;
-
+try extra statistics;
+correct restricted model for bootstrapping (include intercept).
 
 ## CRAN version 9.0
 
