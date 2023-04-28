@@ -18,7 +18,11 @@ library(funtimes)
 ## Future work
 
 - Remove defunct functions.
+- Describe the statistics in causality_pred()
 
+## Current GitHub version
+
+- Added new function `r_crit()` to compute critical values of correlations.
 
 ## CRAN version 9.1
 
