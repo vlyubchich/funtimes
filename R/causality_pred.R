@@ -51,6 +51,9 @@
 #' The order is then selected using the Akaike information criterion (AIC; default),
 #' see the argument \code{k} to change the criterion.
 #' \code{lag.max} of length 2 automatically sets \code{p.free = TRUE}.
+#' @param ic logical indicating whether the lags should be selected
+#' (\code{ic = TRUE}; default) or used as specified by \code{p}
+#' (\code{ic = FALSE}; then the arguments \code{p.free}, \code{k}, and \code{lag.max} are ignored).
 #' @param k numeric scalar specifying the weight of the equivalent degrees of freedom part
 #' in the AIC formula. Default \code{k = 2} corresponds to the traditional AIC.
 #' Use \code{k = log(n)} to use the Bayesian information criterion instead
@@ -124,6 +127,7 @@ causality_pred <- function(y,
                            p.free = FALSE,
                            lag.restrict = 0L,
                            lag.max = NULL,
+                           ic = TRUE,
                            k = 2,
                            B = 500L,
                            test = 0.3,
@@ -168,64 +172,67 @@ causality_pred <- function(y,
     n_test <- n - n_train
 
     # Part 1: Estimate p on the training set if using an information criterion ----
-    if (is.null(p) && is.null(lag.max)) {
-        stop("Please specify p or lag.max.")
-    }
-    if (!is.null(lag.max)) { # then select p
-        if (length(lag.max) == 2) {
-            p.free = TRUE
-        } else {
-            lag.max <- rep(lag.max[1], 2)
+    if (ic){
+        if (is.null(p) && is.null(lag.max)) {
+            stop("Please specify p or lag.max.")
         }
-        maxl <- max(lag.max)
-        if (lag.restrict >= lag.max[2]) {
-            warning("lag.restrict >= lag.max or lag.max[2]. Using lag.restrict = 0 instead.")
-            lag.restrict <- 0
-        }
-        # Embed both X and Y up to maxl to have the results of the same length
-        if (lag.restrict > 0) {
-            lagX <- embed(y[1:n_train, cause], maxl + 1)[, -c(1:(lag.restrict + 1)), drop = FALSE]
-        } else {
-            lagX <- embed(y[1:n_train, cause], maxl + 1)[, -1, drop = FALSE]
-        }
-        lagY <- embed(y[1:n_train, dep], maxl + 1)
-        # Information criterion for the model
-        if (p.free) {
-            best.ic <- Inf
-            for (p1 in 1:lag.max[1]) {
-                for (p2 in (lag.restrict + 1):lag.max[2]) {
+        if (!is.null(lag.max)) { # then select p
+            if (length(lag.max) == 2) {
+                p.free = TRUE
+            } else {
+                lag.max <- rep(lag.max[1], 2)
+            }
+            maxl <- max(lag.max)
+            if (lag.restrict >= lag.max[2]) {
+                warning("lag.restrict >= lag.max or lag.max[2]. Using lag.restrict = 0 instead.")
+                lag.restrict <- 0
+            }
+
+            # Embed both X and Y up to maxl to have the results of the same length
+            if (lag.restrict > 0) {
+                lagX <- embed(y[1:n_train, cause], maxl + 1)[, -c(1:(lag.restrict + 1)), drop = FALSE]
+            } else {
+                lagX <- embed(y[1:n_train, cause], maxl + 1)[, -1, drop = FALSE]
+            }
+            lagY <- embed(y[1:n_train, dep], maxl + 1)
+            # Information criterion for the model
+            if (p.free) {
+                best.ic <- Inf
+                for (p1 in 1:lag.max[1]) {
+                    for (p2 in (lag.restrict + 1):lag.max[2]) {
+                        fit <- stats::lm.fit(x = cbind(1,
+                                                       lagY[, 2:(p1 + 1)],
+                                                       lagX[, 1:(p2 - lag.restrict), drop = FALSE]),
+                                             y = lagY[, 1])
+                        # see stats:::extractAIC.lm() but omit the scale option
+                        nfit <- length(fit$residuals)
+                        edf <- nfit - fit$df.residual
+                        RSS <- sum(fit$residuals^2, na.rm = TRUE) # stats:::deviance.lm(fit)
+                        dev <- nfit * log(RSS/nfit)
+                        fit.ic <- dev + k * edf
+                        if (fit.ic < best.ic) {
+                            best.ic <- fit.ic
+                            p <- c(p1, p2)
+                        }
+                    }
+                }
+            } else {
+                IC <- sapply((lag.restrict + 1):lag.max[2], function(s) {
                     fit <- stats::lm.fit(x = cbind(1,
-                                                   lagY[, 2:(p1 + 1)],
-                                                   lagX[, 1:(p2 - lag.restrict), drop = FALSE]),
+                                                   lagY[, 2:(s + 1)],
+                                                   lagX[, 1:(s - lag.restrict), drop = FALSE]),
                                          y = lagY[, 1])
-                    # see stats:::extractAIC.lm() but omit the scale option
+                    # see stats:::extractAIC.lm; but omit the scale option
                     nfit <- length(fit$residuals)
                     edf <- nfit - fit$df.residual
                     RSS <- sum(fit$residuals^2, na.rm = TRUE) # stats:::deviance.lm(fit)
                     dev <- nfit * log(RSS/nfit)
-                    fit.ic <- dev + k * edf
-                    if (fit.ic < best.ic) {
-                        best.ic <- fit.ic
-                        p <- c(p1, p2)
-                    }
-                }
+                    dev + k * edf
+                })
+                p <- which.min(IC) + lag.restrict
             }
-        } else {
-            IC <- sapply((lag.restrict + 1):lag.max[2], function(s) {
-                fit <- stats::lm.fit(x = cbind(1,
-                                               lagY[, 2:(s + 1)],
-                                               lagX[, 1:(s - lag.restrict), drop = FALSE]),
-                                     y = lagY[, 1])
-                # see stats:::extractAIC.lm; but omit the scale option
-                nfit <- length(fit$residuals)
-                edf <- nfit - fit$df.residual
-                RSS <- sum(fit$residuals^2, na.rm = TRUE) # stats:::deviance.lm(fit)
-                dev <- nfit * log(RSS/nfit)
-                dev + k * edf
-            })
-            p <- which.min(IC) + lag.restrict
-        }
-    } # finish selection of p
+        } # finish selection of p
+    }
     if (length(p) == 2) {
         p.free = TRUE
     } else {
