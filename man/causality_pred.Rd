@@ -11,6 +11,7 @@ causality_pred(
   p.free = FALSE,
   lag.restrict = 0L,
   lag.max = NULL,
+  ic = TRUE,
   k = 2,
   B = 500L,
   test = 0.3,
@@ -47,6 +48,10 @@ the dependent variable and \code{lag.max[2]} is used for the cause variable.
 The order is then selected using the Akaike information criterion (AIC; default),
 see the argument \code{k} to change the criterion.
 \code{lag.max} of length 2 automatically sets \code{p.free = TRUE}.}
+
+\item{ic}{logical indicating whether the lags should be selected
+(\code{ic = TRUE}; default) or used as specified by \code{p}
+(\code{ic = FALSE}; then the arguments \code{p.free}, \code{k}, and \code{lag.max} are ignored).}
 
 \item{k}{numeric scalar specifying the weight of the equivalent degrees of freedom part
 in the AIC formula. Default \code{k = 2} corresponds to the traditional AIC.

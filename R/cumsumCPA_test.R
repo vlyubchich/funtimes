@@ -28,7 +28,7 @@
 #' 
 #' @keywords changepoint ts
 #' 
-#' @seealso \code{\link{mcusum.test}} for change point test for regression
+#' @seealso \code{\link{mcusum_test}} for change point test for regression
 #' 
 #' @author Palina Niamkova, Dorcas Ofori-Boateng, Yulia R. Gel
 #' 

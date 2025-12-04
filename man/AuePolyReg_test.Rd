@@ -83,7 +83,7 @@ plot(incidents.ts) # see the visualized data
 \insertAllCited{}
 }
 \seealso{
-\code{\link{mcusum.test}} change point test for regression
+\code{\link{mcusum_test}} change point test for regression
 }
 \author{
 Palina Niamkova, Dorcas Ofori-Boateng, Yulia R. Gel

@@ -84,7 +84,7 @@ Ecdat::incomeInequality$Year[13] + 1 # year of change point
 \insertAllCited{}
 }
 \seealso{
-\code{\link{mcusum.test}} for change point test for regression
+\code{\link{mcusum_test}} for change point test for regression
 }
 \author{
 Palina Niamkova, Dorcas Ofori-Boateng, Yulia R. Gel

@@ -94,7 +94,7 @@ plot(nkill.us.ts)
 \insertAllCited{}
 }
 \seealso{
-\code{\link{mcusum.test}}  change point test for regression and
+\code{\link{mcusum_test}}  change point test for regression and
 \code{\link[Ecdat]{terrorism}} dataset used in the Example 2
 }
 \author{

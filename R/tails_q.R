@@ -27,7 +27,7 @@
 #' @references
 #' \insertAllCited{}
 #'
-#' @seealso \code{\link{i.tails}}
+#' @seealso \code{\link{tails_i}}
 #'
 #' @keywords ts
 #'

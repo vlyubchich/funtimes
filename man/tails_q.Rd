@@ -43,7 +43,7 @@ tails_q(x0, x1)
 \insertAllCited{}
 }
 \seealso{
-\code{\link{i.tails}}
+\code{\link{tails_i}}
 }
 \author{
 Vyacheslav Lyubchich, Yulia R. Gel

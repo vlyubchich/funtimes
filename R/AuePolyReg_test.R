@@ -29,7 +29,7 @@
 #' @references 
 #' \insertAllCited{}
 #' 
-#' @seealso \code{\link{mcusum.test}} change point test for regression
+#' @seealso \code{\link{mcusum_test}} change point test for regression
 #' 
 #' @keywords changepoint ts
 #' 

@@ -43,7 +43,7 @@ tails_i(x0, x1)
 \insertAllCited{}
 }
 \seealso{
-\code{\link{q.tails}}
+\code{\link{tails_q}}
 }
 \author{
 Calvin Chu, Yulia R. Gel, Vyacheslav Lyubchich

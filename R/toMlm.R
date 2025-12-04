@@ -20,11 +20,13 @@ toMlm <- function(x, ...){
     UseMethod("toMlm")
 }
 
-toMlm.default <- function(x){
+#' @exportS3Method toMlm default
+toMlm.default <- function(x, ...){
     lm(x$model)
 }
 
-toMlm.varest <- function(x){
+#' @exportS3Method toMlm varest
+toMlm.varest <- function(x, ...){
     ix <- 1:x$K
     X <- x$datamat
     int <- "-1" #automatic intercept is removed by default
@@ -75,6 +77,7 @@ bread.varest <- function(x, ...){
     sandwich::bread(toMlm.varest(x), ...)
 }
 
+#' @exportS3Method vcov varest
 vcov.varest <- function(object, ...){
     stats::vcov(toMlm.varest(object), ...)
 }
