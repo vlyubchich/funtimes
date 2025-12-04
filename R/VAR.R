@@ -1,10 +1,20 @@
-# This is a copy of the code from the package vars by Bernhard Pfaff
-# with changes that were not merged to the package
-# with the pull request from 2021-08-22
+# Internal VAR Estimation Function (Modified from vars package)
+#
+# This is a modified copy of the VAR() function from the vars package by Bernhard Pfaff.
+# The modifications were submitted via pull request on 2021-08-22 but were not merged:
 # https://github.com/bpfaff/vars/pull/10/files
-# I.e., subsequent vars v.1.5-6 (2021-09-17) does not include these changes.
-# The changes (most of them are marked with "#VL") allow for restricted VAR
-# estimation and Granger causality testing using such models.
+#
+# The vars package v.1.5-6 (2021-09-17) and later versions do not include these changes.
+# This modified version is maintained internally to support restricted VAR estimation
+# and Granger causality testing with lag restrictions.
+#
+# Key Modifications (marked with "#VL" comments):
+# - Added lag.restrict parameter to exclude near-contemporaneous lags
+# - Enhanced integration with causality_pred() and causality_predVAR() functions
+# - Support for restricted coefficient matrices in VAR models
+#
+# @keywords internal
+# @noRd
 
 VAR <- function(y, p = 1, type = c("const", "trend", "both", "none"),
     season = NULL, exogen = NULL, lag.max = NULL,

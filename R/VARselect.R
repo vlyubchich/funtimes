@@ -1,10 +1,20 @@
-# This is a copy of the code from the package vars by Bernhard Pfaff
-# with changes that were not merged to the package
-# with the pull request from 2021-08-22
+# Internal VAR Order Selection Function (Modified from vars package)
+#
+# This is a modified copy of the VARselect() function from the vars package by Bernhard Pfaff.
+# The modifications were submitted via pull request on 2021-08-22 but were not merged:
 # https://github.com/bpfaff/vars/pull/10/files
-# I.e., subsequent vars v.1.5-6 (2021-09-17) does not include these changes.
-# The changes (most of them are marked with "#VL") allow for restricted VAR
-# estimation and Granger causality testing using such models.
+#
+# The vars package v.1.5-6 (2021-09-17) and later versions do not include these changes.
+# This modified version is maintained internally to support restricted VAR estimation
+# with lag restrictions for Granger causality testing.
+#
+# Key Modifications (marked with "#VL" comments):
+# - Added lag.restrict parameter for excluding near-contemporaneous lags
+# - Validation checks for lag.restrict parameter
+# - Integration with modified VAR() function
+#
+# @keywords internal
+# @noRd
 
 VARselect <- function(y,
                       lag.max = 10,

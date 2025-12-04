@@ -1,5 +1,18 @@
-#Auxiliary functions related to the TRUST algorithm;
-#were in the main body of the package until v.5.
+# Internal Helper Functions for TRUST Clustering Algorithm
+#
+# This file contains internal (non-exported) helper functions for the TRUST
+# (TRUSTworthy Spatio-Temporal cluster detection) algorithm. These functions
+# were previously exported in package versions prior to v.5.
+# They are used by BICC(), CSlideCluster(), CWindowCluster(), and related clustering methods.
+#
+# Functions:
+#   - CNeighbor(): Identifies E^theta_delta neighbors of time series
+#   - CHomogeneity(): Checks homogeneity of time series clusters
+#   - CExpandSlideCluster(): Expands slide-level time series clusters
+#   - CExpandWindowCluster(): Expands window-level time series clusters
+#
+# @keywords internal
+# @noRd
 
 
 # ##### Neighborhood of Time Series #####

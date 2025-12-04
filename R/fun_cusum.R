@@ -1,5 +1,16 @@
-#Auxiliary functions related to the modified CUSUM statistic 
-#by Horvath et al. (2017) for testing changepoints.
+# Internal Helper Functions for Modified CUSUM Changepoint Tests
+#
+# This file contains internal (non-exported) helper functions for implementing
+# the modified CUSUM statistic by Horvath et al. (2017) for changepoint detection.
+# These functions are used by mcusum_test() and related changepoint detection methods.
+#
+# Functions:
+#   - Mfun(): Computes M(k1,...,km) statistic from p. 553
+#   - M1fun(): Optimized version for at most one changepoint
+#   - MTfun(): Computes MT statistic from p. 554 or first equation on p. 568
+#
+# @keywords internal
+# @noRd
 
 
 ##### The function for M(k1,...,km) on p. 553:

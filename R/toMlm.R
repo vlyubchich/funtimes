@@ -1,10 +1,20 @@
-# This is a copy of the code from the package vars by Bernhard Pfaff
-# with changes that were not merged to the package
-# with the pull request from 2021-08-22
+# Internal VAR to MLM Conversion Function (Modified from vars package)
+#
+# This is a modified copy of toMlm() methods from the vars package by Bernhard Pfaff.
+# The modifications were submitted via pull request on 2021-08-22 but were not merged:
 # https://github.com/bpfaff/vars/pull/10/files
-# I.e., subsequent vars v.1.5-6 (2021-09-17) does not include these changes.
-# The changes (most of them are marked with "#VL") allow for restricted VAR
-# estimation and Granger causality testing using such models.
+#
+# The vars package v.1.5-6 (2021-09-17) and later versions do not include these changes.
+# This modified version is maintained internally to support conversion of restricted
+# VAR models to multivariate linear models (MLM) for coefficient estimation and testing.
+#
+# Key Modifications (marked with "#VL" comments):
+# - Support for x$restrictions matrix in varest objects
+# - Proper handling of restricted coefficients in conversion to MLM
+# - Individual equation fitting respecting coefficient restrictions
+#
+# @keywords internal
+# @noRd
 
 toMlm <- function(x, ...){
     UseMethod("toMlm")

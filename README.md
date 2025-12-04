@@ -23,6 +23,7 @@ library(funtimes)
 ## Current GitHub version
 
 - Added new function `r_crit()` to compute critical values of correlations.
+- In the function `causality_pred()`, added option to turn off automatic lag selection. 
 
 ## CRAN version 9.1
 

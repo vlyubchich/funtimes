@@ -1,3 +1,16 @@
+# Internal Helper Functions for Granger Causality Testing
+#
+# This file contains internal (non-exported) helper functions for Granger causality
+# testing with restricted VAR models. These functions are used by causality_pred()
+# and causality_predVAR().
+#
+# Functions:
+#   - restrictions(): Creates/overlays restriction matrix for VAR models
+#   - caustests(): Computes multiple causality test statistics
+#
+# @keywords internal
+# @noRd
+
 # Function to recreate matrix of restrictions and overlay new restrictions for causality testing
 restrictions <- function(x, cause) {
     co.names <- vars::Bcoef(x)
