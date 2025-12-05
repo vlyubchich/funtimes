@@ -182,9 +182,9 @@ notrend_test <- function(x, B = 1000, test = c("t", "MK", "WAVK"),
     if (test == "MK") {
         METHOD <- "Sieve-bootstrap Mann--Kendall's trend test"
         ALTERNATIVE <- "monotonic trend."
-        STATISTIC <- MannKendall(x)$tau
+        STATISTIC <- mann_kendall_tau(x)
         names(STATISTIC) <- "Mann--Kendall's tau"
-        boot.stat <- sapply(1:dim(Y)[2], function(i) MannKendall(Y[,i])$tau)
+        boot.stat <- sapply(1:dim(Y)[2], function(i) mann_kendall_tau(Y[,i]))
     }
     #If WAVK test is used
     if (test == "WAVK") {

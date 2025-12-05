@@ -8,6 +8,7 @@
 #   - Mfun(): Computes M(k1,...,km) statistic from p. 553
 #   - M1fun(): Optimized version for at most one changepoint
 #   - MTfun(): Computes MT statistic from p. 554 or first equation on p. 568
+#   - mann_kendall_tau(): Computes Kendall's tau for trend detection
 #
 # @keywords internal
 # @noRd

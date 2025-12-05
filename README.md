@@ -22,8 +22,12 @@ library(funtimes)
 
 ## Current GitHub version
 
+## CRAN version 10.0
+
 - Added new function `r_crit()` to compute critical values of correlations.
 - In the function `causality_pred()`, added option to turn off automatic lag selection. 
+- Removed defunct functions.
+- Removed dependence on the package `Kendall` by adding an internal helper function.
 
 ## CRAN version 9.1
 
