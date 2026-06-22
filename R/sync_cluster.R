@@ -122,15 +122,26 @@
 #' 
 sync_cluster <- function(formula, rate = 1, alpha = 0.05, ...) 
 {
+    if (!inherits(formula, "formula"))
+        stop("formula must be a valid formula object.")
+    if (!is.numeric(rate) || length(rate) != 1L || is.na(rate) || rate <= 0)
+        stop("rate must be a single positive numeric value.")
+    if (!is.numeric(alpha) || length(alpha) != 1L || is.na(alpha) || alpha <= 0 || alpha >= 1)
+        stop("alpha must be a single numeric value in (0, 1).")
+
     ## separating formula to find the time series
     frml <- deparse(substitute(formula))
     splt <- strsplit(frml, "~")[[1]]
     DNAME <- splt[1]
     sh <- splt[2]
     Y <- as.data.frame(eval(parse(text = DNAME)))
+    if (!all(vapply(Y, is.numeric, logical(1L))))
+        stop("All columns in the input time-series object must be numeric.")
     OrigNames <- colnames(Y)
     # assigning column names
     N <- ncol(Y)
+    if (N < 2)
+        stop("At least two time series are required for clustering.")
     colnames(Y) <- 1:N 
     # Storing the final cluster labels
     cluster <- rep(NA, N)
@@ -200,10 +211,9 @@ sync_cluster <- function(formula, rate = 1, alpha = 0.05, ...)
     elements <- tapply(OrigNames, cluster, c)
     names(elements)[names(elements) == "0"] <- "Time series that each formed a separate cluster"
     ## Final clustering results:
-    print("Cluster labels:")
-    print(cluster)
-    print(paste("Number of single-element clusters (labeled with '0'):", 
-                sum(cluster == 0)))
+    message("Cluster labels: ", paste(cluster, collapse = " "))
+    message("Number of single-element clusters (labeled with '0'): ", 
+            sum(cluster == 0))
     return(invisible(structure(list(cluster = cluster, 
                                     elements = elements, 
                                     estimate = sync.common_trend_estimates, 
