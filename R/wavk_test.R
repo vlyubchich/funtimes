@@ -129,53 +129,66 @@ wavk_test <- function(formula, factor.length = c("user.defined", "adaptive.selec
     DNAME <- splt[1]
     x <- lm(formula = as.formula(paste0(DNAME, "~ 1"), env = parent.frame(n = 4)),
             method = "model.frame")[,1]
-    if (is.null(Window)) {
-        Window = round(0.1*length(x))
-    }
-    if (NCOL(x) > 1 | !is.numeric(x)) {
-        stop("x is not a vector or univariate time series.")
-    }
-    n <- length(x)
+    x <- as.vector(x)
     if (any(is.na(x))) {
         stop("x contains missing values.")
     }
+    if (!is.numeric(x))
+        stop("x must be numeric.")
+    n <- length(x)
+    if (n < 5)
+        stop("x must contain at least 5 observations.")
+
+    if (is.null(Window)) {
+        Window <- round(0.1*n)
+    }
+    if (length(Window) != 1L || is.na(Window))
+        stop("Window must be a single non-missing value.")
+    Window <- as.integer(Window)
+    if (Window < 2 || Window >= n)
+        stop("Window must be in [2, length(x)).")
+
+    if (!is.numeric(B) || length(B) != 1L || is.na(B))
+        stop("B must be a single non-missing numeric value.")
+    B <- as.integer(B)
+    if (B <= 0)
+        stop("number of bootstrap samples B must be positive.")
+
+    if (!is.null(ar.order)) {
+        if (length(ar.order) != 1L || is.na(ar.order))
+            stop("ar.order must be a single non-missing value.")
+        ar.order <- as.integer(ar.order)
+        if (ar.order < 0)
+            stop("ar.order must be non-negative.")
+    }
+
     factor.length <- match.arg(factor.length)
-    if (NCOL(q) > 1 | !is.numeric(q) | NROW(q) > 1) {
-        stop("q is not a scalar.")
-    }
-    if (q >= 1 | q <= 0) {
-        stop("q is out of range from 0 to 1.")
-    }
-    if (!is.vector(j) | !is.numeric(j)) {
-        stop("j is not a numeric vector.")
-    }
+
+    if (length(q) != 1L || is.na(q))
+        stop("q must be a single non-missing numeric value.")
+    if (q <= 0 || q >= 1)
+        stop("q must be in (0, 1).")
+
+    if (!is.vector(j) || !is.numeric(j))
+        stop("j must be a numeric vector.")
+    if (any(is.na(j)))
+        stop("j must not contain missing values.")
     if (factor.length == "user.defined") {
-        kn <- Window[1]
+        kn <- Window
     } else {
-        kn <- length(x)*q^j
+        kn <- n*q^j
     }
     kn <- unique(sort(floor(kn)))
     kn <- kn[kn > 2 & kn < n]
-    if (length(kn) == 0) {
-        stop("set a proper window.")
-    }
-    if (factor.length == "adaptive.selection" & length(kn) < 3) {
+    if (length(kn) == 0)
+        stop("set a proper window. Check Window parameter or adjust q/j values.")
+    if (factor.length == "adaptive.selection" && length(kn) < 3)
         stop("number of possible windows is not enough for adaptive selection. Change parameters 'q' and/or 'j'.")
-    }
+
     if (factor.length == "adaptive.selection") {
         method <- "boot"
     }
-    B <- round(B)
-    if (B <= 0) {
-        stop("number of bootstrap samples B must be positive.")
-    }
     method <- match.arg(method)
-    if (!is.null(ar.order) & (NCOL(ar.order) > 1 | !is.numeric(ar.order) | NROW(ar.order) > 1)) {
-        stop("ar.order is not a scalar.")
-    }
-    if (!is.null(ar.order) && ar.order < 0) {
-        stop("ar.order must be non-negative.")
-    }
     ### Function.
     t <- c(1:n)/n
     result <- matrix(NA, length(kn), 2)
