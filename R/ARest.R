@@ -59,10 +59,29 @@ ARest <- function(x,
                   ic = c("BIC", "AIC", "none"))
 {
     x <- as.vector(x)
+    if (!is.numeric(x) || anyNA(x))
+        stop("x must be a numeric vector without missing values.")
     n <- length(x)
+    if (n < 5)
+        stop("x must contain at least 5 observations.")
+
     if (is.null(ar.order)) {
         ar.order <- round(10*log10(n))
     }
+    if (length(ar.order) != 1L || is.na(ar.order))
+        stop("ar.order must be a single non-missing value.")
+    ar.order <- as.integer(ar.order)
+    if (ar.order < 0)
+        stop("ar.order must be >= 0.")
+
+    allowed.methods <- c("HVK", "burg", "ols", "mle", "yw")
+    if (length(ar.method) != 1L || is.na(ar.method) || !(ar.method %in% allowed.methods))
+        stop("ar.method must be one of: HVK, burg, ols, mle, yw.")
+
+    x.var <- var(x)
+    if (!is.finite(x.var) || x.var <= 0)
+        stop("x must have positive finite variance.")
+
     ic <- match.arg(ic)
     if (ic == "BIC") {
         useIC <- TRUE
@@ -73,8 +92,8 @@ ARest <- function(x,
     } else {
         useIC <- FALSE
     }
-    ics <- rep(NA, ar.order + 1)
-    ics[1] <- n*log(var(x)) # no AR-filtering (ar.order == 0)
+    ics <- rep(NA_real_, ar.order + 1)
+    ics[1] <- n * log(x.var) # no AR-filtering (ar.order == 0)
     pheta <- numeric(0) # if no AR-filtering, otherwise will be redefined below
     if (ar.order > 0) {
         if (!useIC) { # useIC == FALSE, use fixed ar.order > 0
