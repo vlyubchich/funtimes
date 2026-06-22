@@ -24,13 +24,26 @@ VARselect <- function(y,
                       exogen = NULL)
 {
     y <- as.matrix(y)
+    if (!is.numeric(y))
+        stop("\ny must be numeric.\n")
     if (any(is.na(y)))
         stop("\nNAs in y.\n")
+    if (is.null(colnames(y)))
+        colnames(y) <- paste0("y", seq_len(ncol(y)))
     colnames(y) <- make.names(colnames(y))
     K <- ncol(y)
     lag.max <- abs(as.integer(lag.max))
+    if (is.na(lag.max) || lag.max < 1)
+        stop("\nlag.max must be an integer >= 1.\n")
+    if (nrow(y) <= lag.max)
+        stop("\nNot enough observations for selected lag.max.\n")
     #VL: check that lag.restrict is an N0 number below lag.max [0,1,...,lag.max)
+    if (length(lag.restrict) != 1L)
+        warning("lag.restrict has length > 1. Using first element.")
+    lag.restrict <- lag.restrict[1L]
     lag.restrict <- abs(as.integer(lag.restrict))
+    if (is.na(lag.restrict))
+        stop("\nlag.restrict must be an integer >= 0.\n")
     if (lag.restrict >= lag.max) { #VL
         warning("lag.restrict >= lag.max. Using lag.restrict = 0 instead.")
         lag.restrict <- 0
@@ -93,10 +106,13 @@ VARselect <- function(y,
             }
             nstar <- ncol(ys.lagged)
         }
-        sigma.det <- det(crossprod(resids)/sample)
-        criteria[1, ii] <- log(sigma.det) + (2/sample) * (i * K^2 + K * detint)
-        criteria[2, ii] <- log(sigma.det) + (2 * log(log(sample))/sample) * (i * K^2 + K * detint)
-        criteria[3, ii] <- log(sigma.det) + (log(sample)/sample) * (i * K^2 + K * detint)
+        sigma.hat <- crossprod(as.matrix(resids))/sample
+        sigma.hat <- (sigma.hat + t(sigma.hat))/2
+        log.sigma.det <- as.numeric(determinant(sigma.hat, logarithm = TRUE)$modulus)
+        sigma.det <- exp(log.sigma.det)
+        criteria[1, ii] <- log.sigma.det + (2/sample) * (i * K^2 + K * detint)
+        criteria[2, ii] <- log.sigma.det + (2 * log(log(sample))/sample) * (i * K^2 + K * detint)
+        criteria[3, ii] <- log.sigma.det + (log(sample)/sample) * (i * K^2 + K * detint)
         criteria[4, ii] <- ((sample + nstar)/(sample - nstar))^K * sigma.det
         ii <- ii + 1
     }
