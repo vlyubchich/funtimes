@@ -86,33 +86,58 @@
 #' 
 BICC <- function(X, Alpha = NULL, Beta = NULL, Theta = 0.8, p, w, s) 
 {
-    i <- dim(X)
-    N <- i[2] #number of time series
-    n <- i[1] #length of time series
+    dims <- dim(X)
+    N <- dims[2] #number of time series
+    n <- dims[1] #length of time series
+    
     IQRx <- median(apply(X, 2, IQR))
-    DELTA <- seq(IQRx/50, IQRx/2, IQRx/10)
-    EPS <- seq(1.0/w, 1.0, 1.0/w)
-    IC <- array(NA, dim = c(length(DELTA), length(EPS)))
-    for (i in 1:(length(DELTA))) { 
-        for (j in 1:length(EPS)) {
-            outputTMP <- CWindowCluster(X, Delta = DELTA[i], Epsilon = EPS[j], 
-                                        Alpha = Alpha, Beta = Beta, Theta = Theta, 
-                                        p = p, w = w, s = s)
-            k <- max(outputTMP) 
-            Res <- sapply(1:k, function(v) as.matrix(X[,v == outputTMP]) - 
-                              rowMeans(as.matrix(X[,v == outputTMP])))
-            VarRes <- var(as.vector(unlist(Res)))*(n*N - 1)/(n*N) #biased variance estimate
-            IC[i,j] <- N*log(VarRes) + k*log(N) #BIC
+    deltas <- seq(IQRx/50, IQRx/2, IQRx/10)
+    epsilons <- seq(1.0/w, 1.0, 1.0/w)
+    
+    IC <- array(NA, dim = c(length(deltas), length(epsilons)))
+    
+    for (i in 1:length(deltas)) { 
+        for (j in 1:length(epsilons)) {
+            clusters_tmp <- CWindowCluster(X, Delta = deltas[i], Epsilon = epsilons[j], 
+                                           Alpha = Alpha, Beta = Beta, Theta = Theta, 
+                                           p = p, w = w, s = s)
+            k <- max(clusters_tmp) 
+            
+            # Calculate residuals for each cluster
+            residuals_list <- lapply(1:k, function(v) {
+                cluster_series <- X[, clusters_tmp == v, drop = FALSE]
+                cluster_mean <- rowMeans(cluster_series)
+                cluster_series - cluster_mean
+            })
+            
+            # Biased variance of all residuals
+            all_residuals <- unlist(residuals_list)
+            residuals_var <- var(all_residuals) * (n * N - 1) / (n * N)
+            
+            IC[i, j] <- N * log(residuals_var) + k * log(N) #BIC
         }
     }
-    IC[IC == Inf | IC == -Inf] <- NA
-    i <- which(IC == min(IC, na.rm = TRUE), arr.ind = TRUE)
-    DELTA_opt <- DELTA[i[1, 1]]
-    EPSILON_opt <- EPS[i[1, 2]]
-    output <- CWindowCluster(X, Delta = DELTA_opt, Epsilon = EPSILON_opt, 
+    
+    IC[is.infinite(IC)] <- NA
+    
+    # Find optimal parameters.
+    # In case of ties for the minimum IC, which.min returns the first one.
+    # We are following that behavior by taking the first row of the index matrix.
+    min_ic_idx <- which(IC == min(IC, na.rm = TRUE), arr.ind = TRUE)
+    opt_idx <- min_ic_idx[1, ]
+    delta_opt <- deltas[opt_idx[1]]
+    epsilon_opt <- epsilons[opt_idx[2]]
+    
+    output <- CWindowCluster(X, Delta = delta_opt, Epsilon = epsilon_opt, 
                              Alpha = Alpha, Beta = Beta, Theta = Theta, 
                              p = p, w = w, s = s)
+    
     dimnames(output) <- list(paste("Window", c(1:nrow(output)), sep = "_"), colnames(X))
-    return(list(delta.opt = DELTA_opt, epsilon.opt = EPSILON_opt, 
-                clusters = output, IC = IC, delta.all = DELTA, epsilon.all = EPS))
+    
+    return(list(delta.opt = delta_opt, 
+                epsilon.opt = epsilon_opt, 
+                clusters = output, 
+                IC = IC, 
+                delta.all = deltas, 
+                epsilon.all = epsilons))
 }
