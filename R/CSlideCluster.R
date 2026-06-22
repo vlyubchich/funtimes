@@ -35,30 +35,45 @@
 CSlideCluster <- function(X, Alpha = NULL, Beta = NULL, Delta = NULL, Theta = 0.8)
 {
     #X is a matrix of time series, with one slide
-    N <- dim(X)[2]
-    if (is.null(Alpha) | is.null(Beta)) {
-        Alpha <- quantile(X)[2] - 1.5*(quantile(X)[4] - quantile(X)[2])
-        Beta <- quantile(X)[4] + 1.5*(quantile(X)[4] - quantile(X)[2])
+    N <- ncol(X)
+    
+    if (is.null(Alpha) || is.null(Beta)) {
+        q <- quantile(X)
+        IQR_X <- q[4] - q[2]
+        Alpha <- q[2] - 1.5 * IQR_X
+        Beta <- q[4] + 1.5 * IQR_X
     }
-    if (is.null(Delta)) {Delta <- 0.1*(Beta - Alpha)}
-    TSclusters <- rep(NA, N)
-    currentTS <- currentCluster <- 1
-    TSclusters[currentTS] <- currentCluster
-    Unclassified <- is.na(TSclusters)
-    while (any(Unclassified)) {
-        Include <- CExpandSlideCluster(X[,currentTS], X[,Unclassified], 
-                                       Alpha, Beta, Delta, Theta)
-        #Assign cluster number to the time series that were just grouped
-        TSclusters[Unclassified][Include] <- currentCluster
-        #Next cluster number will be:
-        currentCluster <- currentCluster + 1
-        #Still unclassified time series
-        Unclassified <- is.na(TSclusters)
-        #Select the next time series to start the cluster with, and immediately
-        #assign it to the new cluster
-        currentTS <- which(Unclassified)[1]
-        TSclusters[currentTS] <- currentCluster
-        Unclassified <- is.na(TSclusters)
+    
+    if (is.null(Delta)) {
+        Delta <- 0.1 * (Beta - Alpha)
     }
-    TSclusters
+    
+    ts_clusters <- rep(NA, N)
+    cluster_label <- 1
+    
+    unclassified_indices <- 1:N
+    
+    while (length(unclassified_indices) > 0) {
+        # Start a new cluster with the first unclassified time series
+        seed_ts_idx <- unclassified_indices[1]
+        ts_clusters[seed_ts_idx] <- cluster_label
+        
+        # Find other unclassified series to add to this cluster
+        unclassified_subset_indices <- unclassified_indices[-1]
+        
+        if (length(unclassified_subset_indices) > 0) {
+            series_to_include <- CExpandSlideCluster(X[, seed_ts_idx], 
+                                                     X[, unclassified_subset_indices, drop = FALSE],
+                                                     Alpha, Beta, Delta, Theta)
+            
+            # Assign the current cluster label to the included series
+            ts_clusters[unclassified_subset_indices[series_to_include]] <- cluster_label
+        }
+        
+        # Prepare for the next iteration
+        cluster_label <- cluster_label + 1
+        unclassified_indices <- which(is.na(ts_clusters))
+    }
+    
+    ts_clusters
 }
