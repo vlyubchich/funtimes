@@ -102,7 +102,7 @@ notrend_test <- function(x, B = 1000, test = c("t", "MK", "WAVK"),
 {
     ### Perform various checks.
     DNAME <- deparse(substitute(x))
-    if (NCOL(x) > 1 | !is.numeric(x)) {
+    if (NCOL(x) > 1 || !is.numeric(x)) {
         stop("x is not a vector or univariate time series.")
     }
     if (any(is.na(x))) {
@@ -110,44 +110,56 @@ notrend_test <- function(x, B = 1000, test = c("t", "MK", "WAVK"),
     }
     x <- as.vector(x)
     n <- length(x)
+    if (n < 5)
+        stop("x must contain at least 5 observations.")
+
+    if (!is.numeric(B) || length(B) != 1L || is.na(B))
+        stop("B must be a single non-missing numeric value.")
+    B <- as.integer(B)
+    if (B <= 0)
+        stop("number of bootstrap samples B must be positive.")
+
+    if (!is.null(ar.order)) {
+        if (length(ar.order) != 1L || is.na(ar.order))
+            stop("ar.order must be a single non-missing value.")
+        ar.order <- as.integer(ar.order)
+        if (ar.order < 0)
+            stop("ar.order must be non-negative.")
+    }
+
     test <- match.arg(test)
     if (identical(test, "WAVK")) { #checks only for WAVK
         factor.length <- match.arg(factor.length)
         if (is.null(Window)) {
-            Window = round(0.1*n)
+            Window <- round(0.1*n)
         }
-        if (NCOL(q) > 1 | !is.numeric(q) | NROW(q) > 1) {
-            stop("q is not a scalar.")
-        }
-        if (q >= 1 | q <= 0) {
-            stop("q is out of range from 0 to 1.")
-        }
-        if (!is.vector(j) | !is.numeric(j)) {
-            stop("j is not a numeric vector.")
-        }
+        if (length(Window) != 1L || is.na(Window))
+            stop("Window must be a single non-missing value.")
+        Window <- as.integer(Window)
+        if (Window < 2 || Window >= n)
+            stop("Window must be in [2, length(x)).")
+
+        if (length(q) != 1L || is.na(q))
+            stop("q must be a single non-missing numeric value.")
+        if (q <= 0 || q >= 1)
+            stop("q must be in (0, 1).")
+
+        if (!is.vector(j) || !is.numeric(j))
+            stop("j must be a numeric vector.")
+        if (any(is.na(j)))
+            stop("j must not contain missing values.")
+
         if (factor.length == "user.defined") {
-            kn <- Window[1]
+            kn <- Window
         } else {
             kn <- n*q^j
         }
         kn <- unique(sort(floor(kn)))
         kn <- kn[kn > 2 & kn < n]
-        if (length(kn) == 0) {
-            stop("set a proper window.")
-        }
-        if (factor.length == "adaptive.selection" & length(kn) < 3) {
+        if (length(kn) == 0)
+            stop("set a proper window. Check Window parameter or adjust q/j values.")
+        if (factor.length == "adaptive.selection" && length(kn) < 3)
             stop("number of possible windows is not enough for adaptive selection. Change parameters 'q' and/or 'j'.")
-        }
-    }
-    B <- round(B)
-    if (B <= 0) {
-        stop("number of bootstrap samples B must be positive.")
-    }
-    if (!is.null(ar.order) & (NCOL(ar.order) > 1 | !is.numeric(ar.order) | NROW(ar.order) > 1)) {
-        stop("ar.order is not a scalar.")
-    }
-    if (!is.null(ar.order) && ar.order < 0) {
-        stop("ar.order must be non-negative.")
     }
     ### Function.
     Y <- array(data = NA, c(n, B))
@@ -167,7 +179,7 @@ notrend_test <- function(x, B = 1000, test = c("t", "MK", "WAVK"),
             Y[ ,i] <- sample(Z, size = n, replace = TRUE)
         }
     }
-    Z <- na.omit(Z) - mean(Z)
+    Z <- na.omit(Z) - mean(na.omit(Z))
     ESTIMATE <- list(length(pheta), pheta)
     names(ESTIMATE) <- c("AR_order", "AR_coefficients")
     #If Student's t-test is used
