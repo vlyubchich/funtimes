@@ -85,6 +85,17 @@
 #' 
 purity <- function(classes, clusters) 
 {
+  if (is.null(classes) || is.null(clusters))
+    stop("classes and clusters must be provided.")
+  if (!is.vector(classes) || !is.vector(clusters))
+    stop("classes and clusters must be vectors.")
+  if (length(classes) != length(clusters))
+    stop("classes and clusters must have the same length.")
+  if (length(classes) == 0L)
+    stop("classes and clusters must be non-empty.")
+  if (any(is.na(classes)) || any(is.na(clusters)))
+    stop("classes and clusters must not contain missing values.")
+
   ClassLabels <- ClusterLabels <- ClusterSize <- numeric()
   tmp <- table(classes, clusters)
   i <- 1
