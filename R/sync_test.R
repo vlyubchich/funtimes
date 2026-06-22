@@ -170,16 +170,48 @@ sync_test <- function(formula, B = 1000, Window = NULL, q = NULL, j = NULL,
     DNAME <- splt[1]
     sh <- splt[2]
     X <- eval(parse(text = DNAME), parent.frame())
+
+    # Validate X
+    if (!is.matrix(X) && !is.data.frame(X))
+        stop("data must be a matrix or data frame.")
+    X <- as.matrix(X)
+    if (!is.numeric(X))
+        stop("data must be numeric.")
+    if (any(is.na(X)))
+        stop("data contains missing values.")
     n <- nrow(X)
     K <- ncol(X)
+    if (n < 5)
+        stop("data must have at least 5 observations.")
+    if (K < 2)
+        stop("data must have at least 2 time series (columns).")
+
+    # Validate B
+    if (!is.numeric(B) || length(B) != 1L || is.na(B))
+        stop("B must be a single non-missing numeric value.")
+    B <- as.integer(B)
+    if (B <= 0)
+        stop("number of bootstrap samples B must be positive.")
+
     t <- c(1:n)/n
     if (!is.null(Window)) { #if user set Window
         UseOneWindowPerTS <- TRUE
         ONEwindow <- FALSE
         if (length(Window) == 1) {
             ONEwindow <- TRUE
+            Window <- as.integer(Window)
+            if (is.na(Window))
+                stop("Window must be non-missing.")
+            if (Window < 2 || Window >= n)
+                stop("Window must be in [2, nrow(X)).")
             Window <- rep(Window, K)
-        } else if (length(Window) != K) {
+        } else if (length(Window) == K) {
+            Window <- as.integer(Window)
+            if (any(is.na(Window)))
+                stop("Window values must be non-missing.")
+            if (any(Window < 2) || any(Window >= n))
+                stop("all Window values must be in [2, nrow(X)).")
+        } else {
             stop("number of windows does not match number of time series.")
         }
         if (!is.null(q)) {warning("The parameter q was not used.")}
@@ -187,34 +219,43 @@ sync_test <- function(formula, B = 1000, Window = NULL, q = NULL, j = NULL,
     } else {
         UseOneWindowPerTS <- FALSE
         if (!is.null(q)) {
-            if (NCOL(q) > 1 | !is.numeric(q) | NROW(q) > 1) {
-                stop("q is not a scalar.")
-            }
-            if (q >= 1 | q <= 0) {
-                stop("q is out of range from 0 to 1.")
-            }
+            if (length(q) != 1L || is.na(q))
+                stop("q must be a single non-missing numeric value.")
+            if (q <= 0 || q >= 1)
+                stop("q must be in (0, 1).")
         } else {
             q <- 3/4
         }
         if (!is.null(j)) {
-            if (!is.vector(j) | !is.numeric(j)) {
-                stop("j is not a numeric vector.")
-            }
+            if (!is.vector(j) || !is.numeric(j))
+                stop("j must be a numeric vector.")
+            if (any(is.na(j)))
+                stop("j must not contain missing values.")
         } else {
             j <- c(8:11)
         }
         kn <- n*q^j
         kn <- unique(sort(floor(kn)))
         kn <- kn[kn > 2 & kn < n]
-        if (length(kn) == 0) {
-            stop("set proper q and/or j.")
-        }
+        if (length(kn) == 0)
+            stop("set proper q and/or j to generate valid windows.")
     }
     if (!is.null(ar.order)) { #if user set ar.order
-        maxARorder <- ar.order
         if (length(ar.order) == 1) {
+            if (is.na(ar.order))
+                stop("ar.order must be non-missing.")
+            ar.order <- as.integer(ar.order)
+            if (ar.order < 0)
+                stop("ar.order must be non-negative.")
             maxARorder <- rep(ar.order, K)
-        } else if (length(ar.order) != K) {
+        } else if (length(ar.order) == K) {
+            ar.order <- as.integer(ar.order)
+            if (any(is.na(ar.order)))
+                stop("ar.order values must be non-missing.")
+            if (any(ar.order < 0))
+                stop("all ar.order values must be non-negative.")
+            maxARorder <- ar.order
+        } else {
             stop("number of elements in ar.order does not match number of time series.")
         }
     } else {
@@ -306,21 +347,12 @@ sync_test <- function(formula, B = 1000, Window = NULL, q = NULL, j = NULL,
         p.value.ass <- crit.ass * 2
         p.value.ass[crit.ass > 0.5] <- (1 - crit.ass[crit.ass > 0.5]) * 2
         #
-        if (ONEwindow) {
-            ESTIMATE <- list(TrendCoeff, OutputARorder, OutputWindow,
-                             cbind(Window[1], ST, p.value.boot.all, p.value.ass), wavk_obs)
-            names(ESTIMATE) <- list("common_trend_estimates", "ar.order_used",
-                                    "Window_used", "all_considered_windows", "wavk_obs")
-            dimnames(ESTIMATE[[4]]) <- list(rep("", NROW(ESTIMATE[[4]])),
-                                            c("Window", "Statistic", "p-value", "Asympt. p-value"))
-        } else {
-            ESTIMATE <- list(TrendCoeff, OutputARorder, OutputWindow,
-                             cbind(ST, p.value.boot.all, p.value.ass), wavk_obs)
-            names(ESTIMATE) <- list("common_trend_estimates", "ar.order_used",
-                                    "Window_used", "all_considered_windows", "wavk_obs")
-            dimnames(ESTIMATE[[4]]) <- list(rep("", NROW(ESTIMATE[[4]])),
-                                            c("Statistic", "p-value", "Asympt. p-value"))
-        }
+        ESTIMATE <- list(TrendCoeff, OutputARorder, OutputWindow,
+                         cbind(Window[1], ST, p.value.boot.all, p.value.ass), wavk_obs)
+        names(ESTIMATE) <- list("common_trend_estimates", "ar.order_used",
+                                "Window_used", "all_considered_windows", "wavk_obs")
+        dimnames(ESTIMATE[[4]]) <- list(rep("", NROW(ESTIMATE[[4]])),
+                                        c("Window", "Statistic", "p-value", "Asympt. p-value"))
     }
 
     METHOD <- "Nonparametric test for synchronism of parametric trends"
