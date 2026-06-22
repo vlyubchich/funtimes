@@ -36,17 +36,33 @@
 #' HVK(as.vector(X), ar.order = 1)
 #' 
 HVK <- function(X, m1 = NULL, m2 = NULL, ar.order = 1) {
-    if (!is.numeric(X) | !is.vector(X)) {
-        stop("input object should be a vector.")
-    }    
+    if (!is.numeric(X) || !is.vector(X)) {
+        stop("input object should be a numeric vector.")
+    }
     if (any(is.na(X))) {
         stop("input vector should not contain missing values.")
     }
     n <- length(X)
-    if (is.null(m1) | is.null(m2)) {
+    if (n < 5)
+        stop("input vector is too short for HVK estimation.")
+
+    if (length(ar.order) != 1L || is.na(ar.order))
+        stop("ar.order must be a single non-missing value.")
+    ar.order <- as.integer(ar.order)
+    if (ar.order < 1)
+        stop("ar.order must be >= 1.")
+    if (ar.order >= n)
+        stop("ar.order must be smaller than the sample size.")
+
+    if (is.null(m1) || is.null(m2)) {
         m1 <- round(n^(0.1))
         m2 <- round(n^(0.5))
     }
+    m1 <- as.integer(m1)
+    m2 <- as.integer(m2)
+    if (any(is.na(c(m1, m2))) || m1 < 1 || m2 < m1 || m2 >= n)
+        stop("m1 and m2 must satisfy 1 <= m1 <= m2 < length(X).")
+
     m <- c(m1:m2)
     tmp <- sapply(m, function(x) diff(X, lag = x))
     tmp <- sapply(1:length(tmp), function(x) sum(tmp[[x]]^2))
