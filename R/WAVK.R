@@ -56,21 +56,30 @@
 #'
 WAVK <- function(z, kn = NULL)
 {
-    if (!is.numeric(z) | !is.vector(z)) {
-        stop("input object should be a vector.")
+    if (!is.numeric(z) || !is.vector(z)) {
+        stop("input object should be a numeric vector.")
     }
     if (any(is.na(z))) {
         stop("input vector should not contain missing values.")
     }
-    kn <- round(kn)
     T <- length(z)
-    if (any(T <= kn)) {
+    if (T < 3) {
+        stop("input vector is too short for WAVK statistic.")
+    }
+
+    if (is.null(kn) || length(kn) != 1L || is.na(kn)) {
+        stop("kn must be a single non-missing numeric value.")
+    }
+    kn <- as.integer(round(kn))
+    if (kn < 2) {
+        stop("kn must be at least 2.")
+    }
+    if (T <= kn) {
         stop(paste0("window length kn = ",
-                    kn[1],
+                    kn,
                     " is too big for the time series of this length (",
                     T,
-                    ", after filtering). Possible reasons: too short input time series, nonstationarity of trend residuals, or too high AR order for filtering.")
-             )
+                    ", after filtering). Possible reasons: too short input time series, nonstationarity of trend residuals, or too high AR order for filtering."))
     }
     ave_group <- sapply(c(1:(T - kn + 1)), function(x) mean(z[x:(x + kn - 1)]))
     ave_all <- mean(ave_group)
@@ -79,6 +88,8 @@ WAVK <- function(z, kn = NULL)
         sum((z[x:(x + kn - 1)] - ave_group[x])^2))) / (T*(kn - 1))
     Tn <- MST - MSE
     sigma2 <- sum(diff(z)^2)/(2 * (T - 1))
+    if (!is.finite(sigma2) || sigma2 <= 0)
+        stop("Estimated variance is non-positive; WAVK statistic is undefined.")
     Tns <- sqrt(T/kn) * Tn / (sqrt(4/3) * sigma2)
     crit <- pnorm(Tns, mean = 0, sd = 1)
     if (crit < 0.5) {
