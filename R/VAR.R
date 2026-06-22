@@ -22,6 +22,8 @@ VAR <- function(y, p = 1, type = c("const", "trend", "both", "none"),
     ic = c("AIC", "HQ", "SC", "FPE"))
 {
   y <- as.matrix(y)
+    if (!is.numeric(y))
+      stop("\ny must be numeric.\n")
     if (any(is.na(y)))
         stop("\nNAs in y.\n")
     if (ncol(y) < 2)
@@ -36,12 +38,26 @@ VAR <- function(y, p = 1, type = c("const", "trend", "both", "none"),
     type <- match.arg(type)
     obs <- dim(y)[1]
     K <- dim(y)[2]
+    if (length(lag.restrict) != 1L)
+      warning("lag.restrict has length > 1. Using first element.")
+    lag.restrict <- lag.restrict[1L]
+    lag.restrict <- abs(as.integer(lag.restrict))
+    if (is.na(lag.restrict))
+      stop("\nlag.restrict must be an integer >= 0.\n")
     if (!is.null(lag.max) && is.null(p)) { #VL
       lag.max <- abs(as.integer(lag.max))
       ic <- paste(match.arg(ic), "(n)", sep = "")
       p <- VARselect(y, lag.max = lag.max, lag.restrict = lag.restrict, #VL
                      type = type, season = season, exogen = exogen)$selection[ic]
     }
+    if (length(p) != 1L)
+      warning("p has length > 1. Using first element.")
+    p <- p[1L]
+    p <- abs(as.integer(p))
+    if (is.na(p) || p < 1)
+      stop("\np must be an integer >= 1.\n")
+    if (obs <= p)
+      stop("\nNot enough observations for selected p.\n")
     if (p <= lag.restrict) { #VL
       warning("lag.restrict >= p. Using lag.restrict = 0 instead.")
       lag.restrict <- 0
