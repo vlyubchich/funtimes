@@ -43,11 +43,28 @@
 r_crit <- function(n,
                    conf.level = 0.95,
                    method = c("t")) {
+    method <- match.arg(method)
+    if (method != "t")
+        stop("Only method = 't' is currently supported.")
+
+    if (!is.numeric(n) || length(n) < 1L || any(is.na(n)))
+        stop("n must be a non-missing numeric vector.")
+    n <- as.integer(n)
+
+    if (!is.numeric(conf.level) || length(conf.level) < 1L || is.na(conf.level[1]))
+        stop("conf.level must be a non-missing numeric value.")
+    conf.level <- conf.level[1]
+    if (conf.level <= 0 || conf.level >= 1)
+        stop("conf.level must be in (0, 1).")
+
     if (any(n < 4)) {
         warning("Values of n < 4 were omitted.")
         n <- n[n >= 4]
     }
-    alpha <- 1 - conf.level[1]
+    if (length(n) == 0L)
+        stop("All values of n are < 4.")
+
+    alpha <- 1 - conf.level
     t2 <- qt(p = 1 - alpha/2, df = n - 2)^2
     sqrt(t2 / (n - 2 + t2))
 }
