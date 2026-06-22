@@ -87,7 +87,24 @@ causality_predVAR <- function(y, p = NULL,
                               cl = 1L,
                               ...)
 {
+    y <- as.data.frame(y)
+    if (ncol(y) != 2)
+        stop("y must have 2 columns")
+    if (!all(vapply(y, is.numeric, logical(1L))))
+        stop("Both columns in y must be numeric.")
+    if (anyNA(y))
+        stop("Missing values are not allowed in y.")
+
+    if (!is.null(p) && any(p < 1L))
+        stop("p must be positive integer(s).")
+    if (!is.numeric(B) || length(B) != 1L || is.na(B) || B < 1)
+        stop("B must be a single positive integer.")
+    B <- as.integer(B)
+    if (!is.numeric(test) || length(test) != 1L || is.na(test) || test <= 0)
+        stop("test must be a single positive numeric value.")
+
     bootparallel <- FALSE
+    clStop <- FALSE
     if (is.list(cl)) { #some other cluster supplied; use it but do not stop it
         bootparallel <- TRUE
         clStop <- FALSE
@@ -103,10 +120,20 @@ causality_predVAR <- function(y, p = NULL,
             clStop <- TRUE
         }
     }
+    on.exit({
+        if (clStop && !is.null(cl)) {
+            try(parallel::stopCluster(cl), silent = TRUE)
+        }
+    }, add = TRUE)
+
     varnames <- colnames(y)
     if (length(varnames) != 2) stop("y must have 2 columns")
     if (is.null(cause)) {
         cause <- varnames[1]
+    } else {
+        cause <- as.character(cause)[1L]
+        if (!(cause %in% varnames))
+            stop("cause must match one of the column names in y.")
     }
     dep <- setdiff(varnames, cause)[1] # dependent variable
     K <- 2L #length(varnames)
@@ -116,9 +143,13 @@ causality_predVAR <- function(y, p = NULL,
     if (test < 1) { # percentage split
         n_train <- round(n*(1 - test))
     } else { # use the last "test" observations as the testing set
-        n_train <- n - test
+        n_train <- n - as.integer(test)
     }
     n_test <- n - n_train
+    if (n_train < 3)
+        stop("Training sample is too short for model estimation.")
+    if (n_test < 2)
+        stop("Testing sample must contain at least 2 observations.")
 
     # Estimate model on the training data to get the coefficient structure and
     # estimate p if using an information criterion
@@ -128,6 +159,10 @@ causality_predVAR <- function(y, p = NULL,
     } else {
         ptrain <- p
     }
+    if (n_train <= ptrain)
+        stop("Training sample is too short for selected lag order.")
+    if (n <= ptrain)
+        stop("Sample is too short for selected lag order.")
     R2inv <- restrictions(x, cause)
 
     # # Recreate matrix of restrictions and overlay new restrictions for causality testing
@@ -221,9 +256,6 @@ causality_predVAR <- function(y, p = NULL,
             # test statistics
             caustests(efullb, eresb)
         })
-        if (clStop) {
-            parallel::stopCluster(cl)
-        }
     } else {
         BOOT0 <- #parallel::parSapply(cl, X = 1:B, FUN = function(b) {
             sapply(1:B, FUN = function(b) {
