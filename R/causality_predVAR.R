@@ -1,3 +1,17 @@
+#' @importFrom stats predict residuals
+#' @importFrom mlVAR simulateVAR
+
+.get_recursive_VAR_fcsts <- function(y, p, n_train, n_test, dep, R2inv, ...) {
+    sapply(1:n_test - 1, function(i) {
+        # estimate full model, VAR or restricted VAR (depends on lag.restrict)
+        x <- VAR(y[(1 + i):(n_train + i), ], p = p, ...)
+        ff <- predict(x, n.ahead = 1)$fcst[[dep]][1] # VAR predictions
+        xres <- vars::restrict(x, method = "man", resmat = R2inv)
+        fr <- predict(xres, n.ahead = 1)$fcst[[dep]][1] # VAR predictions
+        c(ff, fr)
+    })
+}
+
 #' Out-of-sample Tests of Granger Causality using (Restricted) Vector Autoregression
 #'
 #' Test for Granger causality using out-of-sample prediction errors from a vector
@@ -87,209 +101,100 @@ causality_predVAR <- function(y, p = NULL,
                               cl = 1L,
                               ...)
 {
+    # Input validation
     y <- as.data.frame(y)
-    if (ncol(y) != 2)
-        stop("y must have 2 columns")
-    if (!all(vapply(y, is.numeric, logical(1L))))
-        stop("Both columns in y must be numeric.")
-    if (anyNA(y))
-        stop("Missing values are not allowed in y.")
-
-    if (!is.null(p) && any(p < 1L))
-        stop("p must be positive integer(s).")
-    if (!is.numeric(B) || length(B) != 1L || is.na(B) || B < 1)
-        stop("B must be a single positive integer.")
+    if (ncol(y) != 2) stop("y must have 2 columns")
+    if (!all(vapply(y, is.numeric, logical(1L)))) stop("Both columns in y must be numeric.")
+    if (anyNA(y)) stop("Missing values are not allowed in y.")
+    if (!is.null(p) && any(p < 1L)) stop("p must be positive integer(s).")
+    if (!is.numeric(B) || length(B) != 1L || is.na(B) || B < 1) stop("B must be a single positive integer.")
     B <- as.integer(B)
-    if (!is.numeric(test) || length(test) != 1L || is.na(test) || test <= 0)
-        stop("test must be a single positive numeric value.")
+    if (!is.numeric(test) || length(test) != 1L || is.na(test) || test <= 0) stop("test must be a single positive numeric value.")
 
+    # Setup parallel processing
     bootparallel <- FALSE
-    clStop <- FALSE
-    if (is.list(cl)) { #some other cluster supplied; use it but do not stop it
+    if (is.list(cl)) {
         bootparallel <- TRUE
-        clStop <- FALSE
     } else {
-        if (is.null(cl)) {
-            cores <- parallel::detectCores()
-        } else {
-            cores <- cl
-        }
-        if (cores > 1) { #specified or detected cores>1; start a cluster and later stop it
+        cores <- if (is.null(cl)) parallel::detectCores() else cl
+        if (cores > 1) {
             bootparallel <- TRUE
             cl <- parallel::makeCluster(cores)
-            clStop <- TRUE
+            on.exit(parallel::stopCluster(cl), add = TRUE)
         }
     }
-    on.exit({
-        if (clStop && !is.null(cl)) {
-            try(parallel::stopCluster(cl), silent = TRUE)
-        }
-    }, add = TRUE)
 
+    # Identify cause and dependent variables
     varnames <- colnames(y)
-    if (length(varnames) != 2) stop("y must have 2 columns")
     if (is.null(cause)) {
         cause <- varnames[1]
     } else {
         cause <- as.character(cause)[1L]
-        if (!(cause %in% varnames))
-            stop("cause must match one of the column names in y.")
+        if (!(cause %in% varnames)) stop("cause must match one of the column names in y.")
     }
-    dep <- setdiff(varnames, cause)[1] # dependent variable
-    K <- 2L #length(varnames)
+    dep <- setdiff(varnames, cause)[1]
+    K <- 2L
 
     # Define samples
-    n <- nrow(y) # sample size
-    if (test < 1) { # percentage split
-        n_train <- round(n*(1 - test))
-    } else { # use the last "test" observations as the testing set
-        n_train <- n - as.integer(test)
-    }
+    n <- nrow(y)
+    n_train <- if (test < 1) round(n * (1 - test)) else n - as.integer(test)
     n_test <- n - n_train
-    if (n_train < 3)
-        stop("Training sample is too short for model estimation.")
-    if (n_test < 2)
-        stop("Testing sample must contain at least 2 observations.")
+    if (n_train < 3) stop("Training sample is too short for model estimation.")
+    if (n_test < 2) stop("Testing sample must contain at least 2 observations.")
 
-    # Estimate model on the training data to get the coefficient structure and
-    # estimate p if using an information criterion
-    x <- VAR(y[1:n_train,], p = p, ...)
-    if (is.null(p)) {
-        ptrain <- x$p
-    } else {
-        ptrain <- p
-    }
-    if (n_train <= ptrain)
-        stop("Training sample is too short for selected lag order.")
-    if (n <= ptrain)
-        stop("Sample is too short for selected lag order.")
-    R2inv <- restrictions(x, cause)
-
-    # # Recreate matrix of restrictions and overlay new restrictions for causality testing
-    # co.names <- vars::Bcoef(x)
-    # k <- which(gsub("\\.l\\d+", "", colnames(co.names)) %in% cause) # select cause regressors
-    # l <- which(rownames(co.names) %in% cause) # select cause regressand
-    # R2inv <- matrix(1, ncol = ncol(co.names), nrow = nrow(co.names))
-    # R2inv[-l, k] <- 0 # select coef to be tested
-    # # If the model already has restriction, overlay with the new ones
-    # if (!is.null(x$restrictions)) {
-    #     xr <- x$restrictions
-    #     # match positions of variables
-    #     xr <- xr[rownames(co.names), colnames(co.names)]
-    #     # overlay
-    #     R2inv <- xr * R2inv
-    # }
+    # Estimate model on the training data to get p and coefficient restrictions
+    x_train <- VAR(y[1:n_train, ], p = p, ...)
+    ptrain <- if (is.null(p)) x_train$p else p
+    if (n_train <= ptrain) stop("Training sample is too short for selected lag order.")
+    if (n <= ptrain) stop("Sample is too short for selected lag order.")
+    R2inv <- restrictions(x_train, cause)
 
     # Get 1-step ahead forecasts from the models (recursive)
-    FCST <- sapply(1:n_test - 1, function(i) { # i = 0
-        # estimate full model, VAR or restricted VAR (depends on lag.restrict)
-        x <- VAR(y[(1 + i):(n_train + i),], p = ptrain, ...)
-        ff <- predict(x, n.ahead = 1)$fcst[[dep]][1] # VAR predictions
-        xres <- vars::restrict(x, method = "man", resmat = R2inv)
-        fr <- predict(xres, n.ahead = 1)$fcst[[dep]][1] # VAR predictions
-        c(ff, fr)
-    })
-    # Forecast errors
-    efull <- y[(n_train + 1):n, dep] - FCST[1,]
-    eres <- y[(n_train + 1):n, dep] - FCST[2,]
-    # Observed test statistics
+    FCST <- .get_recursive_VAR_fcsts(y, ptrain, n_train, n_test, dep, R2inv, ...)
+    efull <- y[(n_train + 1):n, dep] - FCST[1, ]
+    eres <- y[(n_train + 1):n, dep] - FCST[2, ]
     OBS <- caustests(efull, eres)
 
-    # Fast bootstrap (only the out-of-sample errors)
-    BOOT <- #parallel::parSapply(cl, X = 1:B, FUN = function(b) {
-        sapply(1:B, FUN = function(b) {
-            # bootstrap prediction errors
-            ind <- sample(n_test, replace = TRUE)
-            efullb <- efull[ind]
-            # ind <- sample(n_test, replace = TRUE)
-            eresb <- eres[ind]
-            # get bootstrapped statistics
-            caustests(efullb, eresb)
-        })
-    Fast <- list(result = data.frame(MSEt = c(OBS["MSEt"],
-                                              (sum(BOOT["MSEt",] >= 0) + 1) / (B + 1)),
-                                     MSEcor = c(OBS["MSEcor"],
-                                                (sum(BOOT["MSEcor",] >= 0) + 1) / (B + 1)),
+    # Fast bootstrap (on out-of-sample errors)
+    BOOT <- sapply(1:B, FUN = function(b) {
+        ind <- sample(n_test, replace = TRUE)
+        caustests(efull[ind], eres[ind])
+    })
+    Fast <- list(result = data.frame(MSEt = c(OBS["MSEt"], (sum(BOOT["MSEt",] >= 0) + 1) / (B + 1)),
+                                     MSEcor = c(OBS["MSEcor"], (sum(BOOT["MSEcor",] >= 0) + 1) / (B + 1)),
                                      row.names = c("stat_obs", "p_boot")),
                  p = ptrain)
 
-    # Bootstrap restricted model estimated on the full sample
-    x <- VAR(y, p = p, ...)
-    if (is.null(p)) {
-        pfull <- x$p
-    } else {
-        pfull <- p
+    # Bootstrap under the null hypothesis
+    x_full <- VAR(y, p = p, ...)
+    pfull <- if (is.null(p)) x_full$p else p
+    R2inv_full <- restrictions(x_full, cause)
+    xres_full <- vars::restrict(x_full, method = "man", resmat = R2inv_full)
+    xres_coef_mat <- vars::Bcoef(xres_full)
+    keep <- which(gsub("\.l\d+", "", colnames(xres_coef_mat)) %in% varnames)
+    xres_coef_list <- lapply(1:(length(keep) / K), function(i) xres_coef_mat[, keep[((i - 1) * K + 1):(i * K)]])
+    xres_cov <- cov(residuals(xres_full))
+
+    boot_worker <- function(b) {
+        yb <- mlVAR::simulateVAR(pars = xres_coef_list, lags = 1:pfull,
+                                 residuals = xres_cov, Nt = n)
+        names(yb) <- varnames
+        FCST_boot <- .get_recursive_VAR_fcsts(yb, pfull, n_train, n_test, dep, R2inv_full, ...)
+        efullb <- yb[(n_train + 1):n, dep] - FCST_boot[1, ]
+        eresb <- yb[(n_train + 1):n, dep] - FCST_boot[2, ]
+        caustests(efullb, eresb)
     }
-    R2inv <- restrictions(x, cause)
-    xres <- vars::restrict(x, method = "man", resmat = R2inv)
-    xres_coef <- vars::Bcoef(xres)
-    # disregard intercept and other coefficients, simulate just VAR
-    keep <- which(gsub("\\.l\\d+", "", colnames(xres_coef)) %in% varnames)
-    # convert the matrix of coefficients into a list
-    xres_coef <- lapply(1:(length(keep)/K), function(i) xres_coef[,keep[((i - 1)*K + 1):(i*K)]])
-    xres_cov <- cov(residuals(xres))
-    if (bootparallel) {
-        BOOT0 <- parallel::parSapply(cl, X = 1:B, FUN = function(b) {
-            # sapply(1:B, FUN = function(b) {
-            yb <- mlVAR::simulateVAR(pars = xres_coef, lags = 1:pfull,
-                                     ,residuals = xres_cov
-                                     ,Nt = n)
-            names(yb) <- varnames
-            # xb <- VAR(yb[1:n_train,], p = pfull, ...)
-            # if (is.null(p)) {
-            #     ptrainb <- xb$p
-            # } else {
-            #     ptrainb <- p
-            # }
-            # R2inv <- restrictions(xb, cause)
-            FCST <- sapply(1:n_test - 1, function(i) { # i = 0
-                # estimate full model, VAR or restricted VAR (depends on lag.restrict)
-                x <- VAR(yb[(1 + i):(n_train + i),], p = pfull, ...)
-                ff <- predict(x, n.ahead = 1)$fcst[[dep]][1] # VAR predictions
-                xres <- vars::restrict(x, method = "man", resmat = R2inv)
-                fr <- predict(xres, n.ahead = 1)$fcst[[dep]][1] # VAR predictions
-                c(ff, fr)
-            })
-            # Forecast errors
-            efullb <- yb[(n_train + 1):n, dep] - FCST[1,]
-            eresb <- yb[(n_train + 1):n, dep] - FCST[2,]
-            # test statistics
-            caustests(efullb, eresb)
-        })
+    
+    BOOT0 <- if (bootparallel) {
+        parallel::parSapply(cl, 1:B, FUN = boot_worker)
     } else {
-        BOOT0 <- #parallel::parSapply(cl, X = 1:B, FUN = function(b) {
-            sapply(1:B, FUN = function(b) {
-                yb <- mlVAR::simulateVAR(pars = xres_coef, lags = 1:pfull,
-                                         ,residuals = xres_cov
-                                         ,Nt = n)
-                names(yb) <- varnames
-                # xb <- VAR(yb[1:n_train,], p = pfull, ...)
-                # if (is.null(p)) {
-                #     ptrainb <- xb$p
-                # } else {
-                #     ptrainb <- p
-                # }
-                # R2inv <- restrictions(xb, cause)
-                FCST <- sapply(1:n_test - 1, function(i) { # i = 0
-                    # estimate full model, VAR or restricted VAR (depends on lag.restrict)
-                    x <- VAR(yb[(1 + i):(n_train + i),], p = pfull, ...)
-                    ff <- predict(x, n.ahead = 1)$fcst[[dep]][1] # VAR predictions
-                    xres <- vars::restrict(x, method = "man", resmat = R2inv)
-                    fr <- predict(xres, n.ahead = 1)$fcst[[dep]][1] # VAR predictions
-                    c(ff, fr)
-                })
-                # Forecast errors
-                efullb <- yb[(n_train + 1):n, dep] - FCST[1,]
-                eresb <- yb[(n_train + 1):n, dep] - FCST[2,]
-                # test statistics
-                caustests(efullb, eresb)
-            })
-    }#end sequential bootstrap
-    FullH0 <- list(result = data.frame(MSEt = c(OBS["MSEt"],
-                                                (sum(BOOT0["MSEt",] <= OBS["MSEt"]) + 1) / (B + 1)),
-                                       MSEcor = c(OBS["MSEcor"],
-                                                  (sum(BOOT0["MSEcor",] <= OBS["MSEcor"]) + 1) / (B + 1)),
+        sapply(1:B, FUN = boot_worker)
+    }
+
+    FullH0 <- list(result = data.frame(MSEt = c(OBS["MSEt"], (sum(BOOT0["MSEt",] <= OBS["MSEt"]) + 1) / (B + 1)),
+                                       MSEcor = c(OBS["MSEcor"], (sum(BOOT0["MSEcor",] <= OBS["MSEcor"]) + 1) / (B + 1)),
                                        row.names = c("stat_obs", "p_boot")),
                    p = pfull)
+
     return(list(Fast = Fast, FullH0 = FullH0))
 }
