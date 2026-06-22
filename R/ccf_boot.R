@@ -1,3 +1,26 @@
+#' @importFrom grDevices adjustcolor
+#' @importFrom graphics grid lines matplot points polygon
+#' @importFrom stats ccf arima.sim sd qnorm loess
+
+.get_ar_residuals <- function(ts, ...) {
+    pheta <- ARest(ts, ...)
+    if (length(pheta) > 0) {
+        tmp <- stats::filter(ts, pheta, sides = 1)
+        residuals <- ts[(length(pheta) + 1):length(ts)] - tmp[length(pheta):(length(ts) - 1)]
+    } else {
+        residuals <- ts
+    }
+    return(residuals - mean(residuals))
+}
+
+.get_ci_bounds <- function(boot_samples, lags, alpha, smooth) {
+    upper_bounds <- apply(boot_samples, 1, function(x) qnorm(1 - alpha / 2, sd = sd(x)))
+    if (smooth) {
+        upper_bounds <- loess(upper_bounds ~ lags, span = 0.25)$fitted
+    }
+    return(data.frame(lower = -upper_bounds, upper = upper_bounds))
+}
+
 #' Cross-Correlation of Autocorrelated Time Series
 #'
 #' Account for possible autocorrelation of time series when assessing the statistical significance
@@ -114,144 +137,101 @@ ccf_boot <- function(x,
                      cl = 1L,
                      ...)
 {
-    ### Perform various checks
+    # Perform various checks
     namex <- deparse(substitute(x))[1L]
     namey <- deparse(substitute(y))[1L]
-    if (is.matrix(x) || is.matrix(y)) {
-        stop("x and y should be univariate time series only.")
-    }
-    if (any(is.na(x)) || any(is.na(y))) {
-        stop("data should not contain missing values.")
-    }
+    if (is.matrix(x) || is.matrix(y)) stop("x and y should be univariate time series only.")
+    if (any(is.na(x)) || any(is.na(y))) stop("data should not contain missing values.")
     nx <- length(x)
     ny <- length(y)
     B <- as.integer(B)
-    if (B <= 0) {
-        stop("number of bootstrap resamples B must be positive.")
-    }
+    if (B <= 0) stop("number of bootstrap resamples B must be positive.")
     plt <- match.arg(plot)
+
+    # Setup parallel processing
     bootparallel <- FALSE
-    if (is.list(cl)) { #some other cluster supplied; use it but do not stop it
+    clStop <- FALSE
+    if (is.list(cl)) {
         bootparallel <- TRUE
-        clStop <- FALSE
     } else {
-        if (is.null(cl)) {
-            cores <- parallel::detectCores()
-        } else {
-            cores <- cl
-        }
-        if (cores > 1) { #specified or detected cores>1; start a cluster and later stop it
+        cores <- if (is.null(cl)) parallel::detectCores() else cl
+        if (cores > 1) {
             bootparallel <- TRUE
             cl <- parallel::makeCluster(cores)
             clStop <- TRUE
+            on.exit(parallel::stopCluster(cl), add = TRUE)
         }
     }
-    ### Function
+
+    # Calculate observed correlations
     xrank <- rank(x)
     yrank <- rank(y)
     attributes(xrank) <- attributes(x)
     attributes(yrank) <- attributes(y)
     tmp <- ccf(x, y, lag.max = lag.max, plot = FALSE)
-    lags <- tmp$lag[,1,1]
-    rP <- tmp$acf[,1,1]
-    rS <- ccf(xrank, yrank, lag.max = lag.max, plot = FALSE)$acf[,1,1]
+    lags <- tmp$lag[, 1, 1]
+    rP <- tmp$acf[, 1, 1]
+    rS <- ccf(xrank, yrank, lag.max = lag.max, plot = FALSE)$acf[, 1, 1]
+
+    # Get AR model residuals
     phetax <- ARest(x, ...)
     phetay <- ARest(y, ...)
-    if (length(phetax) > 0) {
-        names(phetax) <- paste0(rep("phi_", length(phetax)), c(1:length(phetax)))
-        tmp <- stats::filter(x, phetax, sides = 1)
-        Zx <- x[(length(phetax) + 1):nx] - tmp[length(phetax):(nx - 1)]
-    } else {
-        Zx <- x
+    Zx <- .get_ar_residuals(x, ...)
+    Zy <- .get_ar_residuals(y, ...)
+
+    # Bootstrap
+    boot_worker <- function(b) {
+        xboot <- arima.sim(list(order = c(length(phetax), 0, 0), ar = phetax), n = nx,
+                           innov = sample(Zx, size = nx, replace = TRUE))
+        yboot <- arima.sim(list(order = c(length(phetay), 0, 0), ar = phetay), n = ny,
+                           innov = sample(Zy, size = ny, replace = TRUE))
+        xrankboot <- rank(xboot)
+        yrankboot <- rank(yboot)
+        attributes(xboot) <- attributes(xrankboot) <- attributes(x)
+        attributes(yboot) <- attributes(yrankboot) <- attributes(y)
+        rPboot <- ccf(xboot, yboot, lag.max = lag.max, plot = FALSE)$acf[,1,1]
+        rSboot <- ccf(xrankboot, yrankboot, lag.max = lag.max, plot = FALSE)$acf[,1,1]
+        cbind(rPboot, rSboot)
     }
-    Zx <- Zx - mean(Zx)
-    if (length(phetay) > 0) {
-        names(phetay) <- paste0(rep("phi_", length(phetay)), c(1:length(phetay)))
-        tmp <- stats::filter(y, phetay, sides = 1)
-        Zy <- y[(length(phetay) + 1):ny] - tmp[length(phetay):(ny - 1)]
+    
+    CCFs <- if (bootparallel) {
+        parallel::parSapply(cl, 1:B, FUN = boot_worker, simplify = "array")
     } else {
-        Zy <- y
+        sapply(1:B, FUN = boot_worker, simplify = "array")
     }
-    Zy <- Zy - mean(Zy)
-    ### Bootstrap
-    if (bootparallel) {
-        CCFs <- parallel::parSapply(cl, 1:B, function(b) {
-            xboot <- arima.sim(list(order = c(length(phetax), 0, 0), ar = phetax), n = nx,
-                               innov = sample(Zx, size = nx, replace = TRUE))
-            yboot <- arima.sim(list(order = c(length(phetay), 0, 0), ar = phetay), n = ny,
-                               innov = sample(Zy, size = ny, replace = TRUE))
-            xrankboot <- rank(xboot)
-            yrankboot <- rank(yboot)
-            attributes(xboot) <- attributes(xrankboot) <- attributes(x)
-            attributes(yboot) <- attributes(yrankboot) <- attributes(y)
-            rPboot <- ccf(xboot, yboot, lag.max = lag.max, plot = FALSE)$acf[,1,1]
-            rSboot <- ccf(xrankboot, yrankboot, lag.max = lag.max, plot = FALSE)$acf[,1,1]
-            cbind(rPboot, rSboot)
-        }, simplify = "array")
-        if (clStop) {
-            parallel::stopCluster(cl)
-        }
-    } else {
-        CCFs <- sapply(1:B, function(b) {
-            xboot <- arima.sim(list(order = c(length(phetax), 0, 0), ar = phetax), n = nx,
-                               innov = sample(Zx, size = nx, replace = TRUE))
-            yboot <- arima.sim(list(order = c(length(phetay), 0, 0), ar = phetay), n = ny,
-                               innov = sample(Zy, size = ny, replace = TRUE))
-            xrankboot <- rank(xboot)
-            yrankboot <- rank(yboot)
-            attributes(xboot) <- attributes(xrankboot) <- attributes(x)
-            attributes(yboot) <- attributes(yrankboot) <- attributes(y)
-            rPboot <- ccf(xboot, yboot, lag.max = lag.max, plot = FALSE)$acf[,1,1]
-            rSboot <- ccf(xrankboot, yrankboot, lag.max = lag.max, plot = FALSE)$acf[,1,1]
-            cbind(rPboot, rSboot)
-        }, simplify = "array")
-    } # end sequential bootstrap
-    #CCFs has dimensions of nlags * 2 (Pearson and Spearman) * B
-    ### Confidence regions
+
+    # Confidence regions
     alpha <- 1 - level
-    # Percentile
-    # crP <- apply(CCFs[,1,], 1, quantile, probs = c(alpha/2, 1 - alpha / 2))
-    # crS <- apply(CCFs[,2,], 1, quantile, probs = c(alpha/2, 1 - alpha / 2))
-    # Normal
-    crP <- apply(CCFs[,1,], 1, function(x) qnorm(1 - alpha / 2, sd = sd(x)))
-    if (smooth) {
-        crP <- loess(crP ~ lags, span = 0.25)$fitted
-    }
-    crP <- rbind(-crP, crP)
-    crS <- apply(CCFs[,2,], 1, function(x) qnorm(1 - alpha / 2, sd = sd(x)))
-    if (smooth) {
-        crS <- loess(crS ~ lags, span = 0.25)$fitted
-    }
-    crS <- rbind(-crS, crS)
-    ### p-values
-    # pP <- sapply(1:dim(CCFs)[1L], function(i) mean(abs(CCFs[i,1,]) > abs(rP[i])))
-    # pS <- sapply(1:dim(CCFs)[1L], function(i) mean(abs(CCFs[i,2,]) > abs(rS[i])))
+    ciP <- .get_ci_bounds(CCFs[, 1, ], lags, alpha, smooth)
+    ciS <- .get_ci_bounds(CCFs[, 2, ], lags, alpha, smooth)
+    
     RESULT <- data.frame(Lag = lags,
-                         r_P = rP, #p_P = pP,
-                         lower_P = crP[1,], upper_P = crP[2,], #Pearson
-                         r_S = rS, #p_S = pS,
-                         lower_S = crS[1,], upper_S = crS[2,]) #Spearman
-    ### Plotting
-    if (plt == "Pearson") {
-        TMP <- RESULT[,grepl("_P", names(RESULT))]
-    }
-    if (plt == "Spearman") {
-        TMP <- RESULT[,grepl("_S", names(RESULT))]
-    }
-    if (plt == "Pearson" || plt == "Spearman") {
-        matplot(lags, TMP, type = "n",
-                xlab = "Lag", ylab = "CCF",
-                main = paste0(plt, " correlation of ", namex, "(t + Lag)", " and ", namey, "(t)\n",
-                              "with ", level*100, "% bootstrap confidence region"),
-                las = 1)
+                         r_P = rP,
+                         lower_P = ciP$lower, upper_P = ciP$upper,
+                         r_S = rS,
+                         lower_S = ciS$lower, upper_S = ciS$upper)
+
+    # Plotting
+    if (plt != "none") {
+        plot_data <- if (plt == "Pearson") {
+            RESULT[, c("r_P", "lower_P", "upper_P")]
+        } else {
+            RESULT[, c("r_S", "lower_S", "upper_S")]
+        }
+        main_title <- paste0(plt, " correlation of ", namex, "(t + Lag)", " and ", namey, "(t)
+",
+                              "with ", level * 100, "% bootstrap confidence region")
+        
+        matplot(lags, plot_data, type = "n",
+                xlab = "Lag", ylab = "CCF", main = main_title, las = 1)
         grid(nx = 2, ny = NULL, lty = 1)
         polygon(x = c(lags, rev(lags)),
-                y = c(TMP[,2], rev(TMP[,3])),
+                y = c(plot_data[, 2], rev(plot_data[, 3])),
                 col =  adjustcolor("deepskyblue", alpha.f = 0.80),
                 border = NA)
-        lines(lags, TMP[,1], type = "h")
-        isoutside <- (TMP[,1] < TMP[,2]) | (TMP[,3] < TMP[,1])
-        points(lags, TMP[,1], pch = c(1, 16)[1 + isoutside])
+        lines(lags, plot_data[, 1], type = "h")
+        is_significant <- (plot_data[, 1] < plot_data[, 2]) | (plot_data[, 3] < plot_data[, 1])
+        points(lags, plot_data[, 1], pch = c(1, 16)[1 + is_significant])
         return(invisible(RESULT))
     } else {
         return(RESULT)
