@@ -67,86 +67,87 @@
 #' beales(discharge, loads, level = 0.9, d = 30)
 #' 
 beales <- function(x, y, level = 0.95, N = NULL, p = NULL, d = NULL, verbose = TRUE){
-    if (length(x) != length(y)) stop("Vectors 'x' and 'y' must be of the same length.")
+    if (length(x) != length(y)) {
+        stop("Vectors 'x' and 'y' must be of the same length.")
+    }
+    
+    x_copy <- x
+    y_copy <- y
+    
     #Population and sample sizes:
-    if (is.null(N)) N <- length(x)
-    n <- sum(!is.na(y))
-    if (n >= N || length(x) > N) stop("Population size 'N' must be bigger than the sample.")
+    if (is.null(N)) {
+        N <- length(x_copy)
+    }
+    n <- sum(!is.na(y_copy))
+    if (n >= N || length(x_copy) > N) {
+        stop("Population size 'N' must be bigger than the sample.")
+    }
     
     #Components of Beale's estimator:
-    xbarprime <- mean(x, na.rm = TRUE)
-    x[is.na(x)] <- xbarprime #if some x-values are missing, they are replaced with mean
-    xbar <- mean(x[!is.na(y)])
-    ybar <- mean(y, na.rm = TRUE)
-    s2x <- var(x[!is.na(y)])
+    xbarprime <- mean(x_copy, na.rm = TRUE)
+    x_copy[is.na(x_copy)] <- xbarprime #if some x-values are missing, they are replaced with mean
+    xbar <- mean(x_copy[!is.na(y_copy)])
+    ybar <- mean(y_copy, na.rm = TRUE)
+    s2x <- var(x_copy[!is.na(y_copy)])
     X <- N * xbarprime
     theta <- 1/n - 1/N
-    sxy <- cov(x, y, use = "complete.obs")
+    sxy <- cov(x_copy, y_copy, use = "complete.obs")
     
     #Beale's estimate of Y:
-    Yhat <- X * ybar * (1 + theta*sxy/(xbar*ybar)) / (xbar * (1 + theta*s2x/xbar^2)) #output
+    Yhat <- X * ybar * (1 + theta*sxy/(xbar*ybar)) / (xbar * (1 + theta*s2x/xbar^2))
     
-    #Cumulants:
-    i <- is.na(y)
-    x <- x[!i]
-    y <- y[!i]
+    #Sample cumulants for variance estimation
+    complete_cases <- !is.na(y_copy)
+    x_complete <- x_copy[complete_cases]
+    y_complete <- y_copy[complete_cases]
     C11 <- sxy / (xbar * ybar)
-    C20 <- var(x) / (xbar^2)
-    C02 <- var(y) / (ybar^2)
-    C21 <- (sum((x - xbar)^2*(y - ybar)) / (n - 1)) / (xbar^2 * ybar)
-    C12 <- (sum((x - xbar)*(y - ybar)^2) / (n - 1)) / (xbar * ybar^2)
-    C30 <- (sum((x - xbar)^3) / (n - 1)) / (xbar^3)
+    C20 <- var(x_complete) / (xbar^2)
+    C02 <- var(y_complete) / (ybar^2)
+    C21 <- (sum((x_complete - xbar)^2*(y_complete - ybar)) / (n - 1)) / (xbar^2 * ybar)
+    C12 <- (sum((x_complete - xbar)*(y_complete - ybar)^2) / (n - 1)) / (xbar * ybar^2)
+    C30 <- (sum((x_complete - xbar)^3) / (n - 1)) / (xbar^3)
     a_hat <- 2*C20^2 - 4*C20*C11 + C11^2 + C20*C02
     b_hat <- C20 + C02 - 2*C11 + 2*(C30 - 2*C21 + C12)/N
     VarYhat <- X^2*ybar^2 * (theta * b_hat + theta^2 * a_hat ) / xbar^2
+    
     #Confidence interval:
     z <- qnorm((1 - level)/2)
-    seYhat <- sqrt(VarYhat) #output
-    CI <- Yhat + c(1, -1) * z * seYhat #output
+    seYhat <- sqrt(VarYhat)
+    CI <- Yhat + c(1, -1) * z * seYhat
+    
     if (verbose) {
-        print(paste("Beale's estimate of the total (for population size ", N, ") is ", round(Yhat, 3), 
-                    " with ", level*100, "% confidence interval from ", 
-                    round(CI[1], 3), " to ", round(CI[2], 3), ".", sep = ""))
+        message(paste0("Beale's estimate of the total (for population size ", N, ") is ", round(Yhat, 3), 
+                       " with ", level*100, "% confidence interval from ", 
+                       round(CI[1], 3), " to ", round(CI[2], 3), "."))
     }
+    
+    result <- list(estimate = Yhat,
+                   se = seYhat,
+                   CI = CI,
+                   level = level,
+                   N = N,
+                   n = n)
+    
     #Check if additional arguments are set, calculate sample size:
-    if (is.null(p) && is.null(d)) {
-        result <- list(estimate = Yhat,
-                       se = seYhat,
-                       CI = CI,
-                       level = level,
-                       N = N,
-                       n = n)
-    } else if (!is.null(p)) {#the relative error "p" is set by user
+    if (!is.null(p)) { #the relative error "p" is set by user
         c_hatprime <- p^2 / z^2
         theta_2 <- (-b_hat + sqrt(b_hat^2 + 4*a_hat*c_hatprime)) / (2*a_hat)
         n2 <- ceiling(1 / (theta_2 + 1/N))
-        result <- list(estimate = Yhat,
-                       se = seYhat,
-                       CI = CI,
-                       level = level,
-                       N = N,
-                       n = n,
-                       p = p,
-                       nhat = n2)
+        result$p <- p
+        result$nhat <- n2
         if (verbose) {
-            print(paste("To obtain a ", level*100, "% confidence interval with a relative error of ", 
-                        p*100, "%, a sample of size ", n2, " is required.", sep = ""))
+            message(paste0("To obtain a ", level*100, "% confidence interval with a relative error of ", 
+                         p*100, "%, a sample of size ", n2, " is required."))
         }
-    } else {#it means the margin of error "d" is set by user
+    } else if (!is.null(d)) { #it means the margin of error "d" is set by user
         c_hat <- d^2 * xbar^2 / (z^2 * X^2 * ybar^2)
         theta_2 <- (-b_hat + sqrt(b_hat^2 + 4*a_hat*c_hat)) / (2*a_hat)
         n2 <- ceiling(1 / (theta_2 + 1/N) )
-        result <- list(estimate = Yhat,
-                       se = seYhat,
-                       CI = CI,
-                       level = level,
-                       N = N,
-                       n = n,
-                       d = d,
-                       nhat = n2)
+        result$d <- d
+        result$nhat <- n2
         if (verbose) {
-            print(paste("To obtain a ", level*100, "% confidence interval with a margin of error being ", 
-                        round(d, 3), ", a sample of size ", n2, " is required.", sep = ""))
+            message(paste0("To obtain a ", level*100, "% confidence interval with a margin of error being ", 
+                         round(d, 3), ", a sample of size ", n2, " is required."))
         }
     }
     return(result)
