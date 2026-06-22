@@ -55,74 +55,78 @@
 #'
 ARest <- function(x,
                   ar.order = NULL,
-                  ar.method = "HVK",
+                  ar.method = c("HVK", "burg", "ols", "mle", "yw"),
                   ic = c("BIC", "AIC", "none"))
 {
     x <- as.vector(x)
-    if (!is.numeric(x) || anyNA(x))
+    if (!is.numeric(x) || anyNA(x)) {
         stop("x must be a numeric vector without missing values.")
+    }
     n <- length(x)
-    if (n < 5)
+    if (n < 5) {
         stop("x must contain at least 5 observations.")
+    }
 
     if (is.null(ar.order)) {
-        ar.order <- round(10*log10(n))
+        ar.order <- round(10 * log10(n))
     }
-    if (length(ar.order) != 1L || is.na(ar.order))
-        stop("ar.order must be a single non-missing value.")
+    if (length(ar.order) != 1L || !is.finite(ar.order) || ar.order < 0) {
+        stop("ar.order must be a single non-negative number.")
+    }
     ar.order <- as.integer(ar.order)
-    if (ar.order < 0)
-        stop("ar.order must be >= 0.")
 
-    allowed.methods <- c("HVK", "burg", "ols", "mle", "yw")
-    if (length(ar.method) != 1L || is.na(ar.method) || !(ar.method %in% allowed.methods))
-        stop("ar.method must be one of: HVK, burg, ols, mle, yw.")
+    ar.method <- match.arg(ar.method)
+    ic <- match.arg(ic)
 
     x.var <- var(x)
-    if (!is.finite(x.var) || x.var <= 0)
+    if (!is.finite(x.var) || x.var <= 0) {
         stop("x must have positive finite variance.")
-
-    ic <- match.arg(ic)
-    if (ic == "BIC") {
-        useIC <- TRUE
-        k <- log(n)
-    } else if (ic == "AIC") {
-        useIC <- TRUE
-        k <- 2
-    } else {
-        useIC <- FALSE
     }
-    ics <- rep(NA_real_, ar.order + 1)
-    ics[1] <- n * log(x.var) # no AR-filtering (ar.order == 0)
-    pheta <- numeric(0) # if no AR-filtering, otherwise will be redefined below
+
+    # Handle the case where no information criterion is used for model selection
+    if (ic == "none") {
+        if (ar.order == 0) {
+            return(numeric(0))
+        }
+        if (ar.method == "HVK") {
+            pheta <- HVK(x, ar.order = ar.order)
+        } else {
+            a <- ar(x, aic = FALSE, order.max = ar.order,
+                    demean = TRUE, method = ar.method)
+            pheta <- a$ar
+        }
+        return(pheta)
+    }
+
+    # IC-based order selection
+    k <- if (ic == "BIC") log(n) else 2
+
+    # IC for order 0
+    ics <- n * log(x.var)
+    phetas_list <- list(numeric(0)) # For order p = 0
+
     if (ar.order > 0) {
-        if (!useIC) { # useIC == FALSE, use fixed ar.order > 0
+        # Calculate IC for orders 1 to ar.order
+        for (p in 1:ar.order) {
             if (ar.method == "HVK") {
-                pheta <- HVK(x, ar.order = ar.order)
+                pheta <- HVK(x, ar.order = p)
             } else {
-                a <- ar(x, aic = FALSE, order.max = ar.order,
+                a <- ar(x, aic = FALSE, order.max = p,
                         demean = TRUE, method = ar.method)
                 pheta <- a$ar
             }
-        } else { # IC-based filtering
-            PHETAS <- list()
-            for (i in 2:length(ics)) {
-                if (ar.method == "HVK") {
-                    PHETAS[[i]] <- HVK(x, ar.order = i - 1)
-                } else {
-                    a <- ar(x, aic = FALSE, order.max = i - 1,
-                            demean = TRUE, method = ar.method)
-                    PHETAS[[i]] <- a$ar
-                }
-                tmp <- filter(x, PHETAS[[i]], sides = 1)
-                et <- x[i:n] - tmp[(i - 1):(n - 1)]
-                ics[i] <- n*log(var(et)) + i*k # here use i = ARorder p + 1 (variance)
-            }
-            min_ic_index <- which.min(ics)
-            if (min_ic_index > 1) {
-                pheta <- PHETAS[[min_ic_index]]
-            }
+            phetas_list[[p + 1]] <- pheta
+
+            # Calculate residuals
+            res <- filter(x, pheta, sides = 1)
+            et <- x[(p + 1):n] - res[p:(n - 1)]
+
+            # Update IC vector
+            ics[p + 1] <- n * log(var(et)) + (p + 1) * k
         }
     }
-    return(pheta)
+
+    # Find the best model order
+    best_p_idx <- which.min(ics)
+    return(phetas_list[[best_p_idx]])
 }
