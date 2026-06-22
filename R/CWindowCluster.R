@@ -94,47 +94,58 @@ CWindowCluster <- function(X, Alpha = NULL, Beta = NULL, Delta = NULL, Theta = 0
     if (!is.numeric(Epsilon) || length(Epsilon) != 1L || is.na(Epsilon) || Epsilon < 0 || Epsilon > 1)
         stop("Epsilon must be a single numeric value in [0, 1].")
 
-    T <- dim(X)[1]
-    N <- dim(X)[2]
-    if (T %% p != 0)
+    T_len <- nrow(X)
+    N <- ncol(X)
+    if (T_len %% p != 0)
         stop("nrow(X) must be divisible by p.")
-    if (p * w > T)
+    if (p * w > T_len)
         stop("p * w must be less than or equal to nrow(X).")
-    nWindows <- length(seq(from = p*w, to = T, by = s*p))
-    if (nWindows < 1)
+    
+    n_windows <- length(seq(from = p * w, to = T_len, by = s * p))
+    if (n_windows < 1)
         stop("No windows can be formed with the provided p, w, and s values.")
-    Clusters <- array(NA, dim = c(w, N, nWindows))
-    ClustersWithinWindow <- array(NA, dim = c(nWindows, N))
+    
+    slide_clusters <- array(NA, dim = c(w, N, n_windows))
+    window_clusters <- array(NA, dim = c(n_windows, N))
+    
     #Separate data into windows
-    for (nw in 1:nWindows) {
-        #Apply CSlideCluster to each slide withing the window
+    for (nw in 1:n_windows) {
+        # Apply CSlideCluster to each slide within the window
         for (sl in 1:w) {
-            Clusters[sl,,nw] <- CSlideCluster(X[c(((nw - 1)*w*p + 1 + (sl - 1)*p):((nw - 1)*w*p + (sl)*p)),], 
-                                              Alpha = Alpha, Beta = Beta, Delta = Delta, Theta = Theta)
+            slide_start_idx <- (nw - 1) * s * p + (sl - 1) * p + 1
+            slide_end_idx <- (nw - 1) * s * p + sl * p
+            slide_data <- X[slide_start_idx:slide_end_idx, , drop = FALSE]
+            slide_clusters[sl, , nw] <- CSlideCluster(slide_data, 
+                                                      Alpha = Alpha, Beta = Beta, Delta = Delta, Theta = Theta)
         }
-        #Apply clusterization to CSlideCluster within window
-        #count how many times each node was clustered together with each other node, frow w times
-        E <- (sapply(1:N, function(n) colSums(Clusters[,n,nw] == Clusters[,,nw])) >= Epsilon * w)
-        TSclusters <- rep(NA, N)
-        currentTS <- currentCluster <- 1
-        TSclusters[currentTS] <- currentCluster
-        Unclassified <- is.na(TSclusters)
-        while (any(Unclassified)) {
-            Include <- CExpandWindowCluster(E[Unclassified, currentTS], 
-                                            E[Unclassified, Unclassified])
-            #Assign cluster number to the time series that were just grouped
-            TSclusters[Unclassified][Include] <- currentCluster
-            #Next cluster number will be:
-            currentCluster <- currentCluster + 1
-            #Still unclassified time series
-            Unclassified <- is.na(TSclusters)
-            #Select the next time series to start the cluster with, and immediately
-            #assign it to the new cluster
-            currentTS <- which(Unclassified)[1]
-            TSclusters[currentTS] <- currentCluster
-            Unclassified <- is.na(TSclusters)
+        
+        # E is a similarity matrix: E[i,j] is TRUE if TS i and j are often in the same slide-cluster.
+        E <- (sapply(1:N, function(n) colSums(slide_clusters[, n, nw] == slide_clusters[, , nw])) >= Epsilon * w)
+        
+        # Cluster based on the similarity matrix E
+        ts_clusters_in_window <- rep(NA, N)
+        cluster_label <- 1
+        unclassified_indices <- 1:N
+        
+        while (length(unclassified_indices) > 0) {
+            seed_ts_idx <- unclassified_indices[1]
+            ts_clusters_in_window[seed_ts_idx] <- cluster_label
+            
+            unclassified_subset_indices <- unclassified_indices[-1]
+            
+            if (length(unclassified_subset_indices) > 0) {
+                seed_similarities <- E[unclassified_subset_indices, seed_ts_idx]
+                subset_similarity_matrix <- E[unclassified_subset_indices, unclassified_subset_indices, drop = FALSE]
+                
+                series_to_include <- CExpandWindowCluster(seed_similarities, subset_similarity_matrix)
+                
+                ts_clusters_in_window[unclassified_subset_indices[series_to_include]] <- cluster_label
+            }
+            
+            cluster_label <- cluster_label + 1
+            unclassified_indices <- which(is.na(ts_clusters_in_window))
         }
-        ClustersWithinWindow[nw,] <- TSclusters
+        window_clusters[nw, ] <- ts_clusters_in_window
     }
-    return(ClustersWithinWindow)
+    return(window_clusters)
 }
