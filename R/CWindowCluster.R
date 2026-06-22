@@ -78,9 +78,31 @@
 CWindowCluster <- function(X, Alpha = NULL, Beta = NULL, Delta = NULL, Theta = 0.8, 
                            p, w, s, Epsilon = 1)
 {
+    X <- as.matrix(X)
+    if (!is.numeric(X))
+        stop("X must be numeric.")
+    if (any(is.na(X)))
+        stop("X contains missing values.")
+    if (ncol(X) < 2)
+        stop("X must contain at least two time series (columns).")
+
+    p <- as.integer(p)
+    w <- as.integer(w)
+    s <- as.integer(s)
+    if (any(is.na(c(p, w, s))) || any(c(p, w, s) < 1))
+        stop("p, w, and s must be positive integers.")
+    if (!is.numeric(Epsilon) || length(Epsilon) != 1L || is.na(Epsilon) || Epsilon < 0 || Epsilon > 1)
+        stop("Epsilon must be a single numeric value in [0, 1].")
+
     T <- dim(X)[1]
     N <- dim(X)[2]
+    if (T %% p != 0)
+        stop("nrow(X) must be divisible by p.")
+    if (p * w > T)
+        stop("p * w must be less than or equal to nrow(X).")
     nWindows <- length(seq(from = p*w, to = T, by = s*p))
+    if (nWindows < 1)
+        stop("No windows can be formed with the provided p, w, and s values.")
     Clusters <- array(NA, dim = c(w, N, nWindows))
     ClustersWithinWindow <- array(NA, dim = c(nWindows, N))
     #Separate data into windows
