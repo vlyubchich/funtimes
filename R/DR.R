@@ -1,3 +1,49 @@
+#' @importFrom dbscan dbscan
+
+.para_opt <- function(M) {
+    acd <- M[, 2]
+    max_acd <- max(acd)
+    if (max_acd == 0) {
+        warning("All ACDs are 0. The range of controlling parameters might be unsuitable.")
+        return(NA)
+    }
+    
+    # Find the last index of the maximum ACD value
+    max_indices <- which(acd == max_acd)
+    max_idx <- max_indices[length(max_indices)]
+    
+    # Check if there is enough room after the max ACD to find a local minimum.
+    # The logic looks for a minimum in a window of size 3, so we need at least 3 points after max_idx+3.
+    if (max_idx > (length(acd) - 6)) {
+        warning("Max ACD is found near the upper bound. Consider increasing the 'ub' parameter.")
+        return(NA)
+    }
+    
+    # Search for the first local minimum after the max ACD.
+    # A point is a local minimum if it's smaller than or equal to its 3 neighbors to the left,
+    # and strictly smaller than its 3 neighbors to the right.
+    for (i in (max_idx + 3):(length(acd) - 3)) {
+        is_local_min <- all(acd[i] <= acd[(i - 3):(i - 1)]) && 
+                        all(acd[i] < acd[(i + 1):(i + 3)])
+        if (is_local_min) {
+            return(M[i, 1])
+        }
+    }
+    
+    warning("Could not find a suitable local minimum for the optimal parameter.")
+    return(NA)
+}
+
+.calculate_acd <- function(param, data, B_samples, n_nodes, cluster_func) {
+    diffs <- replicate(B_samples, {
+        s_index <- sample(ncol(data), n_nodes, replace = FALSE)
+        cl1 <- max(cluster_func(data[, s_index, drop = FALSE], param))
+        cl2 <- max(cluster_func(data[, -s_index, drop = FALSE], param))
+        abs(cl1 - cl2)
+    })
+    mean(diffs)
+}
+
 #' Downhill Riding (DR) Procedure
 #' 
 #' Downhill riding procedure for selecting optimal tuning parameters in clustering 
@@ -14,7 +60,7 @@
 #' and \insertCite{Huang_etal_2018_riding;textual}{funtimes}.
 #' 
 #' 
-#' @param X an \eqn{n\times k} matrix where columns are \eqn{k} objects to be clustered, 
+#' @param X an \eqn{n	imes k} matrix where columns are \eqn{k} objects to be clustered, 
 #' and each object contains n observations (objects could be a set of time series).
 #' @param method the clustering method to be used -- currently either 
 #' \dQuote{TRUST} \insertCite{Ciampi_etal_2010}{funtimes} 
@@ -25,7 +71,7 @@
 #' @param minPts the minimum number of samples in an \eqn{\epsilon}-neighborhood of 
 #' a point to be considered as a core point. The \code{minPts} is to be used only 
 #' with the \code{DBSCAN} method. The default value is 3.
-#' @param theta connectivity parameter \eqn{\theta \in (0,1)}, which is to be used 
+#' @param theta connectivity parameter \eqn{	heta \in (0,1)}, which is to be used 
 #' only with the \code{TRUST} method. The default value is 0.9.
 #' @param B number of random splits in calculating the 
 #' Average Cluster Deviation (ACD). The default value is 500.
@@ -72,7 +118,7 @@
 #' res <- dbscan(Data, eps = eps_opt, minPts =5)$cluster  
 #' 
 #' # calculate NMI to compare the clustering result with the ground truth label
-#' clue::cl_agreement(as.cl_partition(ground_truth_label),
+#' clue::cl_agreement(as.cl_partition(as.numeric(ground_truth_label)),
 #'                    as.cl_partition(as.numeric(res)), method = "NMI") 
 #' # visualize the clustering result and compare it with the ground truth result
 #' # 3D visualization of clustering result using variables Sepal.Width, Sepal.Length, 
@@ -135,73 +181,34 @@
 #' 
 DR <- function(X, method, minPts = 3, theta = 0.9, B = 500, lb = -30, ub = 10)
 {
-    control_para <- sapply(seq(lb, ub, by = 0.5), function(x) 1.1^x)
-    Nnodes <- floor(ncol(X)/2)
-    # define local minimum selection function
-    para_opt <- function(M) {
-        acd <- M[,2]
-        max <- max(acd)
-        max_idx <- which(acd == max)
-        max_idx <- max_idx[length(max_idx)]
-        if (max == 0) {
-            return("All ACDs are 0. This may be caused by the range of controlling parameters is either too small or too large.")
-        } else if (max_idx > (length(acd) - 6)) {
-            return("Max ACD is found near the upper bound of controlling parameters, there is no room to check the local minimum. You might need increase the upper bound of controlling parameters.")
-        } else {
-            for (i in (max_idx + 3):(length(acd) - 3)) {
-                if (acd[i - 1] >= acd[i] & acd[i] < acd[i + 1]) {
-                    if (acd[i - 2] >= acd[i] & acd[i] < acd[i + 2]) {
-                        if (acd[i - 3] >= acd[i] & acd[i] < acd[i + 3]) return(M[i, 1])
-                    }
-                }
-            }
-            return("Not finding a local minimum.")
-        }
-    }
-    
-    cat(sprintf("Total # of controlling parameter: %d \n",length(control_para)))
-    cat(sprintf("The # of controlling parameters has been processed: \n"))
+    control_para <- 1.1^seq(lb, ub, by = 0.5)
+    Nnodes <- floor(ncol(X) / 2)
+
+    message(sprintf("Total # of controlling parameters: %d", length(control_para)))
     
     if (method == "DBSCAN") {
         if (missing(minPts)) {
             stop("Missing parameter minPts for DBSCAN")
-        } else {
-            ACD <- lapply(1:length(control_para), function(x) {
-                Buffer <- c()
-                for (i in 1:B) {
-                    Sindex <- sample(1:ncol(X), Nnodes, replace = FALSE)
-                    sub_data_1 <- X[,Sindex]
-                    cl_1 <- max(dbscan::dbscan(t(sub_data_1), eps = control_para[x], minPts = minPts)$cluster)
-                    sub_data_2 <- X[,-Sindex]
-                    cl_2 <- max(dbscan::dbscan(t(sub_data_2), eps = control_para[x], minPts = minPts)$cluster)
-                    Buffer <- c(Buffer,abs(cl_1 - cl_2))
-                }
-                print(x)
-                return(list(control_para[x], mean(Buffer)))
-            })
         }
+        dbscan_fn <- function(data, eps) dbscan::dbscan(t(data), eps = eps, minPts = minPts)$cluster
+        acd_values <- sapply(seq_along(control_para), function(i) {
+            message(sprintf("Processing parameter %d of %d", i, length(control_para)))
+            .calculate_acd(control_para[i], X, B, Nnodes, dbscan_fn)
+        })
     } else if (method == "TRUST") {
-        ACD <- lapply(1:length(control_para), function(x){
-            Buffer <- c()
-            for (i in 1:B) {
-                Sindex <- sample(1:ncol(X), Nnodes, replace = FALSE)
-                sub_data_1 <- X[,Sindex]
-                cl_1 <- max(CSlideCluster(sub_data_1, Delta = control_para[x], Theta = theta))
-                sub_data_2 <- X[,-Sindex]
-                cl_2 <- max(CSlideCluster(sub_data_2, Delta = control_para[x], Theta = theta))
-                Buffer <- c(Buffer, abs(cl_1 - cl_2))
-            }
-            print(x)
-            return(list(control_para[x], mean(Buffer)))
+        trust_fn <- function(data, delta) CSlideCluster(data, Delta = delta, Theta = theta)
+        acd_values <- sapply(seq_along(control_para), function(i) {
+            message(sprintf("Processing parameter %d of %d", i, length(control_para)))
+            .calculate_acd(control_para[i], X, B, Nnodes, trust_fn)
         })
     } else {
-        stop("Missing method")
+        stop("Method must be 'DBSCAN' or 'TRUST'")
     }
+
+    ACD_matrix <- data.frame("Controlling.Parameter" = control_para, "ACD" = acd_values)
     
-    ACD_matrix <- apply(do.call('rbind', ACD), 2, as.numeric)
-    colnames(ACD_matrix) <- c("Controlling Parameter", "ACD")
-    p_opt <- para_opt(ACD_matrix)
-    out <- list(p_opt, ACD_matrix)
-    names(out) <- c("P_opt", "ACD_matrix")
+    p_opt <- .para_opt(ACD_matrix)
+    
+    out <- list(P_opt = p_opt, ACD_matrix = ACD_matrix)
     return(out)
 }
