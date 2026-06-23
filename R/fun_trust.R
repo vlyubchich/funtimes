@@ -42,7 +42,7 @@
 
 CNeighbor <- function(Bu, Bv, Alpha, Beta, Delta, Theta){
     p <- length(Bu)
-    if (is.null(dim(Bv)[2])) {Bv <- matrix(Bv, ncol = 1)}
+    if (!is.matrix(Bv)) {Bv <- as.matrix(Bv)}
     colSums(abs(Bu - Bv) / (Beta - Alpha) <= Delta) >= Theta * p
 }
 
@@ -70,9 +70,9 @@ CNeighbor <- function(Bu, Bv, Alpha, Beta, Delta, Theta){
 CHomogeneity <- function(Bu, Bv, Alpha, Beta, Delta)
 {
     M <- cbind(Bu, Bv)
-    med <- apply(M, 2, median)
-    MED <- matrix(med, length(med), length(med))
-    tmp <- abs(MED - t(MED))/(Beta - Alpha) <= Delta
+    medians_vec <- apply(M, 2, median)
+    medians_mat <- matrix(medians_vec, length(medians_vec), length(medians_vec))
+    tmp <- abs(medians_mat - t(medians_mat))/(Beta - Alpha) <= Delta
     all(tmp)
 }
 
@@ -101,7 +101,7 @@ CHomogeneity <- function(Bu, Bv, Alpha, Beta, Delta)
 
 CExpandSlideCluster <- function(u, Xuncl, Alpha, Beta, Delta, Theta)
 {
-    if (is.null(dim(Xuncl)[2])) {Xuncl <- matrix(Xuncl, ncol = 1)}
+    if (!is.matrix(Xuncl)) {Xuncl <- as.matrix(Xuncl)}
     ClusterInclude <- rep(FALSE, dim(Xuncl)[2])
     if (length(ClusterInclude) == 0) {return(ClusterInclude)}
     #Define neighbors of the time series among the unclussified unincluded time series Xuncl
@@ -165,7 +165,7 @@ CExpandSlideCluster <- function(u, Xuncl, Alpha, Beta, Delta, Theta)
 
 CExpandWindowCluster <- function(e, Euncl)
 {
-    if (is.null(dim(Euncl)[2])) {Euncl <- matrix(Euncl, ncol = 1)}
+    if (!is.matrix(Euncl)) {Euncl <- as.matrix(Euncl)}
     ClusterInclude <- rep(FALSE, dim(Euncl)[2])
     if (length(ClusterInclude) == 0) {return(ClusterInclude)}
     if (any(e)) { #Perform it only if we have neighbors
