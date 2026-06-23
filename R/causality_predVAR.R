@@ -171,7 +171,7 @@ causality_predVAR <- function(y, p = NULL,
     R2inv_full <- restrictions(x_full, cause)
     xres_full <- vars::restrict(x_full, method = "man", resmat = R2inv_full)
     xres_coef_mat <- vars::Bcoef(xres_full)
-    keep <- which(gsub("\.l\d+", "", colnames(xres_coef_mat)) %in% varnames)
+    keep <- which(gsub("\\.l\\d+", "", colnames(xres_coef_mat)) %in% varnames)
     xres_coef_list <- lapply(1:(length(keep) / K), function(i) xres_coef_mat[, keep[((i - 1) * K + 1):(i * K)]])
     xres_cov <- cov(residuals(xres_full))
 
@@ -184,7 +184,7 @@ causality_predVAR <- function(y, p = NULL,
         eresb <- yb[(n_train + 1):n, dep] - FCST_boot[2, ]
         caustests(efullb, eresb)
     }
-    
+
     BOOT0 <- if (bootparallel) {
         parallel::parSapply(cl, 1:B, FUN = boot_worker)
     } else {

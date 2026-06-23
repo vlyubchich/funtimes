@@ -94,8 +94,8 @@
 #' # CCF with bootstrap
 #' tmp <- ccf_boot(x, y)
 #' # One can extract results for both Pearson and Spearman correlations
-#' tmp$rP
-#' tmp$rS
+#' tmp$r_P
+#' tmp$r_S
 #'
 #' # Example 2
 #' # Simulated ts objects of different lengths and starts (incomplete overlap)
@@ -193,7 +193,7 @@ ccf_boot <- function(x,
         rSboot <- ccf(xrankboot, yrankboot, lag.max = lag.max, plot = FALSE)$acf[,1,1]
         cbind(rPboot, rSboot)
     }
-    
+
     CCFs <- if (bootparallel) {
         parallel::parSapply(cl, 1:B, FUN = boot_worker, simplify = "array")
     } else {
@@ -204,7 +204,7 @@ ccf_boot <- function(x,
     alpha <- 1 - level
     ciP <- .get_ci_bounds(CCFs[, 1, ], lags, alpha, smooth)
     ciS <- .get_ci_bounds(CCFs[, 2, ], lags, alpha, smooth)
-    
+
     RESULT <- data.frame(Lag = lags,
                          r_P = rP,
                          lower_P = ciP$lower, upper_P = ciP$upper,
@@ -221,7 +221,7 @@ ccf_boot <- function(x,
         main_title <- paste0(plt, " correlation of ", namex, "(t + Lag)", " and ", namey, "(t)
 ",
                               "with ", level * 100, "% bootstrap confidence region")
-        
+
         matplot(lags, plot_data, type = "n",
                 xlab = "Lag", ylab = "CCF", main = main_title, las = 1)
         grid(nx = 2, ny = NULL, lty = 1)
