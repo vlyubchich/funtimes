@@ -60,9 +60,9 @@ MTfun <- function(e, m = NULL, k = NULL, x = NULL) {
             m <- length(k)
         }
         M <- K <- as.list(rep(NA, m))
-        # 2021-08: m can now be <length(k); in the case where both are 1,
-        # we can optimize the execution by avoiding matrix and sapply:
-        if (m == 1) {
+        # 2021-08: m can now be <length(k);
+        # Handle i=1 case (one changepoint), with optimization for length(k) == 1
+        if (m >= 1) {
             if (length(k) == 1) {
                 K[[1]] <- k
                 M[[1]] <- M1fun(x = k, e = e)
@@ -70,9 +70,9 @@ MTfun <- function(e, m = NULL, k = NULL, x = NULL) {
                 K[[1]] <- matrix(k, nrow = 1)
                 M[[1]] <- sapply(k, M1fun, e = e)
             }
-        } else {
-            K[[1]] <- matrix(k, nrow = 1)
-            M[[1]] <- sapply(k, M1fun, e = e)
+        }
+        # Handle i > 1 cases (multiple changepoints)
+        if (m > 1) {
             for (i in 2:m) {
                 K[[i]] <- combn(k, i)
                 M[[i]] <- apply(K[[i]], 2, function(x) Mfun(e, x))
@@ -81,10 +81,11 @@ MTfun <- function(e, m = NULL, k = NULL, x = NULL) {
     }
     mhat <- which.max(sapply(M, max))
     tmp <- which.max(M[[mhat]])
-    if (m == 1) {
-        khat <- k[tmp]
-    } else {
-        khat <- K[[mhat]][,tmp]
+    khat_candidate <- K[[mhat]]
+    if (is.matrix(khat_candidate)) {
+        khat <- khat_candidate[, tmp]
+    } else { # Should be the scalar case, length(k)=1
+        khat <- khat_candidate
     }
     MT <- M[[mhat]][tmp]
     list(MT = MT, m = mhat, k = khat)
