@@ -82,492 +82,193 @@
 #' #the year of 2001, when the 9/11 attack happened.
 #' }
 #'
-GombayCPA_test = function(y, a.order, alternatives = c("two-sided", "greater", "lesser", "temporary"), crit.type = c("asymptotic", "bootstrap"), num.bootstrap=1000)
-{
-  change.point = function(y, a.order, alternatives = c("two-sided", "greater", "lesser", "temporary"))
-  {
-    if(a.order < 0) stop("a.order must be greater than or equal to 0.")
-    n = length(y)
-    #=== demeaning ===#
-    y.dem = y - mean(na.omit(y))
-    ar.p  = arima0(y.dem, order = c(a.order, 0, 0), include.mean = T, method = "ML")
-    # ar.p = ar(y.dem,order=a.order,aic=FALSE) #
-    mu     = mean(na.omit(y.dem)) #=== this is equal to zero ===#
-    sigma2 = ar.p$sigma2
-    if(a.order > 0)
-    {
-      phi    = ar.p$coef
-      gamma  = matrix(NA, ncol = a.order, nrow = a.order)
-      cov    = acf(y, plot = F, type = "covariance")$acf[1:a.order]
-      rownum = rep(c(1:a.order), a.order)
-      colnum = rep(c(1:a.order), each = a.order)
-      abdiff = abs(rownum - colnum) + 1
-      gamma  = matrix(cov[abdiff], ncol = a.order, nrow = a.order)
-    }
-    muvec    = double(n)
-    muvec[1] = y.dem[1]
-    for(i in 2:n)
-    {
-      if(a.order > 0)
-      {
-        len      = min(a.order, (i - 1))
-        muvec[i] = y.dem[i] - sum(phi[1:len]*y.dem[(i-1):(i-len)])
-      }
-      if(a.order == 0)
-      {
-        muvec[i] = y.dem[i]
-      }
-    }
-    if(a.order > 0)
-    {
-      mustat = ((1-sum(phi))/sigma2)*cumsum(muvec)
-    }
-    if(a.order == 0)
-    {
-      mustat = 1/sigma2*cumsum(muvec)
-    }
-    sigmastat = -c(1:n)/(2*sigma2) + 1/(2*sigma2^2)*cumsum((muvec^2))
-
-    if(a.order > 0) {
-      phistat = matrix(NA, nrow = a.order, ncol = n)
-
-      for(s in 1:a.order)
-      {
-        phivec.s    = muvec*c(rep(0,s), y.dem[1:(n-s)])
-        phistat.s   = 1/sigma2*cumsum(phivec.s)
-        phistat[s,] = phistat.s
-      }
-    }
-
-    if(a.order > 0)
-    {
-      allstat = rbind(mustat, sigmastat, phistat)
-    }
-    if(a.order == 0)
-    {
-      allstat = rbind(mustat, sigmastat)
-    }
-
-    info = matrix(0, nrow = (a.order + 2), ncol = (a.order + 2))
-    if(a.order > 0)
-    {
-      info[c(3:(a.order + 2)),c(3:(a.order + 2))] = 1/sigma2*gamma
-      info[1,1]                       = (1/sigma2)*(1 - sum(phi))^2
-    }
-    if(a.order == 0)
-    {
-      info[1,1] = 1/sigma2
-    }
-    info[2,2] = 1/(2*(sigma2^2))
-    svd.info  = svd(info)
-    info.n    = svd.info$u%*%diag(svd.info$d^(-1/2))%*%t(svd.info$v)
-
-    b = n^(-1/2)*info.n%*%allstat
-
-    if(alternatives == "two-sided")
-    {
-      maxstats           = apply(abs(b), 1, max)
-      maxstats           = rbind(maxstats)
-      rownames(maxstats) = "abs.max"
-      if(a.order > 0)
-      {
-        colnames(maxstats) = c("mean","var",paste("phi",c(1:a.order),sep=""))
-      }
-      if(a.order == 0)
-      {
-        colnames(maxstats) = c("mean","var")
-      }
-      points           = apply(abs(b[,-1]), 1, which.max) + 1 #=== this is for two-sided, with the first one trimmed ===#
-      points           = rbind(points)
-      rownames(points) = "abs.max"
-      if(a.order > 0)
-      {
-        colnames(points) = c("mean", "var", paste("phi", c(1:a.order), sep = ""))
-      }
-      if(a.order == 0)
-      {
-        colnames(points) = c("mean","var")
-      }
-    }else if(alternatives == "greater")
-    {
-      maxstats           = apply(b, 1, max)
-      maxstats           = rbind(maxstats)
-      rownames(maxstats) = "max"
-      if(a.order > 0)
-      {
-        colnames(maxstats) = c("mean", "var", paste("phi", c(1:a.order), sep = ""))
-      }
-      if(a.order == 0)
-      {
-        colnames(maxstats) = c("mean", "var")
-      }
-      maxpoints        = apply((b[,-1]), 1, which.max) + 1
-      points           = rbind(maxpoints)
-      rownames(points) = c("max")
-      if(a.order > 0)
-      {
-        colnames(points) = c("mean", "var", paste("phi", c(1:a.order), sep = ""))
-      }
-      if(a.order == 0)
-      {
-        colnames(points) = c("mean", "var")
-      }
-    }else if(alternatives == "lesser")
-    {
-      maxstats           = apply(b, 1, min)
-      maxstats           = rbind(maxstats)
-      rownames(maxstats) = "min"
-      if(a.order > 0)
-      {
-        colnames(maxstats) = c("mean", "var", paste("phi", c(1:a.order), sep = ""))
-      }
-      if(a.order == 0)
-      {
-        colnames(maxstats) = c("mean", "var")
-      }
-      maxpoints        = apply((b[,-1]), 1, which.min) + 1
-      points           = rbind(maxpoints)
-      rownames(points) = c("min")
-      if(a.order > 0)
-      {
-        colnames(points) = c("mean", "var", paste("phi", c(1:a.order), sep = ""))
-      }
-      if(a.order == 0)
-      {
-        colnames(points) = c("mean", "var")
-      }
-    }else
-    {
-      alternatives       = "temporary"
-      supstats           = apply(b, 1, max)
-      infstats           = apply(b, 1, min)
-      maxstats           = supstats - infstats
-      maxstats           = rbind(maxstats)
-      rownames(maxstats) = "diff"
-      if(a.order > 0)
-      {
-        colnames(maxstats) = c("mean", "var", paste("phi", c(1:a.order), sep = ""))
-      }
-      if(a.order == 0)
-      {
-        colnames(maxstats) = c("mean", "var")
-      }
-      maxpoints        = apply((b[,-1]),1, which.max) + 1
-      minpoints        = apply((b[,-1]),1, which.min) + 1
-      abspoints        = apply(abs(b[,-1]), 1, which.max) + 1
-      points           = rbind(maxpoints, minpoints, abspoints)
-      rownames(points) = c("max", "min", "abs.max")
-      if(a.order > 0)
-      {
-        colnames(points) = c("mean", "var", paste("phi", c(1:a.order), sep = ""))
-      }
-      if(a.order == 0)
-      {
-        colnames(points) = c("mean", "var")
-      }
-    }
-    return(list(stats = maxstats, points = points))
+.change_point_test <- function(y, a.order, alternatives = c("two-sided", "greater", "lesser", "temporary"), res = NULL) {
+  if (a.order < 0) stop("a.order must be greater than or equal to 0.")
+  n <- length(y)
+  
+  #=== demeaning ===#
+  y.dem <- y - mean(y, na.rm = TRUE)
+  ar.p <- arima0(y.dem, order = c(a.order, 0, 0), include.mean = TRUE, method = "ML")
+  
+  mu <- mean(y.dem, na.rm = TRUE) #=== this is equal to zero ===#
+  sigma2 <- if (is.null(res)) ar.p$sigma2 else var(res)
+  
+  phi <- if (a.order > 0) ar.p$coef else NULL
+  
+  if (a.order > 0) {
+    gamma <- matrix(NA, ncol = a.order, nrow = a.order)
+    cov <- acf(y, plot = FALSE, type = "covariance")$acf[1:a.order]
+    rownum <- rep(c(1:a.order), a.order)
+    colnum <- rep(c(1:a.order), each = a.order)
+    abdiff <- abs(rownum - colnum) + 1
+    gamma <- matrix(cov[abdiff], ncol = a.order, nrow = a.order)
   }
-
-  ############## change.point function for bootstrapped time series ##############
-
-  change.point.sieve = function(y, a.order, alternatives = c("two-sided", "greater", "lesser", "temporary"), res)
-  {
-    if(a.order < 0) stop("a.order must be greater than or equal to 0.")
-
-    n = length(y)
-
-    ### demeaning ###
-    y.dem = y - mean(y, na.rm = TRUE)
-    ar.p  = arima0(y.dem, order = c(a.order, 0, 0), include.mean = T, method = "ML")
-    # ar.p = ar(y.dem,order=a.order,aic=FALSE) #
-
-    mu     = mean(y.dem, na.rm = TRUE) #== this is equal to zero ==#
-    # sigma2=ar.p$sigma2 #
-    sigma2 = var(res)
-
-    if(a.order > 0)
-    {
-      phi    = ar.p$coef
-      gamma  = matrix(NA, ncol = a.order, nrow = a.order)
-      cov    = acf(y, plot = F, type = "covariance")$acf[1:a.order]
-      rownum = rep(c(1:a.order), a.order)
-      colnum = rep(c(1:a.order), each = a.order)
-      abdiff = abs(rownum - colnum) + 1
-      gamma  = matrix(cov[abdiff], ncol = a.order, nrow = a.order)
-    }
-
-    muvec = double(n)
-    muvec[1] = y.dem[1]
-    for(i in 2:n)
-    {
-      if(a.order > 0)
-      {
-        len      = min(a.order, (i-1))
-        muvec[i] = y.dem[i]-sum(phi[1:len]*y.dem[(i-1):(i-len)])
-      }
-      if(a.order == 0)
-      {
-        muvec[i] = y.dem[i]
-      }
-    }
-
-    if(a.order > 0)
-    {
-      mustat = ((1-sum(phi))/sigma2)*cumsum(muvec)
-    }
-    if(a.order == 0)
-    {
-      mustat = 1/sigma2*cumsum(muvec)
-    }
-
-    sigmastat = -c(1:n)/(2*sigma2) + 1/(2*sigma2^2)*cumsum((muvec^2))
-
-    if(a.order > 0)
-    {
-      phistat = matrix(NA, nrow = a.order, ncol = n)
-
-      for(s in 1:a.order)
-      {
-        phivec.s    = muvec*c(rep(0,s),y.dem[1:(n-s)])
-        phistat.s   = 1/sigma2*cumsum(phivec.s)
-        phistat[s,] = phistat.s
-      }
-    }
-
-    if(a.order > 0)
-    {
-      allstat = rbind(mustat, sigmastat, phistat)
-    }
-    if(a.order == 0)
-    {
-      allstat = rbind(mustat, sigmastat)
-    }
-
-    info = matrix(0, nrow = (a.order+2), ncol = (a.order + 2))
-    if(a.order > 0)
-    {
-      info[c(3:(a.order+2)),c(3:(a.order+2))] = 1/sigma2*gamma
-      info[1,1]                   = (1/sigma2)*(1-sum(phi))^2
-    }
-    if(a.order == 0)
-    {
-      info[1,1] = 1/sigma2
-    }
-    info[2,2] = 1/(2*(sigma2^2))
-    svd.info  = svd(info)
-    info.n    = svd.info$u%*%diag(svd.info$d^(-1/2))%*%t(svd.info$v)
-
-    b = n^(-1/2)*info.n%*%allstat
-
-    if(alternatives == "two-sided")
-    {
-      maxstats           = apply(abs(b), 1, max)
-      maxstats           = rbind(maxstats)
-      rownames(maxstats) = "abs.max"
-      if(a.order > 0)
-      {
-        colnames(maxstats) = c("mean", "var", paste("phi", c(1:a.order), sep = ""))
-      }
-      if(a.order == 0)
-      {
-        colnames(maxstats) = c("mean", "var")
-      }
-      points           = apply(abs(b[,-1]), 1, which.max) + 1 #== this is for two-sided, with the first one trimmed ==#
-      points           = rbind(points)
-      rownames(points) = "abs.max"
-      if(a.order > 0)
-      {
-        colnames(points) = c("mean", "var", paste("phi", c(1:a.order), sep = ""))
-      }
-      if(a.order == 0)
-      {
-        colnames(points) = c("mean", "var")
-      }
-    }else if(alternatives == "greater")
-    {
-      maxstats           = apply(b, 1, max)
-      maxstats           = rbind(maxstats)
-      rownames(maxstats) = "max"
-      if(a.order > 0)
-      {
-        colnames(maxstats) = c("mean", "var", paste("phi", c(1:a.order), sep = ""))
-      }
-      if(a.order == 0)
-      {
-        colnames(maxstats) = c("mean", "var")
-      }
-      maxpoints        = apply((b[,-1]), 1, which.max) + 1
-      points           = rbind(maxpoints)
-      rownames(points) = c("max")
-      if(a.order > 0)
-      {
-        colnames(points) = c("mean", "var", paste("phi", c(1:a.order), sep = ""))
-      }
-      if(a.order == 0)
-      {
-        colnames(points) = c("mean", "var")
-      }
-    }else if(alternatives == "lesser")
-    {
-      maxstats           = apply(b, 1, min)
-      maxstats           = rbind(maxstats)
-      rownames(maxstats) = "min"
-      if(a.order > 0)
-      {
-        colnames(maxstats) = c("mean", "var", paste("phi", c(1:a.order), sep = ""))
-      }
-      if(a.order == 0)
-      {
-        colnames(maxstats) = c("mean", "var")
-      }
-      maxpoints        = apply((b[,-1]), 1, which.min) + 1
-      points           = rbind(maxpoints)
-      rownames(points) = c("min")
-      if(a.order > 0)
-      {
-        colnames(points) = c("mean", "var", paste("phi", c(1:a.order), sep = ""))
-      }
-      if(a.order == 0)
-      {
-        colnames(points) = c("mean", "var")
-      }
-    }else
-    {
-      alternatives       = "temporary"
-      supstats           = apply(b, 1, max)
-      infstats           = apply(b, 1, min)
-      maxstats           = supstats - infstats
-      maxstats           = rbind(maxstats)
-      rownames(maxstats) = "diff"
-      if(a.order > 0)
-      {
-        colnames(maxstats) = c("mean", "var", paste("phi", c(1:a.order), sep = ""))
-      }
-      if(a.order == 0)
-      {
-        colnames(maxstats) = c("mean", "var")
-      }
-      maxpoints        = apply((b[,-1]), 1, which.max) + 1
-      minpoints        = apply((b[,-1]), 1, which.min) + 1
-      abspoints        = apply(abs(b[,-1]), 1, which.max) + 1
-      points           = rbind(maxpoints, minpoints, abspoints)
-      rownames(points) = c("max", "min", "abs.max")
-      if(a.order > 0)
-      {
-        colnames(points) = c("mean", "var", paste("phi", c(1:a.order), sep = ""))
-      }
-      if(a.order == 0)
-      {
-        colnames(points) = c("mean", "var")
-      }
-    }
-    return(list(stats = maxstats, points = points))
-  }
-
-
-  #=== main part of the change.point.boot ===#
-  alternatives = match.arg(alternatives)
-  n            = length(y)
-  y.dem        = y-mean(na.omit(y))
-  ar.p         = arima0(y.dem,order = c(a.order, 0, 0), include.mean = T, method = "ML")
-  if(a.order > 0){phi = ar.p$coef[1:a.order]
-  }
-  if(a.order == 0){phi = 0*ar.p$coef #--- for a.order = 0 ---#
-  }
-
-
-  orig       = change.point(y, a.order, alternatives)
-  origstats  = orig$stats
-  origpoints = orig$points
-
-  B = num.bootstrap
-  crit.type = match.arg(crit.type)
-
-  if(crit.type == "bootstrap"){
-
-    residuals = na.omit(ar.p$residuals) - mean(na.omit(ar.p$residuals))
-
-    bootstats = matrix(NA, nrow = (a.order + 2), ncol = B)
-
-    for(i in 1:B)
-    {
-      e = sample(residuals, size = n + 100, replace = TRUE)
-
-      if(a.order > 0)
-      {
-        y.sim = arima.sim(list(order = c(a.order, 0, 0), ar = phi), n = n+100, innov=e)[101:(n+100)]
-      }
-      if(a.order == 0)
-      {
-        y.sim = e
-      }
-      bootstats[,i] = change.point.sieve(y.sim, a.order, alternatives, e)$stats
-    }
-
-    bootpvals = double((a.order + 2))
-    for(i in 1:(a.order + 2))
-    {
-      if(alternatives == "two-sided")
-      {
-        bootpvals[i]  = length(which(abs(bootstats[i,]) > abs(origstats[i])))/B
-      }
-      if(alternatives == "greater")
-      {
-        bootpvals[i]  = length(which(bootstats[i,] > origstats[i]))/B
-      }
-      if(alternatives == "lesser")
-      {
-        bootpvals[i]  = length(which(bootstats[i,] < origstats[i]))/B
-      }
-      if(alternatives == "temporary")
-      {
-        bootpvals[i] = length(which(bootstats[i,] > origstats[i]))/B
-      }
-    }
-    bootpvals = rbind(bootpvals)
-    rownames(bootpvals) = "p.value"
-    if(a.order > 0)
-    {
-      colnames(bootpvals) = c("mean", "var", paste("phi", c(1:a.order), sep = ""))
-    }
-    if(a.order == 0)
-    {
-      colnames(bootpvals) = c("mean", "var")
-    }
-    return(list(index = origpoints, stats = origstats, p.values = bootpvals))
-  }else{
-    asympvals = double((a.order + 2))
-    for(i in 1:(a.order + 2))
-    {
-      k1   = seq(-1999999, -1, by = 1)
-      k2   = seq(1, 1999999, by = 1)
-      k1sq = k1^2
-      k2sq = k2^2
-      SQtest_stat = origstats[i]^2
-
-      if(alternatives == "greater" || alternatives == "lesser"){
-        eqna          = exp(-2*SQtest_stat)
-        asympvals[i]  = round(eqna,3)
-      }
-      if(alternatives == "two-sided"){
-        eqnb          = sum(((-1)^(k1+1))*exp(-2*SQtest_stat*k1sq))
-        eqnc          = sum(((-1)^(k2+1))*exp(-2*SQtest_stat*k2sq))
-        asympvals[i]  = round((eqnb + eqnc), 3)
-      }
-      if (alternatives == "temporary") {
-        eqnd          = 1 - sum(2*((4*k2sq*SQtest_stat) - 1)*exp(-2*k2sq*SQtest_stat))
-        asympvals[i]  = round(eqnd,3)
-      }
-    }
-    asympvals = rbind(asympvals)
-    rownames(asympvals) = "p.value"
+  
+  muvec <- double(n)
+  muvec[1] <- y.dem[1]
+  for (i in 2:n) {
     if (a.order > 0) {
-      colnames(asympvals) = c("mean", "var", paste("phi", c(1:a.order), sep = ""))
+      len <- min(a.order, (i - 1))
+      muvec[i] <- y.dem[i] - sum(phi[1:len] * y.dem[(i - 1):(i - len)])
+    } else {
+      muvec[i] <- y.dem[i]
     }
-    if (a.order == 0) {
-      colnames(asympvals) = c("mean", "var")
+  }
+  
+  mustat <- if (a.order > 0) {
+    ((1 - sum(phi)) / sigma2) * cumsum(muvec)
+  } else {
+    1 / sigma2 * cumsum(muvec)
+  }
+  
+  sigmastat <- -c(1:n) / (2 * sigma2) + 1 / (2 * sigma2^2) * cumsum((muvec^2))
+  
+  allstat <- if (a.order > 0) {
+    phistat <- matrix(NA, nrow = a.order, ncol = n)
+    for (s in 1:a.order) {
+      phivec.s <- muvec * c(rep(0, s), y.dem[1:(n - s)])
+      phistat.s <- 1 / sigma2 * cumsum(phivec.s)
+      phistat[s, ] <- phistat.s
     }
+    rbind(mustat, sigmastat, phistat)
+  } else {
+    rbind(mustat, sigmastat)
+  }
+  
+  info <- matrix(0, nrow = (a.order + 2), ncol = (a.order + 2))
+  if (a.order > 0) {
+    info[c(3:(a.order + 2)), c(3:(a.order + 2))] <- 1 / sigma2 * gamma
+    info[1, 1] <- (1 / sigma2) * (1 - sum(phi))^2
+  } else {
+    info[1, 1] <- 1 / sigma2
+  }
+  info[2, 2] <- 1 / (2 * (sigma2^2))
+  
+  svd.info <- svd(info)
+  info.n <- svd.info$u %*% diag(svd.info$d^(-1/2)) %*% t(svd.info$v)
+  
+  b <- n^(-1/2) * info.n %*% allstat
+  
+  param_names <- if (a.order > 0) c("mean", "var", paste("phi", 1:a.order, sep = "")) else c("mean", "var")
+  
+  if (alternatives == "two-sided") {
+    maxstats <- apply(abs(b), 1, max)
+    points <- apply(abs(b[, -1]), 1, which.max) + 1
+    stat_names <- "abs.max"
+  } else if (alternatives == "greater") {
+    maxstats <- apply(b, 1, max)
+    points <- apply(b[, -1], 1, which.max) + 1
+    stat_names <- "max"
+  } else if (alternatives == "lesser") {
+    maxstats <- apply(b, 1, min)
+    points <- apply(b[, -1], 1, which.min) + 1
+    stat_names <- "min"
+  } else { # temporary
+    supstats <- apply(b, 1, max)
+    infstats <- apply(b, 1, min)
+    maxstats <- supstats - infstats
+    
+    maxpoints <- apply(b[, -1], 1, which.max) + 1
+    minpoints <- apply(b[, -1], 1, which.min) + 1
+    abspoints <- apply(abs(b[, -1]), 1, which.max) + 1
+    
+    points <- rbind(maxpoints, minpoints, abspoints)
+    rownames(points) <- c("max", "min", "abs.max")
+    colnames(points) <- param_names
+    
+    maxstats <- rbind(maxstats)
+    rownames(maxstats) <- "diff"
+    colnames(maxstats) <- param_names
+    
+    return(list(stats = maxstats, points = points))
+  }
+  
+  maxstats <- rbind(maxstats)
+  rownames(maxstats) <- stat_names
+  colnames(maxstats) <- param_names
+  
+  points <- rbind(points)
+  rownames(points) <- stat_names
+  colnames(points) <- param_names
+  
+  return(list(stats = maxstats, points = points))
+}
+
+GombayCPA_test <- function(y, a.order, alternatives = c("two-sided", "greater", "lesser", "temporary"), crit.type = c("asymptotic", "bootstrap"), num.bootstrap = 1000) {
+  alternatives <- match.arg(alternatives)
+  crit.type <- match.arg(crit.type)
+  n <- length(y)
+  
+  # Original series analysis
+  orig <- .change_point_test(y, a.order, alternatives)
+  origstats <- orig$stats
+  origpoints <- orig$points
+  
+  param_names <- if (a.order > 0) c("mean", "var", paste("phi", 1:a.order, sep = "")) else c("mean", "var")
+  
+  if (crit.type == "bootstrap") {
+    y.dem <- y - mean(na.omit(y))
+    ar.p <- arima0(y.dem, order = c(a.order, 0, 0), include.mean = TRUE, method = "ML")
+    phi <- if (a.order > 0) ar.p$coef[1:a.order] else 0
+    
+    residuals <- na.omit(ar.p$residuals) - mean(na.omit(ar.p$residuals))
+    
+    bootstats <- matrix(NA, nrow = (a.order + 2), ncol = num.bootstrap)
+    
+    for (i in 1:num.bootstrap) {
+      e <- sample(residuals, size = n + 100, replace = TRUE)
+      
+      y.sim <- if (a.order > 0) {
+        arima.sim(list(order = c(a.order, 0, 0), ar = phi), n = n + 100, innov = e)[101:(n + 100)]
+      } else {
+        e[1:n] # Assuming e should be same length as y
+      }
+      bootstats[, i] <- .change_point_test(y.sim, a.order, alternatives, res = e)$stats
+    }
+    
+    bootpvals <- double((a.order + 2))
+    for (i in 1:(a.order + 2)) {
+      if (alternatives == "two-sided") {
+        bootpvals[i] <- mean(abs(bootstats[i, ]) > abs(origstats[i]))
+      } else if (alternatives == "greater") {
+        bootpvals[i] <- mean(bootstats[i, ] > origstats[i])
+      } else if (alternatives == "lesser") {
+        bootpvals[i] <- mean(bootstats[i, ] < origstats[i])
+      } else { # temporary
+        bootpvals[i] <- mean(bootstats[i, ] > origstats[i])
+      }
+    }
+    
+    bootpvals <- rbind(bootpvals)
+    rownames(bootpvals) <- "p.value"
+    colnames(bootpvals) <- param_names
+    return(list(index = origpoints, stats = origstats, p.values = bootpvals))
+    
+  } else { # asymptotic
+    asympvals <- double((a.order + 2))
+    for (i in 1:(a.order + 2)) {
+      SQtest_stat <- origstats[i]^2
+      
+      if (alternatives == "greater" || alternatives == "lesser") {
+        # P(sup|W(t)| > x) approx exp(-2x^2)
+        eqna <- exp(-2 * SQtest_stat)
+        asympvals[i] <- round(eqna, 3)
+      } else if (alternatives == "two-sided") {
+        # More complex series for two-sided test
+        k <- 1:100 # Truncate series for efficiency
+        eqnb <- sum(((-1)^(k + 1)) * exp(-2 * SQtest_stat * k^2))
+        asympvals[i] <- round(4 * eqnb, 3) # approximation
+      } else { # temporary
+        # P(sup W(t) - inf W(t) > x)
+        k <- 1:100 # Truncate series for efficiency
+        eqnd <- sum(2 * ((4 * k^2 * SQtest_stat) - 1) * exp(-2 * k^2 * SQtest_stat))
+        asympvals[i] <- round(1 - eqnd, 3)
+      }
+    }
+    
+    asympvals <- rbind(asympvals)
+    rownames(asympvals) <- "p.value"
+    colnames(asympvals) <- param_names
     return(list(index = origpoints, stats = origstats, p.values = asympvals))
   }
 }
