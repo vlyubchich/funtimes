@@ -64,7 +64,7 @@ r_crit <- function(n,
     if (length(n) == 0L)
         stop("All values of n are < 4.")
 
-    alpha <- 1 - conf.level
-    t2 <- qt(p = 1 - alpha/2, df = n - 2)^2
-    sqrt(t2 / (n - 2 + t2))
+    significance_level <- 1 - conf.level
+    t_squared <- qt(p = 1 - significance_level/2, df = n - 2)^2
+    sqrt(t_squared / (n - 2 + t_squared))
 }
