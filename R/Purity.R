@@ -83,6 +83,28 @@
 #' clusters <- sample(1:3, length(classes), replace = TRUE)
 #' purity(classes, clusters)
 #' 
+.resolve_purity_tie <- function(contingency_table, max_indices) {
+    # Helper function to resolve ties when multiple pairs have the same max frequency.
+    # It chooses the pair where the cluster has the smallest second-most-frequent class,
+    # thereby maximizing the chances for other classes to be matched well.
+    if (any(dim(contingency_table) < 2)) {
+        return(max_indices[1, , drop = FALSE])
+    }
+    
+    # For each potential tied cluster, find the value of the second-most frequent class.
+    second_max_values <- sapply(1:nrow(max_indices), function(j) {
+        cluster_col_index <- max_indices[j, 2]
+        sorted_col <- sort(contingency_table[, cluster_col_index], decreasing = TRUE)
+        # If the column has fewer than 2 non-zero values, the second max is 0.
+        if (length(sorted_col) < 2) return(0)
+        return(sorted_col[2])
+    })
+    
+    # Choose the tie that has the smallest second-max value.
+    best_tie_index <- which.min(second_max_values)
+    return(max_indices[best_tie_index, , drop = FALSE])
+}
+
 purity <- function(classes, clusters) 
 {
   if (is.null(classes) || is.null(clusters))
@@ -97,29 +119,39 @@ purity <- function(classes, clusters)
     stop("classes and clusters must not contain missing values.")
 
   ClassLabels <- ClusterLabels <- ClusterSize <- numeric()
-  tmp <- table(classes, clusters)
+  contingency_table <- table(classes, clusters)
   i <- 1
-  while (min(dim(tmp)) > 0) {
-    ind <- which(tmp == max(tmp), arr.ind = TRUE)
-    if (nrow(ind) > 1) { #several equal max values
-      if (any(dim(tmp) < 2)) {
-        ind <- ind[1,]
-      } else {
-        #for each class with equal max, select the second max and choose minimum of that
-        ind <- ind[which.min(sapply(1:nrow(ind), function(j) 
-          sort(tmp[,ind[j,2]], decreasing = TRUE)[2])), ]
-      }
+  
+  # Iteratively find the best class-cluster mapping
+  while (min(dim(contingency_table)) > 0) {
+    max_val <- max(contingency_table)
+    max_indices <- which(contingency_table == max_val, arr.ind = TRUE)
+    
+    if (nrow(max_indices) > 1) { # Resolve ties
+        best_index <- .resolve_purity_tie(contingency_table, max_indices)
+    } else {
+        best_index <- max_indices
     }
-    ClassLabels[i] <- rownames(tmp)[ind[1]]
-    ClusterLabels[i] <- colnames(tmp)[ind[2]]
-    ClusterSize[i] <- max(tmp)
-    tmp <- tmp[-which(rownames(tmp) == ClassLabels[i]), 
-               -which(colnames(tmp) == ClusterLabels[i]), drop = FALSE]
-    # Reevaluate the remaining table to remove all-zero rows or columns, if any
-    tmp <- tmp[rowSums(tmp) != 0, , drop = FALSE]
-    tmp <- tmp[, colSums(tmp) != 0, drop = FALSE]
+    
+    # Assign the best pair
+    ClassLabels[i] <- rownames(contingency_table)[best_index[1]]
+    ClusterLabels[i] <- colnames(contingency_table)[best_index[2]]
+    ClusterSize[i] <- max_val
+    
+    # Remove the assigned class and cluster from the table for the next iteration
+    contingency_table <- contingency_table[
+        -which(rownames(contingency_table) == ClassLabels[i]), 
+        -which(colnames(contingency_table) == ClusterLabels[i]), 
+        drop = FALSE
+    ]
+    
+    # Re-evaluate the remaining table to remove all-zero rows or columns, if any
+    contingency_table <- contingency_table[rowSums(contingency_table) > 0, , drop = FALSE]
+    contingency_table <- contingency_table[, colSums(contingency_table) > 0, drop = FALSE]
+    
     i <- i + 1
   }
+  
   out <- data.frame(ClassLabels, ClusterLabels, ClusterSize)
   out <- out[order(out$ClassLabels),]
   list(pur = sum(ClusterSize)/length(classes), out = out)
