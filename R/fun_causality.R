@@ -66,9 +66,9 @@ caustests <- function(efull, eres) {
     dt <- efull^2 - eres^2
     mlmt <- lm(dt ~ 1)
     # MSEcor test (or MSEreg)
-    tmp1 <- efull - eres
-    tmp2 <- efull + eres
-    mlm <- lm(tmp1 ~ tmp2 - 1)
+    diff_res <- efull - eres
+    sum_res <- efull + eres
+    mlm <- lm(diff_res ~ sum_res - 1)
     # ENC-NEW from (3) in Clark and McCracken (2001)
     P <- length(efull)
     L2full <- sum(efull^2)
@@ -78,8 +78,12 @@ caustests <- function(efull, eres) {
     # OOS-F from (3) in McCracken (2007)
     OOSF <- -P * sum(dt) / L2full
     # output
-        c(MSEt = summary(mlmt)$coefficients[1, "t value"],
-            MSEcor = summary(mlm)$coefficients[1, "t value"],
-      OOSF = OOSF,
-      EN = EN)
+    stats <- c(
+        summary(mlmt)$coefficients[1, "t value"],
+        summary(mlm)$coefficients[1, "t value"],
+        OOSF,
+        EN
+    )
+    names(stats) <- c("MSEt", "MSEcor", "OOSF", "EN")
+    stats
 }
