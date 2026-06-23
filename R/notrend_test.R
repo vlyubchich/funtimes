@@ -161,72 +161,75 @@ notrend_test <- function(x, B = 1000, test = c("t", "MK", "WAVK"),
         if (factor.length == "adaptive.selection" && length(kn) < 3)
             stop("number of possible windows is not enough for adaptive selection. Change parameters 'q' and/or 'j'.")
     }
-    ### Function.
-    Y <- array(data = NA, c(n, B))
-    t <- c(1:n)/n
+    
+    ### Sieve bootstrap procedure.
     pheta <- ARest(x, ar.order = ar.order, ar.method = ar.method, ic = ic)
     if (length(pheta) > 0) {
-        names(pheta) <- paste(rep("phi_", length(pheta)), c(1:length(pheta)), sep = "")
+        names(pheta) <- paste(rep("phi_", length(pheta)), 1:length(pheta), sep = "")
         tmp <- stats::filter(x, pheta, sides = 1)
         Z <- x[(length(pheta) + 1):n] - tmp[length(pheta):(n - 1)]
-        for (i in 1:B) {
-            e <- sample(Z, size = n, replace = TRUE)
-            Y[ ,i] <- arima.sim(list(order = c(length(pheta), 0, 0), ar = pheta), n = n, innov = e)
-        }
     } else {
+        pheta <- numeric(0)
         Z <- x
-        for (i in 1:B) {
-            Y[ ,i] <- sample(Z, size = n, replace = TRUE)
-        }
     }
-    Z <- na.omit(Z) - mean(na.omit(Z))
+    Z_centered <- na.omit(Z) - mean(na.omit(Z))
+    
+    # Generate bootstrap samples in a single block
+    Y <- vapply(1:B, function(i) {
+        e <- sample(Z_centered, size = n, replace = TRUE)
+        arima.sim(list(order = c(length(pheta), 0, 0), ar = pheta), n = n, innov = e)
+    }, numeric(n))
+
     ESTIMATE <- list(length(pheta), pheta)
     names(ESTIMATE) <- c("AR_order", "AR_coefficients")
-    #If Student's t-test is used
+    
+    t_seq <- 1:n / n
+    
+    # Perform the chosen test
     if (test == "t") {
         METHOD <- "Sieve-bootstrap Student's t-test for a linear trend"
         ALTERNATIVE <- "linear trend."
-        STATISTIC <- summary(lm(x ~ t))$coefficients["t", "t value"]
+        STATISTIC <- summary(lm(x ~ t_seq))$coefficients["t_seq", "t value"]
         names(STATISTIC) <- "Student's t value"
-        boot.stat <- sapply(1:dim(Y)[2], function(i) summary(lm(Y[,i] ~ t))$coefficients["t", "t value"])
-    }
-    #If Mann--Kendall's test is used
-    if (test == "MK") {
+        boot.stat <- apply(Y, 2, function(y_col) summary(lm(y_col ~ t_seq))$coefficients["t_seq", "t value"])
+    } else if (test == "MK") {
         METHOD <- "Sieve-bootstrap Mann--Kendall's trend test"
         ALTERNATIVE <- "monotonic trend."
         STATISTIC <- mann_kendall_tau(x)
         names(STATISTIC) <- "Mann--Kendall's tau"
-        boot.stat <- sapply(1:dim(Y)[2], function(i) mann_kendall_tau(Y[,i]))
-    }
-    #If WAVK test is used
-    if (test == "WAVK") {
+        boot.stat <- apply(Y, 2, mann_kendall_tau)
+    } else { # WAVK test
         METHOD <- "Sieve-bootstrap WAVK trend test"
         ALTERNATIVE <- "(non-)monotonic trend."
         if (length(kn) < 3) {
             kn_opt <- kn[1]
-            boot.stat <- sapply(1:dim(Y)[2], function(j) WAVK(Y[,j], kn_opt)$Tns)
+            boot.stat <- apply(Y, 2, function(y_col) WAVK(y_col, kn_opt)$Tns)
         } else {
-            s <- array(data = NA, c(length(kn), B))
-            for (i in 1:length(kn)) {
-                s[i,] <- sapply(1:dim(Y)[2], function(j) WAVK(Y[,j], kn[i])$Tns)
-            }
-            s <- t(apply(s, 1, sort))
-            distance <- sapply(1:(length(kn) - 1), function(x) dist(s[x:(x + 1),]))
-            argmin <- which.min(distance)
+            s <- vapply(kn, function(k_i) apply(Y, 2, function(y_col) WAVK(y_col, k_i)$Tns), numeric(B))
+            s_sorted <- apply(s, 2, sort) # Sort each column (for each kn)
+            distances <- vapply(1:(ncol(s_sorted) - 1), function(i) dist(t(s_sorted[, i:(i + 1)])), numeric(1))
+            argmin <- which.min(distances)
             kn_opt <- kn[argmin]
-            boot.stat <- s[argmin,]
+            boot.stat <- sort(s[, argmin]) # Use the sorted stats for the optimal window
         }
         STATISTIC <- WAVK(x, kn_opt)$Tns
         names(STATISTIC) <- "WAVK test statistic"
         PARAMETER <- kn_opt
         names(PARAMETER) <- "moving window"
     }
+    
     P.VALUE <- mean(abs(boot.stat) >= abs(STATISTIC))
+    
+    # Construct the htest object
+    result <- list(method = METHOD,
+                   data.name = DNAME,
+                   statistic = STATISTIC,
+                   p.value = P.VALUE,
+                   alternative = ALTERNATIVE,
+                   estimate = ESTIMATE)
     if (test == "WAVK") {
-        structure(list(method = METHOD, data.name = DNAME, statistic = STATISTIC, p.value = P.VALUE,
-                       alternative = ALTERNATIVE, estimate = ESTIMATE, parameter = PARAMETER), class = "htest")
-    } else {
-        structure(list(method = METHOD, data.name = DNAME, statistic = STATISTIC, p.value = P.VALUE,
-                       alternative = ALTERNATIVE, estimate = ESTIMATE), class = "htest")
+        result$parameter <- PARAMETER
     }
+    
+    structure(result, class = "htest")
 }
