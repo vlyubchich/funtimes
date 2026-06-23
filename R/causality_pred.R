@@ -1,65 +1,6 @@
 #' @importFrom stats embed lm.fit var
 #' @importFrom parallel detectCores makeCluster stopCluster parSapply clusterSetRNGStream
 
-.select_lags_ar <- function(y, cause, dep, n_train, lag.max, lag.restrict, p.free, k) {
-    if (length(lag.max) == 1) {
-        lag.max <- rep(lag.max, 2)
-    }
-    maxl <- max(lag.max)
-    if (lag.restrict >= lag.max[2]) {
-        warning("lag.restrict >= lag.max or lag.max[2]. Using lag.restrict = 0 instead.")
-        lag.restrict <- 0
-    }
-
-    # Embed both X and Y up to maxl to have the results of the same length
-    lagX_train <- if (lag.restrict > 0) {
-        embed(y[1:n_train, cause], maxl + 1)[, -c(1:(lag.restrict + 1)), drop = FALSE]
-    } else {
-        embed(y[1:n_train, cause], maxl + 1)[, -1, drop = FALSE]
-    }
-    lagY_train <- embed(y[1:n_train, dep], maxl + 1)
-
-    # Information criterion for the model
-    if (p.free) {
-        best_ic <- Inf
-        p <- c(NA, NA)
-        for (p1 in 1:lag.max[1]) {
-            for (p2 in (lag.restrict + 1):lag.max[2]) {
-                fit <- stats::lm.fit(x = cbind(1,
-                                               lagY_train[, 2:(p1 + 1), drop = FALSE],
-                                               lagX_train[, 1:(p2 - lag.restrict), drop = FALSE]),
-                                     y = lagY_train[, 1])
-                # see stats:::extractAIC.lm() but omit the scale option
-                nfit <- length(fit$residuals)
-                edf <- nfit - fit$df.residual
-                RSS <- sum(fit$residuals^2, na.rm = TRUE)
-                dev <- nfit * log(RSS / nfit)
-                fit_ic <- dev + k * edf
-                if (fit_ic < best_ic) {
-                    best_ic <- fit_ic
-                    p <- c(p1, p2)
-                }
-            }
-        }
-    } else {
-        IC <- sapply((lag.restrict + 1):lag.max[2], function(s) {
-            fit <- stats::lm.fit(x = cbind(1,
-                                           lagY_train[, 2:(s + 1), drop = FALSE],
-                                           lagX_train[, 1:(s - lag.restrict), drop = FALSE]),
-                                 y = lagY_train[, 1])
-            # see stats:::extractAIC.lm; but omit the scale option
-            nfit <- length(fit$residuals)
-            edf <- nfit - fit$df.residual
-            RSS <- sum(fit$residuals^2, na.rm = TRUE)
-            dev <- nfit * log(RSS/nfit)
-            dev + k * edf
-        })
-        p_val <- which.min(IC) + lag.restrict
-        p <- rep(p_val, 2)
-    }
-    return(p)
-}
-
 .get_recursive_fcsts <- function(dy, lagY, lagX, p, lag.restrict, n_train, n_test, maxp) {
     sapply(1:n_test - 1, function(i) {
         train_idx <- 1:(n_train - maxp + i)
