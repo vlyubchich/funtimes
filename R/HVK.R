@@ -63,24 +63,25 @@ HVK <- function(X, m1 = NULL, m2 = NULL, ar.order = 1) {
     if (any(is.na(c(m1, m2))) || m1 < 1 || m2 < m1 || m2 >= n)
         stop("m1 and m2 must satisfy 1 <= m1 <= m2 < length(X).")
 
-    m <- c(m1:m2)
-    tmp <- sapply(m, function(x) diff(X, lag = x))
-    tmp <- sapply(1:length(tmp), function(x) sum(tmp[[x]]^2))
-    autocovar0 <- sum(tmp/(2*(n - m)))/(m2 - m1 + 1)
-    tmp <- sapply(c(1:ar.order), function(x) diff(X, lag = x))
-    if (ar.order == 1) {
-        tmp <- sum(tmp^2)
-    } else {
-        tmp <- sapply(1:length(tmp), function(x) sum(tmp[[x]]^2))
-    }
-    autocovarj <- autocovar0 - tmp/(2*(n - c(1:ar.order)))
+    # Estimate autocovariance at lag 0 (autocovar0)
+    m_lags <- m1:m2
+    diffs_m <- lapply(m_lags, function(x) diff(X, lag = x))
+    sum_sq_diffs_m <- sapply(diffs_m, function(d) sum(d^2))
+    autocovar0 <- sum(sum_sq_diffs_m / (2 * (n - m_lags))) / (m2 - m1 + 1)
+    
+    # Estimate autocovariances for lags 1 to ar.order
+    lags_j <- 1:ar.order
+    diffs_j <- lapply(lags_j, function(x) diff(X, lag = x))
+    sum_sq_diffs_j <- sapply(diffs_j, function(d) sum(d^2))
+    autocovarj <- autocovar0 - sum_sq_diffs_j / (2 * (n - lags_j))
+    
     autocovar <- c(autocovar0, autocovarj)
-    G <- matrix(NA, ar.order, ar.order)
-    for (i in 1:(ar.order)) {
-        for (j in 1:(ar.order)) {
-            G[i,j] <- autocovar[abs(i - j) + 1]
-        }
-    }
+    
+    # Create Toeplitz matrix of autocovariances
+    G <- stats::toeplitz(autocovar[1:ar.order])
+    
+    # Solve Yule-Walker equations
     coeffs <- solve(G) %*% autocovar[2:(ar.order + 1)]
+    
     return(as.vector(coeffs))
 }
