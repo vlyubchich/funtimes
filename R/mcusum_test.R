@@ -103,60 +103,44 @@ mcusum_test <- function(e, k,
     phi <- ARest(e, ...)
     MTobs <- MTfun(e, k = k, m = m)
     if (length(phi) > 0) {
-        e <-  as.vector(embed(e, length(phi) + 1L) %*% c(1, -phi))
+        e <- as.vector(embed(e, length(phi) + 1L) %*% c(1, -phi))
         e <- e - mean(e)
     }
-    if (ksm) { #use e from a smoothed distribution of e
-        ksm.arg$x <- e #append x to the arguments of the density function
-        bw <- do.call(stats::density, ksm.arg) #estimate bandwidth
-        bw <- bw$bw
-        innovfun <- function(e, T, bw) {
-            rnorm(T, mean = sample(e, size = T, replace = TRUE), sd = bw)
-        }
-    } else { #use bootstrapped e
+    
+    innovfun <- if (ksm) {
+        ksm.arg$x <- e
+        bw <- do.call(stats::density, ksm.arg)$bw
+        function(e_res, len, bwidth) rnorm(len, mean = sample(e_res, size = len, replace = TRUE), sd = bwidth)
+    } else {
         bw <- NULL
-        innovfun <- function(e, T, bw) {
-            sample(e, size = T, replace = TRUE)
-        }
+        function(e_res, len, bwidth) sample(e_res, size = len, replace = TRUE)
     }
+    
+    # Helper function to generate one bootstrap replicate of the test statistic
+    .get_boot_stat <- function() {
+        innov <- innovfun(e, T, bw)
+        series_sim <- as.vector(arima.sim(n = T, model = list(order = c(length(phi), 0, 0), ar = phi), innov = innov))
+        MTfun(series_sim, k = k, m = m)$MT
+    }
+    
     if (shortboot) {
-        # Use a heuristic to reduce number of bootstrap replicates
-        # needed to retain null hypothesis:
-        # E.g. when using B = 1000 and 100 out of the first 250
-        # bootstrapped statistics are >= the one obtained from the
-        # actual sample, then the p-value must be >= 0.1 even if
-        # the remaining 750 bootstrapped values were smaller.
-        B_part <- ceiling(B/4) # use a quarter of B, but could also be less/more
-        sig <- ceiling(B/10) # portion of bootstraps that has to be bigger than original for alpha = 0.1
-        thr <- sig/B_part # prior threshold to discard time series which won't reach significant threshold anymore
-        MTboot <- sapply(1:B_part, function(b)
-            MTfun(as.vector(arima.sim(T, model = list(order = c(length(phi), 0, 0), ar = phi),
-                                      innov = innovfun(e, T, bw))),
-                  k = k, m = m)$MT
-        )
+        B_part <- ceiling(B / 4)
+        sig <- ceiling(B / 10)
+        thr <- sig / B_part
+        MTboot <- replicate(B_part, .get_boot_stat())
+        
         if (mean(MTboot >= MTobs$MT) < thr) {
-            MTboot2 <- sapply(1:(B - B_part), function(b)
-                MTfun(as.vector(arima.sim(T, model = list(order = c(length(phi), 0, 0), ar = phi),
-                                          innov = innovfun(e, T, bw))),
-                      k = k, m = m)$MT
-            )
+            MTboot2 <- replicate(B - B_part, .get_boot_stat())
             MTboot <- c(MTboot, MTboot2)
-            # p-value formula from Davison and Hinkley (1997), p. 141:
             pval <- (1 + sum(MTboot >= MTobs$MT)) / (B + 1)
         } else {
-            # In this situation, we only know that the test is not significant:
             pval <- 999.0
         }
-
-    } else { # no shortening of bootstrap
-        MTboot <- sapply(1:B, function(b)
-            MTfun(as.vector(arima.sim(T, model = list(order = c(length(phi), 0, 0), ar = phi),
-                                      innov = innovfun(e, T, bw))),
-                  k = k, m = m)$MT
-        )
-        # p-value formula from Davison and Hinkley (1997), p. 141:
+    } else {
+        MTboot <- replicate(B, .get_boot_stat())
         pval <- (1 + sum(MTboot >= MTobs$MT)) / (B + 1)
     }
+    
     STATISTIC <- MTobs$MT
     names(STATISTIC) <- "M_T"
     PARAMETER <- length(MTobs$k)
